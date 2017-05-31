@@ -7,6 +7,7 @@ import (
 
 	goflow "github.com/trustmaster/goflow"
 	"github.com/wanliu/components"
+	"github.com/wanliu/flow/builitn"
 )
 
 type Package struct {
@@ -50,6 +51,20 @@ func LoadPackage(filename string) (*Package, error) {
 	}
 
 	pk.componentList = componentList()
+
+	for name, _ := range pk.componentList {
+		// goflow.Register(name, constructor)
+		pk.Components = append(pk.Components, name)
+	}
+
+	return &pk, nil
+}
+
+func LoadBuilitnPackage() (*Package, error) {
+	var pk Package
+	pk.Name = builitn.Info.Name
+	pk.Version = builitn.Info.Version
+	pk.componentList = builitn.ComponentList()
 
 	for name, _ := range pk.componentList {
 		// goflow.Register(name, constructor)

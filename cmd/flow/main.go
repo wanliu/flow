@@ -29,6 +29,15 @@ func main() {
 
 	switch kingpin.Parse() {
 	case "run":
+
+		if bpk, err := flow.LoadBuilitnPackage(); err != nil {
+			log.Fatalf("load builitn package failed: %s", err)
+		} else {
+			if err := bpk.RegisterComponents(); err != nil {
+				log.Fatalf("load builitn  components failed: %s", err)
+			}
+		}
+
 		rt, err := flow.LoadRuntime(*rtfile)
 
 		if err != nil {
@@ -46,14 +55,21 @@ func main() {
 		graph := goflow.ParseJSON(buf)
 
 		log.Printf("graph %# v", pretty.Formatter(graph))
+
+		start := make(chan string)
+		out := make(chan string)
+
+		graph.SetInPort("In", start)
+		graph.SetOutPort("Out", out)
+		// out := make(chan int)
 		goflow.RunNet(graph)
 
 		// Wait for the network setup
 		<-graph.Ready()
 
 		// Close start to halt it normally
-		// close(start)
-
+		close(start)
+		<-out
 		<-graph.Wait()
 
 	case "register":
