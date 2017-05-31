@@ -38,46 +38,70 @@ func LoadRuntime(filename string) (*Runtime, error) {
 		return nil, err
 	}
 
+	rt.LoadPackages()
 	return &rt, nil
 }
 
-func (rt *Runtime) Register(pkgfile string) error {
+func (rt *Runtime) Register(pkgfile string) (*Package, error) {
 	pkg, err := LoadPackage(pkgfile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for i, pk := range rt.Packages {
 		if pkg.Name == pk.Name {
 			v1, err := semver.NewConstraint(pk.Version)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			v2, err := semver.NewVersion(pkg.Version)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			if !v1.Check(v2) {
-				return fmt.Errorf("invalid version %s don't match %s", pk.Version, pkg.Version)
+				return nil, fmt.Errorf("invalid version %s don't match %s", pk.Version, pkg.Version)
 			}
 
 			rt.Packages[i] = *pkg
-			return nil
+			return pkg, nil
 		}
 	}
 	rt.Packages = append(rt.Packages, *pkg)
-	return nil
+	return pkg, nil
 }
 
 func (rt *Runtime) SaveTo(filename string) error {
 	var buf []byte
 
-	buf, err := json.Marshal(rt)
+	buf, err := json.MarshalIndent(rt, "", "  ")
 	if err != nil {
 		return err
 	}
 
 	return ioutil.WriteFile(filename, buf, 0644)
+}
+
+func (rt *Runtime) LoadPackages() error {
+	for i, pkg := range rt.Packages {
+		pk, err := LoadPackage(pkg.Path)
+		if err != nil {
+			return err
+		}
+
+		rt.Packages[i] = *pk
+	}
+
+	return nil
+}
+
+func (rt *Runtime) LoadComponents() error {
+	for _, pkg := range rt.Packages {
+		if err := pkg.RegisterComponents(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

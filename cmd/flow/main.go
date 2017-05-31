@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 
+	"github.com/kr/pretty"
 	goflow "github.com/trustmaster/goflow"
 	"github.com/wanliu/flow"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
@@ -27,25 +29,47 @@ func main() {
 
 	switch kingpin.Parse() {
 	case "run":
+		rt, err := flow.LoadRuntime(*rtfile)
+
+		if err != nil {
+			log.Fatalf("load runtime failed: %s", err)
+		}
+
+		if err := rt.LoadComponents(); err != nil {
+			log.Fatalf("load components failed: %s", err)
+		}
+
 		buf, err := ioutil.ReadFile(*runfile)
 		if err != nil {
 			log.Fatalf("open run file failed: %s", err)
 		}
 		graph := goflow.ParseJSON(buf)
-		log.Printf("%#v", graph)
+
+		log.Printf("graph %# v", pretty.Formatter(graph))
+		goflow.RunNet(graph)
+
+		// Wait for the network setup
+		<-graph.Ready()
+
+		// Close start to halt it normally
+		// close(start)
+
+		<-graph.Wait()
+
 	case "register":
 		rt, err := flow.LoadRuntime(*rtfile)
 		if err != nil {
 			log.Fatalf("load runtime failed: %s", err)
 		}
-
-		if err := rt.Register(*pkgfile); err != nil {
+		pkg, err := rt.Register(*pkgfile)
+		if err != nil {
 			log.Fatalf("register pkgfile failed: %s", err)
 		}
 
 		if err := rt.SaveTo(*rtfile); err != nil {
 			log.Fatalf("save to runtime:%s failed: %s", *rtfile, err)
 		}
+		fmt.Printf("Installed component's package '%s#%s' successful\n", pkg.Name, pkg.Version)
 	}
 }
 

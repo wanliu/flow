@@ -2,6 +2,7 @@ package flow
 
 import (
 	"fmt"
+	"log"
 	"plugin"
 
 	goflow "github.com/trustmaster/goflow"
@@ -29,13 +30,14 @@ func LoadPackage(filename string) (*Package, error) {
 		return nil, err
 	}
 
-	pkg, ok := v.(components.Package)
+	pkg, ok := v.(*components.Package)
 	if !ok {
 		return nil, fmt.Errorf("invalid Info Struct")
 	}
 
 	pk.Name = pkg.Name
 	pk.Version = pkg.Version
+	pk.Path = filename
 
 	v, err = p.Lookup("ComponentList")
 	if err != nil {
@@ -59,6 +61,7 @@ func LoadPackage(filename string) (*Package, error) {
 
 func (pk *Package) RegisterComponents() error {
 	for name, constructor := range pk.componentList {
+		log.Printf("register component: %s", name)
 		goflow.Register(name, constructor)
 		// pk.Components = append(pk.Components, name)
 	}
