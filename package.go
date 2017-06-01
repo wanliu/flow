@@ -5,9 +5,9 @@ import (
 	"log"
 	"plugin"
 
-	goflow "github.com/trustmaster/goflow"
 	"github.com/wanliu/components"
 	"github.com/wanliu/flow/builitn"
+	goflow "github.com/wanliu/goflow"
 )
 
 type Package struct {

@@ -1,9 +1,10 @@
 package builitn
 
 import (
+	"io/ioutil"
 	"log"
 
-	flow "github.com/trustmaster/goflow"
+	flow "github.com/wanliu/goflow"
 )
 
 type GetElement struct {
@@ -21,6 +22,14 @@ type Output struct {
 	Out     chan<- string
 }
 
+type ReadFile struct {
+	flow.Component
+	Read <-chan string
+	// Encoding <-chan string
+	Out   chan<- string
+	Error chan<- error
+}
+
 func NewGetElement() interface{} {
 	return new(GetElement)
 }
@@ -33,13 +42,19 @@ func NewOutput() interface{} {
 	return new(Output)
 }
 
-// func (o *Output) Init() {
-// 	o.In = make(<-chan string)
-// 	o.Options = make(<-chan map[string]interface{})
-// 	o.Out = make(chan<- string)
-// }
+func NewReadFile() interface{} {
+	return new(ReadFile)
+}
 
 func (o *Output) OnIn(msg string) {
 	log.Printf("output: %s", msg)
 	o.Out <- msg
+}
+
+func (rf *ReadFile) OnRead(filename string) {
+	if buf, err := ioutil.ReadFile(filename); err != nil {
+		rf.Error <- err
+	} else {
+		rf.Out <- string(buf)
+	}
 }

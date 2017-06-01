@@ -1,0 +1,2 @@
+INPORT=Read.IN:FILENAME
+Read(ReadFile) OUT -> IN Display(Output)

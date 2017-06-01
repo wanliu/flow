@@ -8,10 +8,10 @@ import (
 	"github.com/Masterminds/semver"
 )
 
-type Runtime struct {
-	Name        string
-	RuntimeType string
-	Packages    []Package
+type Config struct {
+	Name       string
+	ConfigType string
+	Packages   []Package
 }
 
 type PType int
@@ -21,12 +21,12 @@ const (
 	JavascriptType
 )
 
-func NewRuntime() *Runtime {
-	return &Runtime{}
+func NewConfig() *Config {
+	return &Config{}
 }
 
-func LoadRuntime(filename string) (*Runtime, error) {
-	var rt Runtime
+func LoadConfig(filename string) (*Config, error) {
+	var rt Config
 	buf, err := ioutil.ReadFile(filename)
 
 	if err != nil {
@@ -42,7 +42,7 @@ func LoadRuntime(filename string) (*Runtime, error) {
 	return &rt, nil
 }
 
-func (rt *Runtime) Register(pkgfile string) (*Package, error) {
+func (rt *Config) Register(pkgfile string) (*Package, error) {
 	pkg, err := LoadPackage(pkgfile)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (rt *Runtime) Register(pkgfile string) (*Package, error) {
 	return pkg, nil
 }
 
-func (rt *Runtime) SaveTo(filename string) error {
+func (rt *Config) SaveTo(filename string) error {
 	var buf []byte
 
 	buf, err := json.MarshalIndent(rt, "", "  ")
@@ -83,7 +83,7 @@ func (rt *Runtime) SaveTo(filename string) error {
 	return ioutil.WriteFile(filename, buf, 0644)
 }
 
-func (rt *Runtime) LoadPackages() error {
+func (rt *Config) LoadPackages() error {
 	for i, pkg := range rt.Packages {
 		pk, err := LoadPackage(pkg.Path)
 		if err != nil {
@@ -96,7 +96,7 @@ func (rt *Runtime) LoadPackages() error {
 	return nil
 }
 
-func (rt *Runtime) LoadComponents() error {
+func (rt *Config) LoadComponents() error {
 	for _, pkg := range rt.Packages {
 		if err := pkg.RegisterComponents(); err != nil {
 			return err

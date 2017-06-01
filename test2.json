@@ -1,0 +1,39 @@
+{
+  "processes": {
+    "Read": {
+      "component": "ReadFile"
+    },
+    "Display": {
+      "component": "Output"
+    }
+  },
+  "connections": [
+    {
+      "src": {
+        "process": "Read",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Display",
+        "port": "In"
+      }
+    }
+  ],
+  "inports": {
+    "FILENAME": {
+      "process": "Read",
+      "port": "In"
+    }
+  },
+ "exports": [
+    {
+      "private": "Read.Read",
+      "public": "Start"
+    },
+    {
+      "private": "Display.Out",
+      "public": "Out"
+    }
+  ],  
+  "caseSensitive": true
+}
