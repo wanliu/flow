@@ -72,6 +72,21 @@ func (rt *Config) Register(pkgfile string) (*Package, error) {
 	return pkg, nil
 }
 
+func (rt *Config) Deregister(pkgfile string) (*Package, error) {
+	pkg, err := LoadPackage(pkgfile)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, pk := range rt.Packages {
+		if pkg.Name == pk.Name {
+			rt.Packages = append(rt.Packages[0:i], rt.Packages[i:]...)
+			return pkg, nil
+		}
+	}
+	return pkg, fmt.Errorf("not found this package")
+}
+
 func (rt *Config) SaveTo(filename string) error {
 	var buf []byte
 

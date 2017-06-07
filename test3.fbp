@@ -1,0 +1,5 @@
+'somefile.txt' -> SOURCE Read(ReadFile:main)
+Read() OUT -> IN Split(SplitStr:foo=bar,baz=123)
+Split() OUT -> IN Count(Counter:main)
+Count() COUNT -> IN Display(Output:main)
+Read() ERROR -> IN Display()

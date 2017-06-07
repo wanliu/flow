@@ -4,10 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"reflect"
-	"strings"
 
-	"github.com/kr/pretty"
 	"github.com/wanliu/flow"
 	goflow "github.com/wanliu/goflow"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
@@ -22,94 +19,15 @@ var (
 	run     = kingpin.Command("run", "Run a brain flow file.")
 	runfile = run.Arg("flowfile", "File of flow program").Required().ExistingFile()
 
-	inports  = Inports(run.Flag("in", "Inports of flow graph"))
-	outports = Outports(run.Flag("out", "Outports of flow graph"))
+	inports  = flow.Inports(run.Flag("in", "Inports of flow graph"))
+	outports = flow.Outports(run.Flag("out", "Outports of flow graph"))
 
 	register = kingpin.Command("register", "Register a flow components package.")
 	pkgfile  = register.Arg("package", "components file of package").Required().ExistingFile()
+
+	deregister = kingpin.Command("deregister", "Deregister a flow components package.")
+	depkgfile  = deregister.Arg("package", "components file of package").Required().ExistingFile()
 )
-
-type PortsValues map[string]interface{}
-
-func (in PortsValues) Set(value string) error {
-	parts := strings.Split(value, ",")
-	for _, part := range parts {
-		if exp := strings.Split(part, "="); len(exp) == 2 {
-			name := exp[0]
-
-			typ := exp[1]
-			switch typ {
-			case "string":
-				in[name] = make(chan string)
-				// case "int":
-				// 	in[name] = reflect.TypeOf(0)
-				// case "bool":
-				// 	in[name] = reflect.TypeOf(true)
-				// case "float":
-				// 	in[name] = reflect.TypeOf(0.0)
-				// default:
-				// 	in[name] = reflect.TypeOf("")
-			}
-		} else {
-			name := exp[0]
-			in[name] = make(chan string)
-		}
-	}
-
-	return nil
-}
-
-func (in PortsValues) String() string {
-	return ""
-}
-
-func (in PortsValues) SetInPorts(net *goflow.Graph) {
-
-	for port, ch := range in {
-		// c := reflect.MakeChan(typ, 0)
-		net.SetInPort(port, ch)
-	}
-}
-
-func (in PortsValues) SetOutPorts(net *goflow.Graph) {
-
-	for port, ch := range in {
-		// c := reflect.MakeChan(typ, 0)
-		net.SetOutPort(port, ch)
-	}
-}
-
-func (in PortsValues) Wait() {
-	for _, ch := range in {
-		v := reflect.ValueOf(ch)
-		v.Recv()
-	}
-}
-
-func (in PortsValues) Close() {
-	for _, ch := range in {
-		v := reflect.ValueOf(ch)
-		v.Close()
-	}
-}
-
-func Inports(s kingpin.Settings) PortsValues {
-	var result = make(map[string]interface{})
-	s.SetValue(PortsValues(result))
-	if len(result) == 0 {
-		result["Start"] = make(chan string)
-	}
-	return result
-}
-
-func Outports(s kingpin.Settings) PortsValues {
-	var result = make(map[string]interface{})
-	s.SetValue(PortsValues(result))
-	if len(result) == 0 {
-		result["Out"] = make(chan string)
-	}
-	return result
-}
 
 func main() {
 	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version("1.0").Author("Hysios Hu")
@@ -141,7 +59,11 @@ func main() {
 			log.Fatalf("open run file failed: %s", err)
 		}
 		net := goflow.ParseJSON(buf)
-		log.Printf("net %# v", pretty.Formatter(net))
+		if net == nil {
+			log.Fatalf("load graph file failed")
+		}
+		// log.Printf("net %# v", pretty.Formatter(net))
+		// net.in
 		inports.SetInPorts(net)
 		outports.SetOutPorts(net)
 		goflow.RunNet(net)
@@ -149,7 +71,10 @@ func main() {
 		// Wait for the network setup
 		<-net.Ready()
 
+		inports.Send()
+		// if len(outports) > 0 {
 		outports.Wait()
+		// }
 		inports.Close()
 		<-net.Wait()
 
@@ -167,6 +92,20 @@ func main() {
 			log.Fatalf("save to Config:%s failed: %s", *rtfile, err)
 		}
 		fmt.Printf("Installed component's package '%s#%s' successful\n", pkg.Name, pkg.Version)
+	case "deregister":
+		rt, err := flow.LoadConfig(*rtfile)
+		if err != nil {
+			log.Fatalf("load Config failed: %s", err)
+		}
+		pkg, err := rt.Deregister(*depkgfile)
+		if err != nil {
+			log.Fatalf("register pkgfile failed: %s", err)
+		}
+
+		if err := rt.SaveTo(*rtfile); err != nil {
+			log.Fatalf("save to Config:%s failed: %s", *rtfile, err)
+		}
+		fmt.Printf("Uninstalled component's package '%s#%s' successful\n", pkg.Name, pkg.Version)
 	}
 }
 

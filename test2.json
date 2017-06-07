@@ -22,18 +22,14 @@
   "inports": {
     "FILENAME": {
       "process": "Read",
-      "port": "In"
+      "port": "Read"
     }
   },
- "exports": [
-    {
-      "private": "Read.Read",
-      "public": "Start"
-    },
-    {
-      "private": "Display.Out",
-      "public": "Out"
+  "outports": {
+    "Out": {
+      "process": "Display",
+      "port": "Out"
     }
-  ],  
+  },
   "caseSensitive": true
 }

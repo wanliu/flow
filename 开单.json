@@ -1,0 +1,52 @@
+{
+  "processes": {
+    "ReadLine": {
+      "component": "ReadLine"
+    },
+    "Luis": {
+      "component": "LuisAnalyze",
+      "metadata": {
+        "appId": "12341234",
+        "secret": "12341234"
+      }
+    },
+    "Display": {
+      "component": "Output"
+    }
+  },
+  "connections": [
+    {
+      "src": {
+        "process": "ReadLine",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Luis",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Luis",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Display",
+        "port": "In"
+      }
+    }
+  ],
+  "inports": {
+    "FILENAME": {
+      "process": "ReadLine",
+      "port": "In"
+    }
+  },
+  "outports": {
+    "Out": {
+      "process": "Display",
+      "port": "Out"
+    }
+  },
+  "caseSensitive": true
+}

@@ -13,6 +13,8 @@ type GetElement struct {
 
 type Split struct {
 	flow.Component
+	In  <-chan string
+	Out chan<- string
 }
 
 type Output struct {
@@ -51,10 +53,18 @@ func (o *Output) OnIn(msg string) {
 	o.Out <- msg
 }
 
+func (rf *ReadFile) Init() {
+	// rf.Error = make(chan error)
+}
+
 func (rf *ReadFile) OnRead(filename string) {
 	if buf, err := ioutil.ReadFile(filename); err != nil {
 		rf.Error <- err
 	} else {
 		rf.Out <- string(buf)
 	}
+}
+
+func (sp *Split) OnIn(msg string) {
+	sp.Out <- msg
 }

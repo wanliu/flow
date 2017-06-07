@@ -1,0 +1,79 @@
+{
+  "processes": {
+    "Read": {
+      "component": "ReadFile",
+      "metadata": {
+        "routes": "main"
+      }
+    },
+    "Split": {
+      "component": "SplitStr",
+      "metadata": {
+        "foo": "bar",
+        "baz": "123"
+      }
+    },
+    "Count": {
+      "component": "Counter",
+      "metadata": {
+        "routes": "main"
+      }
+    },
+    "Display": {
+      "component": "Output",
+      "metadata": {
+        "routes": "main"
+      }
+    }
+  },
+  "connections": [
+    {
+      "data": "somefile.txt",
+      "tgt": {
+        "process": "Read",
+        "port": "source"
+      }
+    },
+    {
+      "src": {
+        "process": "Read",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "Split",
+        "port": "in"
+      }
+    },
+    {
+      "src": {
+        "process": "Split",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "Count",
+        "port": "in"
+      }
+    },
+    {
+      "src": {
+        "process": "Count",
+        "port": "count"
+      },
+      "tgt": {
+        "process": "Display",
+        "port": "in"
+      }
+    },
+    {
+      "src": {
+        "process": "Read",
+        "port": "error"
+      },
+      "tgt": {
+        "process": "Display",
+        "port": "in"
+      }
+    }
+  ],
+  "caseSensitive": false
+}
