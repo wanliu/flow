@@ -1,8 +1,10 @@
 package builitn
 
 import (
+	"bufio"
 	"io/ioutil"
 	"log"
+	"os"
 
 	flow "github.com/wanliu/goflow"
 )
@@ -30,6 +32,13 @@ type ReadFile struct {
 	// Encoding <-chan string
 	Out   chan<- string
 	Error chan<- error
+}
+
+type ReadLine struct {
+	flow.Component
+	ReadLine <-chan string
+	Out      chan<- string
+	Error    chan<- error
 }
 
 func NewGetElement() interface{} {
@@ -63,6 +72,16 @@ func (rf *ReadFile) OnRead(filename string) {
 	} else {
 		rf.Out <- string(buf)
 	}
+}
+
+func (rl *ReadLine) OnReadLine(filename string) {
+	if f, err := os.Open(filename); err != nil {
+		rl.Error <- err
+	}
+
+	defer f.Close()
+	reader = bufio.NewReader(f)
+	rl.Out <- string(reader.ReadLine())
 }
 
 func (sp *Split) OnIn(msg string) {
