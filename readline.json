@@ -1,0 +1,35 @@
+{
+  "processes": {
+    "ReadLine": {
+      "component": "ReadLine"
+    },
+    "Display": {
+      "component": "Output"
+    }
+  },
+  "connections": [
+    {
+      "src": {
+        "process": "ReadLine",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Display",
+        "port": "In"
+      }
+    }
+  ],
+  "inports": {
+    "FILENAME": {
+      "process": "ReadLine",
+      "port": "In"
+    }
+  },
+  "outports": {
+    "Out": {
+      "process": "Display",
+      "port": "Out"
+    }
+  },
+  "caseSensitive": true
+}
