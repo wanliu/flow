@@ -1,0 +1,42 @@
+{
+  "processes": {
+    "Luis": {
+      "component": "LuisAnalyze"
+    },
+    "Display": {
+      "component": "Output"
+    }
+  },
+  "connections": [
+    {
+      "data": "纯牛奶5件",
+      "tgt": {
+        "process": "Luis",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Luis",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Display",
+        "port": "In"
+      }
+    }
+  ],
+  "inports": {
+    "Start": {
+      "process": "Luis",
+      "port": "In"
+    }
+  },
+  "outports": {
+    "Out": {
+      "process": "Display",
+      "port": "Out"
+    }
+  },
+  "caseSensitive": true
+}
