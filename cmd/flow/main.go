@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"reflect"
 
 	"github.com/wanliu/flow"
 	goflow "github.com/wanliu/goflow"
@@ -72,11 +73,14 @@ func main() {
 		<-net.Ready()
 
 		inports.Send()
-		// if len(outports) > 0 {
-		outports.Wait()
-		// }
 		inports.Close()
-		<-net.Wait()
+
+		WaitNetEnd(net, outports)
+		// // if len(outports) > 0 {
+		// outports.Wait()
+		// // }
+
+		// <-net.Wait()
 
 	case "register":
 		rt, err := flow.LoadConfig(*rtfile)
@@ -106,6 +110,30 @@ func main() {
 			log.Fatalf("save to Config:%s failed: %s", *rtfile, err)
 		}
 		fmt.Printf("Uninstalled component's package '%s#%s' successful\n", pkg.Name, pkg.Version)
+	}
+}
+
+func WaitNetEnd(net *goflow.Graph, ports flow.PortsValues) error {
+	var cases = make([]reflect.SelectCase, 0)
+	cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(net.Wait())})
+
+	for _, chVal := range ports {
+		v := reflect.ValueOf(chVal.Chan)
+		cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: v})
+	}
+
+	for {
+		chosen, recv, recvOK := reflect.Select(cases)
+		if !recvOK {
+			if chosen == 0 {
+				// Net Wait signal
+				return nil
+			} else {
+				log.Printf("recv close chosen: %d", chosen)
+			}
+		} else {
+			log.Printf("recv: %v", recv)
+		}
 	}
 }
 
