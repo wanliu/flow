@@ -3,6 +3,9 @@
     "Luis": {
       "component": "LuisAnalyze"
     },
+    "ToString": {
+      "component": "Stringifier"
+    },
     "Display": {
       "component": "Output"
     }
@@ -18,6 +21,16 @@
     {
       "src": {
         "process": "Luis",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "ToString",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "ToString",
         "port": "Out"
       },
       "tgt": {

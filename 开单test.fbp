@@ -1,4 +1,5 @@
 INPORT=Luis.In:Start
 OUTPORT=Display.Out:Out
 "纯牛奶5件" -> In Luis(LuisAnalyze)
-Luis() Out -> In Display(Output)
+Luis() Out -> In ToString(Stringifier)
+ToString() Out -> In Display(Output)
