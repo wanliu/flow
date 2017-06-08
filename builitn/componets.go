@@ -1,12 +1,15 @@
 package builitn
 
 import (
+	"bufio"
 	"fmt"
-	"github.com/franela/goreq"
 	"io/ioutil"
 	"log"
 	"net/http/cookiejar"
+	"os"
 	"time"
+
+	"github.com/franela/goreq"
 
 	flow "github.com/wanliu/goflow"
 )
@@ -36,6 +39,13 @@ type ReadFile struct {
 	Error chan<- error
 }
 
+type ReadLine struct {
+	flow.Component
+	ReadLine <-chan string
+	Out      chan<- string
+	Error    chan<- error
+}
+
 func NewGetElement() interface{} {
 	return new(GetElement)
 }
@@ -50,6 +60,10 @@ func NewOutput() interface{} {
 
 func NewReadFile() interface{} {
 	return new(ReadFile)
+}
+
+func NewReadLine() interface{} {
+	return new(ReadLine)
 }
 
 func NewLuisAnalyze() interface{} {
@@ -137,6 +151,21 @@ func (rf *ReadFile) OnRead(filename string) {
 		rf.Error <- err
 	} else {
 		rf.Out <- string(buf)
+	}
+}
+
+func (rl *ReadLine) OnIn(filename string) {
+	if f, err := os.Open(filename); err != nil {
+		rl.Error <- err
+	} else {
+		defer f.Close()
+		var reader = bufio.NewReader(f)
+
+		if line, _, err := reader.ReadLine(); err != nil {
+			rl.Error <- err
+		} else {
+			rl.Out <- string(line)
+		}
 	}
 }
 

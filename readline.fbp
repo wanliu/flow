@@ -1,0 +1,3 @@
+INPORT=ReadLine.In:FILENAME
+OUTPORT=Display.Out:Out
+ReadLine(ReadLine) Out -> In Display(Output)
