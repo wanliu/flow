@@ -41,9 +41,9 @@ type ReadFile struct {
 
 type ReadLine struct {
 	flow.Component
-	ReadLine <-chan string
-	Out      chan<- string
-	Error    chan<- error
+	In    <-chan string
+	Out   chan<- string
+	Error chan<- error
 }
 
 func NewGetElement() interface{} {
@@ -161,11 +161,24 @@ func (rl *ReadLine) OnIn(filename string) {
 		defer f.Close()
 		var reader = bufio.NewReader(f)
 
-		if line, _, err := reader.ReadLine(); err != nil {
-			rl.Error <- err
-		} else {
-			rl.Out <- string(line)
+		// if line, _, err := reader.ReadLine(); err != nil {
+		// 	rl.Error <- err
+		// } else {
+		// 	rl.Out <- string(line)
+		// }
+
+		scanner := bufio.NewScanner(reader)
+		scanner.Split(bufio.ScanLines)
+
+		for scanner.Scan() {
+			text := scanner.Text()
+
+			if len(text) > 0 {
+				rl.Out <- string(text)
+			}
 		}
+
+		log.Printf("loop ended")
 	}
 }
 
