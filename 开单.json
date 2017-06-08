@@ -1,20 +1,48 @@
 {
   "processes": {
+    "Luis": {
+      "component": "LuisAnalyze"
+    },
     "ReadLine": {
       "component": "ReadLine"
     },
-    "Luis": {
-      "component": "LuisAnalyze",
+    "OpenOrder": {
+      "component": "IntentAnalyze",
       "metadata": {
-        "appId": "12341234",
-        "secret": "12341234"
+        "intent": "1234",
+        "score": "05"
       }
     },
-    "Display": {
-      "component": "Output"
+    "Hello": {
+      "component": "IntentAnalyze",
+      "metadata": {
+        "intent": "1234",
+        "score": "05"
+      }
+    },
+    "Help": {
+      "component": "IntentAnalyze",
+      "metadata": {
+        "intent": "1234",
+        "score": "05"
+      }
     }
   },
   "connections": [
+    {
+      "data": "AppId",
+      "tgt": {
+        "process": "Luis",
+        "port": "AppId"
+      }
+    },
+    {
+      "data": "Key",
+      "tgt": {
+        "process": "Luis",
+        "port": "Key"
+      }
+    },
     {
       "src": {
         "process": "ReadLine",
@@ -28,10 +56,30 @@
     {
       "src": {
         "process": "Luis",
-        "port": "Out"
+        "port": "Result"
       },
       "tgt": {
-        "process": "Display",
+        "process": "OpenOrder",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Luis",
+        "port": "Result"
+      },
+      "tgt": {
+        "process": "Hello",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Luis",
+        "port": "Result"
+      },
+      "tgt": {
+        "process": "Help",
         "port": "In"
       }
     }

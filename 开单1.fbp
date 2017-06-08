@@ -1,0 +1,30 @@
+ReadLine(ReadLine) Out -> MainTask(WithContext:context)
+
+MainTask() Main -> In Luis(LuisAnalyze:appId=12341234,secret=12341234)
+# Result 是 QueryResult 的类型，包括了 TopScoringIntent 与 Entities
+Luis() Result -> In OpenOrder(IntentAnalyze:intent=1234,score=05)
+Luis() Result -> In Hello(IntentAnalyze:intent=1234,score=05)
+Luis() Result -> In Help(IntentAnalyze:intent=1234,score=05)
+
+MainTask() SubTask -> In Luis(LuisAnalyze:appId=12341234,secret=12341234)
+
+OpenOrder(IntentAnalyze:intent=1234,score=05)
+
+OpenOrder() Out -> Welcome(Welcome:msg=123412341234)
+OpenOrder() Ctx -> Products(TryGetEntities:entity=products)
+
+Products() Failed -> Relay1(ReplyAndTerminal:msg=您没有提供足够的信息，我们需要你说出产品，数量与送货地址（如：纯牛奶3件，美又多八件)
+Products() Entities -> SaveProducts
+Products() Rest -> Number(TryGetEntities:entities)
+
+
+'products' -> Entity MissingProducts(MissingEntities)
+Entities -> Entities MissingProducts()
+MissingProducts() Rest -> 
+MissingProducts() Sub -> In Prompt(Prompt)
+'请输入你需要的商品名称与数量（纯牛奶1件）' -> Msg Prompt()
+
+
+
+
+
