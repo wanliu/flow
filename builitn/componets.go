@@ -1,8 +1,12 @@
 package builitn
 
 import (
+	"fmt"
+	"github.com/franela/goreq"
 	"io/ioutil"
 	"log"
+	"net/http/cookiejar"
+	"time"
 
 	flow "github.com/wanliu/goflow"
 )
@@ -46,6 +50,77 @@ func NewOutput() interface{} {
 
 func NewReadFile() interface{} {
 	return new(ReadFile)
+}
+
+func NewLuisAnalyze() interface{} {
+	return new(LuisAnalyze)
+}
+
+type Luis struct {
+	Url       string
+	AppID     string
+	Key       string
+	Secret    string
+	cookieJar *cookiejar.Jar
+	Proxy     string
+}
+
+func NewLuis(appid, key, secret string) *Luis {
+	jar, _ := cookiejar.New(nil)
+	// https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/052297dc-12b9-4044-8220-a21a20d72581?subscription-key=6b916f7c107643069c242cf881609a82&timezoneOffset=0.0&verbose=true&q=
+	return &Luis{
+		Url:       "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/%s",
+		AppID:     appid,
+		Key:       key,
+		Secret:    secret,
+		cookieJar: jar,
+		Proxy:     "http://192.168.0.151:1087",
+	}
+}
+
+type LuisInput struct {
+	Query string
+}
+
+type QueryParams struct {
+	Key      string `url:"subscription-key"`
+	TimeZone string `url:"timezoneOffset"`
+	Query    string `url:"q"`
+	Verbose  bool   `url:"verbose"`
+}
+
+type LuisAnalyze struct {
+	flow.Component
+	In  <-chan string
+	Out chan<- string
+}
+
+func (l *LuisAnalyze) OnIn(input string) {
+	var (
+		luis   = NewLuis("052297dc-12b9-4044-8220-a21a20d72581", "6b916f7c107643069c242cf881609a82", "")
+		url    = fmt.Sprintf(luis.Url, luis.AppID)
+		params = QueryParams{
+			Key:      luis.Key,
+			TimeZone: "0",
+			Query:    input,
+			Verbose:  true,
+		}
+	)
+
+	res, err := goreq.Request{
+		Uri:         url,
+		QueryString: params,
+		Timeout:     10 * time.Second,
+		CookieJar:   luis.cookieJar,
+		Proxy:       luis.Proxy,
+	}.Do()
+
+	if err != nil {
+		l.Out <- err.Error()
+	} else {
+		var result, _ = res.Body.ToString()
+		l.Out <- result
+	}
 }
 
 func (o *Output) OnIn(msg string) {

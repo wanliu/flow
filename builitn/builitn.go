@@ -15,6 +15,7 @@ func ComponentList() map[string]func() interface{} {
 	_components["Split"] = NewSplit
 	_components["Output"] = NewOutput
 	_components["ReadFile"] = NewReadFile
+	_components["LuisAnalyze"] = NewLuisAnalyze
 
 	return _components
 }
