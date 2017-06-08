@@ -15,7 +15,7 @@ type Stringifier struct {
 	Out chan<- string
 }
 
-func (s *Stringifier) onIn(input ResultParams) {
+func (s *Stringifier) OnIn(input ResultParams) {
 	str, _ := json.Marshal(input)
 
 	s.Out <- string(str)
