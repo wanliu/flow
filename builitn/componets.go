@@ -57,6 +57,10 @@ func NewReadFile() interface{} {
 	return new(ReadFile)
 }
 
+func NewReadLine() interface{} {
+	return new(ReadLine)
+}
+
 func (o *Output) OnIn(msg string) {
 	log.Printf("output: %s", msg)
 	o.Out <- msg
@@ -77,11 +81,16 @@ func (rf *ReadFile) OnRead(filename string) {
 func (rl *ReadLine) OnReadLine(filename string) {
 	if f, err := os.Open(filename); err != nil {
 		rl.Error <- err
-	}
+	} else {
+		defer f.Close()
+		var reader = bufio.NewReader(f)
 
-	defer f.Close()
-	reader = bufio.NewReader(f)
-	rl.Out <- string(reader.ReadLine())
+		if line, _, err := reader.ReadLine(); err != nil {
+			r1.Error <- err
+		} else {
+			rl.Out <- string(line)
+		}
+	}
 }
 
 func (sp *Split) OnIn(msg string) {
