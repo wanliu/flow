@@ -132,7 +132,7 @@ func (l *LuisAnalyze) OnIn(input string) {
 	if err != nil {
 		l.Out <- err.Error()
 	} else {
-		var result, _ = res.Body.ToString()
+		result, _ := res.Body.ToString()
 		l.Out <- result
 	}
 }
