@@ -18,6 +18,8 @@ func ComponentList() map[string]func() interface{} {
 	_components["ReadLine"] = NewReadLine
 	_components["LuisAnalyze"] = NewLuisAnalyze
 	_components["Stringifier"] = NewStringifier
+	_components["StringifierB"] = NewStringifierB
+	_components["TextReader"] = NewTextReader
 
 	return _components
 }
