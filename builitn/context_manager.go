@@ -1,8 +1,6 @@
 package builitn
 
 import (
-	"log"
-
 	"github.com/wanliu/context"
 	flow "github.com/wanliu/goflow"
 )
@@ -37,7 +35,7 @@ type ContextComponent struct {
 }
 
 func (cc *ContextComponent) Init() {
-	log.Printf("ContextComponent Init %#p", cc)
+	// log.Printf("ContextComponent Init %#p", cc)
 	// cc.Ctx = make(chan context.IContext)
 }
 
