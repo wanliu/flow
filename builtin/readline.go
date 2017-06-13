@@ -45,11 +45,10 @@ func (r *ReadInput) GetLine() <-chan string {
 		for {
 			var in string
 			fmt.Printf(r._prompt)
-			_, err := fmt.Scanf("%q", &in)
+			_, err := fmt.Scanf("%s", &in)
 			if err != nil {
 				log.Printf("err: %s", err)
 			}
-			log.Printf("%s", in)
 			ch <- in
 		}
 	}()
