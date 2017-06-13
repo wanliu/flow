@@ -33,24 +33,25 @@ func (r *ReadInput) Loop() {
 				}
 			}
 		case prompt, _ := <-r.Prompt:
-			r._prompt = prompt
+			r.SetPrompt(prompt)
 		}
 	}
 }
 
 func (r *ReadInput) GetLine() <-chan string {
 	ch := make(chan string)
-
 	go func() {
-		for {
-			var in string
-			fmt.Printf(r._prompt)
-			_, err := fmt.Scanf("%s", &in)
-			if err != nil {
-				log.Printf("err: %s", err)
-			}
-			ch <- in
+		var in string
+		fmt.Printf(r._prompt)
+		_, err := fmt.Scanf("%s", &in)
+		if err != nil {
+			log.Printf("err: %s", err)
 		}
+		ch <- in
 	}()
 	return ch
+}
+
+func (r *ReadInput) SetPrompt(pro string) {
+	r._prompt = pro
 }
