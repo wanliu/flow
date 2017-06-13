@@ -1,4 +1,4 @@
-package builitn
+package builtin
 
 import (
 	"fmt"
@@ -26,6 +26,8 @@ type Context interface {
 	Send(interface{})
 	Value(interface{}) interface{}
 	SetValue(interface{}, interface{})
+	GlobalValue(interface{}) interface{}
+	SetGlobalValue(interface{}, interface{})
 }
 
 var (
@@ -108,6 +110,14 @@ func (ctx *ctxt) Value(name interface{}) interface{} {
 
 func (ctx *ctxt) SetValue(name, value interface{}) {
 	ctx.values[name] = value
+}
+
+func (ctx *ctxt) GlobalValue(name interface{}) interface{} {
+	return ctx.Stack.Root.values[name]
+}
+
+func (ctx *ctxt) SetGlobalValue(name, value interface{}) {
+	ctx.Stack.Root.values[name] = value
 }
 
 func (ctx *ctxt) Wait(task TaskHandle) {

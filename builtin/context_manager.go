@@ -1,7 +1,8 @@
-package builitn
+package builtin
 
 import (
 	"sync"
+	"time"
 
 	flow "github.com/wanliu/goflow"
 )
@@ -139,6 +140,7 @@ func (cc *CtxControl) run() {
 
 		cc.cond.L.Unlock()
 	})
+	time.Sleep(1 * time.Millisecond)
 }
 
 func (cc *CtxControl) Reset() {
@@ -177,9 +179,9 @@ func (cc *CtxControl) OnDone(do bool) {
 }
 
 func (cv *ContextString) OnCtx(ctx Context) {
-	if str, ok := ctx.Value(cv.fieldName).(string); ok {
-		cv.Next <- ctx
+	if str, ok := ctx.GlobalValue(cv.fieldName).(string); ok {
 		cv.Out <- str
+		cv.Next <- ctx
 	} else {
 		// error
 	}
@@ -190,7 +192,7 @@ func (cv *ContextString) OnField(name string) {
 }
 
 func (cv *ContextInt) OnCtx(ctx Context) {
-	if i, ok := ctx.Value(cv.fieldName).(int); ok {
+	if i, ok := ctx.GlobalValue(cv.fieldName).(int); ok {
 		cv.Next <- ctx
 		cv.Out <- i
 	} else {
@@ -203,7 +205,7 @@ func (cv *ContextInt) OnField(name string) {
 }
 
 func (cv *ContextBool) OnCtx(ctx Context) {
-	if b, ok := ctx.Value(cv.fieldName).(bool); ok {
+	if b, ok := ctx.GlobalValue(cv.fieldName).(bool); ok {
 		cv.Next <- ctx
 		cv.Out <- b
 	} else {

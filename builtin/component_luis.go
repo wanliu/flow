@@ -1,10 +1,11 @@
-package builitn
+package builtin
 
 import (
 	"fmt"
-	"github.com/franela/goreq"
 	"net/http/cookiejar"
 	"time"
+
+	"github.com/franela/goreq"
 
 	flow "github.com/wanliu/goflow"
 )
@@ -73,14 +74,19 @@ type ResultParams struct {
 
 type LuisAnalyze struct {
 	flow.Component
-	In  <-chan string
-	Out chan<- ResultParams
+	appid string
+	key   string
+	In    <-chan string
+	AppId <-chan string
+	Key   <-chan string
+	Out   chan<- ResultParams
 	// Out chan<- string
 }
 
 func (l *LuisAnalyze) OnIn(input string) {
 	var (
-		luis   = NewLuis("052297dc-12b9-4044-8220-a21a20d72581", "6b916f7c107643069c242cf881609a82", "")
+		// luis   = NewLuis("052297dc-12b9-4044-8220-a21a20d72581", "6b916f7c107643069c242cf881609a82", "")
+		luis   = NewLuis(l.appid, l.key, "")
 		url    = fmt.Sprintf(luis.Url, luis.AppID)
 		params = QueryParams{
 			Key:      luis.Key,
@@ -91,6 +97,7 @@ func (l *LuisAnalyze) OnIn(input string) {
 		result ResultParams
 	)
 
+	ch := l.promptBegin()
 	res, err := goreq.Request{
 		Uri:         url,
 		QueryString: params,
@@ -98,7 +105,7 @@ func (l *LuisAnalyze) OnIn(input string) {
 		CookieJar:   luis.cookieJar,
 		Proxy:       luis.Proxy,
 	}.Do()
-
+	ch <- true
 	if err != nil {
 		// l.Out <- err.Error()
 		l.Out <- *new(ResultParams)
@@ -107,4 +114,38 @@ func (l *LuisAnalyze) OnIn(input string) {
 		res.Body.FromJsonTo(&result)
 		l.Out <- result
 	}
+}
+
+func (l *LuisAnalyze) OnAppId(appid string) {
+	l.appid = appid
+}
+
+func (l *LuisAnalyze) OnKey(key string) {
+	l.key = key
+}
+
+func (l *LuisAnalyze) promptBegin() chan<- bool {
+	var tick bool
+	end := make(chan bool)
+	fmt.Printf("正在查询。。。")
+	go func() {
+		for {
+			select {
+			case <-end:
+				fmt.Printf("\r")
+				return
+			case <-time.After(500 * time.Millisecond):
+
+				if tick {
+
+					fmt.Printf("\r.")
+				} else {
+					fmt.Printf("\r")
+				}
+
+				tick = !tick
+			}
+		}
+	}()
+	return end
 }

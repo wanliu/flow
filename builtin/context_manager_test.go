@@ -1,10 +1,11 @@
-package builitn
+package builtin
 
 import (
 	"log"
 	"testing"
 	"time"
 
+	"github.com/kr/pretty"
 	flow "github.com/wanliu/goflow"
 )
 
@@ -40,6 +41,15 @@ type Component4 struct {
 	Out   chan<- string
 }
 
+type IsContain struct {
+	flow.Component
+	contain string
+	Contain <-chan string
+	In      <-chan Context
+	Yes     chan<- bool
+	Next    chan<- Context
+}
+
 func (c *Component3) Init() {
 	c.TaskHandle = func(ctx Context, raw interface{}) error {
 		if msg, ok := raw.(string); ok {
@@ -61,7 +71,8 @@ func (c *Component4) Init() {
 
 func (cm *ContextManager2) Init() {
 	cm.SendHandle = func(ctx, parent Context) error {
-		if msg, ok := parent.Value("Msg").(string); ok {
+		log.Printf("cm ctx: %#v, parent: %#v", ctx, parent)
+		if msg, ok := ctx.GlobalValue("Msg").(string); ok {
 			ctx.Send(msg)
 		}
 		return nil
@@ -70,6 +81,19 @@ func (cm *ContextManager2) Init() {
 
 func (cm *ContextManager2) OnCtx(ctx Context) {
 	cm.ContextManager.OnCtx(ctx)
+}
+
+func (c *IsContain) OnIn(ctx Context) {
+	if msg, ok := ctx.GlobalValue("Msg").(string); ok {
+		if msg == c.contain {
+			c.Yes <- true
+			c.Next <- ctx
+		}
+	}
+}
+
+func (c *IsContain) OnContain(con string) {
+	c.contain = con
 }
 
 func newGraph() *testNet {
@@ -131,30 +155,71 @@ func newContextGraph2Task() *testNet {
 	net := new(testNet)
 	net.InitGraphState()
 
-	cm := new(ContextManager2)
+	cm := new(ContextManager)
 
-	c1 := new(Component4)
-	c2 := new(Component4)
+	cm.SendHandle = func(ctx, parent Context) error {
+		if msg, ok := ctx.GlobalValue("Msg").(string); ok {
+			ctx.Send(msg)
+		}
+		return nil
+	}
+	c1 := new(ContextComponent)
+	// c2 := new(Component4)
+	is := new(IsContain)
+	ctrl := new(CtxControl)
+	str := new(ContextString)
 
 	net.Add(cm, "cm")
 	net.Add(c1, "c1")
-	net.Add(c2, "c2")
+	// net.Add(c2, "c2")
+	net.Add(is, "is")
+	net.Add(ctrl, "ctrl")
+	net.Add(str, "str")
+	net.AddIIP("Msg", "str", "Field")
+	net.AddIIP("Hello", "is", "Contain")
 
 	net.Connect("cm", "Process", "c1", "Enter")
 	// net.Connect("c1", "Process", "c1", "Done")
-	net.Connect("c1", "Process", "c2", "Enter")
+	net.Connect("c1", "Process", "is", "In")
+	net.Connect("is", "Yes", "ctrl", "Done")
+	net.Connect("is", "Next", "ctrl", "Ctx")
+	net.Connect("c1", "Next", "str", "Ctx")
+
 	net.MapInPort("In", "cm", "Ctx")
-	net.MapOutPort("Out1", "c1", "Out")
-	net.MapOutPort("Out2", "c2", "Out")
+	net.MapOutPort("Out", "str", "Out")
+	return net
+}
+
+func newLuisGraph() *testNet {
+	net := new(testNet)
+	net.InitGraphState()
+
+	cm := new(ContextManager)
+	ri := new(ReadInput)
+	luis := new(LuisAnalyze)
+
+	cm.SendHandle = func(ctx, parent Context) error {
+		if msg, ok := ctx.GlobalValue("Msg").(string); ok {
+			ctx.Send(msg)
+		}
+		return nil
+	}
+	net.Add(cm, "cm")
+	net.Add(ri, "ri")
+	net.Add(luis, "luis")
+
+	net.AddIIP("052297dc-12b9-4044-8220-a21a20d72581", "luis", "AppId")
+	net.AddIIP("6b916f7c107643069c242cf881609a82", "luis", "Key")
+	net.AddIIP("请输入你的话:", "ri", "Prompt")
+
+	net.Connect("ri", "Out", "luis", "In")
+	net.MapInPort("Ctx", "cm", "Ctx")
+	net.MapOutPort("Out", "luis", "Out")
 	return net
 }
 
 func (c *Component2) OnIn(msg string) {
-
-	// log.Printf("component OnIn Msg: %s", msg)
-	// log.Printf("component: %#p", c)
 	c.Out <- msg
-
 }
 
 func TestContextManager(t *testing.T) {
@@ -171,17 +236,7 @@ func TestContextManager(t *testing.T) {
 	log.Printf("running net")
 
 	for i := 0; i < 3; i++ {
-
-		// c, err := context.NewContext()
-		// if err != nil {
-		// 	log.Fatalf("create context failed: %s", err)
-		// }
-
 		in <- "hello"
-		// ctx <- c
-
-		//
-
 		<-out
 	}
 
@@ -306,12 +361,8 @@ func TestContextManager2(t *testing.T) {
 	// log.Printf("%# v", pretty.Formatter(net))
 	for {
 		select {
-		case ctx, ok := <-out:
-			if ok {
-				log.Printf("out: %#v", ctx)
-			} else {
-				log.Printf("out close.")
-			}
+		case ctx := <-out:
+			log.Printf("out: %#v", ctx)
 		case <-net.Wait():
 			goto Exit
 		}
@@ -424,44 +475,78 @@ func TestContextManager4(t *testing.T) {
 	net := newContextGraph2Task()
 
 	in := make(chan Context)
-	out1 := make(chan string)
-	out2 := make(chan string)
+	// out1 := make(chan string)
+	out := make(chan string)
+	// out2 := make(chan string)
 
 	net.SetInPort("In", in)
-	net.SetOutPort("Out1", out1)
-	net.SetOutPort("Out2", out1)
+	net.SetOutPort("Out", out)
 
 	flow.RunNet(net)
 	<-net.Ready()
-	// log.Printf("%# v", pretty.Formatter(net))
 
 	ctx1 := NewContext()
-	ctx2 := NewContext()
 	in <- ctx1
-	time.Sleep(1 * time.Millisecond)
-	in <- ctx2
 	time.Sleep(1 * time.Millisecond)
 	ctx1.SetValue("Msg", "Hello")
+
 	in <- ctx1
-	time.Sleep(1 * time.Millisecond)
-	ctx2.SetValue("Msg", "World")
-	in <- ctx2
+
+	time.Sleep(2 * time.Millisecond)
+	ctx1.SetValue("Msg", "World")
+
+	in <- ctx1
 
 	go func() {
-		time.Sleep(1 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 		close(in)
 	}()
-	// net.Stop()
-	// log.Printf("%# v", pretty.Formatter(net))
-	for {
+
+	var exit bool
+	for !exit {
 		select {
-		case msg := <-out1:
-			log.Printf("out1 msg: %s", msg)
-		case msg := <-out2:
-			log.Printf("out2 msg: %s", msg)
+		case msg, ok := <-out:
+			if ok {
+				log.Printf("out msg: %s", msg)
+				exit = true
+			} else {
+				goto Exit
+			}
+
+		// case msg := <-out2:
+		// 	log.Printf("out2 msg: %s", msg)
 		case <-net.Wait():
 			goto Exit
 		}
 	}
+
 Exit:
+}
+
+func ListWaits(net *testNet) {
+	log.Printf("Wait List ---")
+	for _, wait := range net.ListWaits() {
+		log.Printf("name: %s, counter: %d", wait.Name, wait.Counter)
+	}
+}
+
+func TestLuisTalk(t *testing.T) {
+	net := newLuisGraph()
+
+	in := make(chan Context)
+	// out1 := make(chan string)
+	out := make(chan ResultParams)
+	// out2 := make(chan string)
+
+	net.SetInPort("Ctx", in)
+	net.SetOutPort("Out", out)
+
+	flow.RunNet(net)
+	<-net.Ready()
+	log.Printf("net: %# v", pretty.Formatter(net))
+
+	ctx := NewContext()
+	in <- ctx
+
+	<-net.Wait()
 }

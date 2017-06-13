@@ -1,7 +1,8 @@
-package builitn
+package builtin
 
 import (
 	"encoding/json"
+
 	flow "github.com/wanliu/goflow"
 )
 

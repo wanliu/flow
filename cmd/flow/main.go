@@ -37,11 +37,11 @@ func main() {
 	switch kingpin.Parse() {
 	case "run":
 
-		if bpk, err := flow.LoadBuilitnPackage(); err != nil {
-			log.Fatalf("load builitn package failed: %s", err)
+		if bpk, err := flow.LoadbuiltinPackage(); err != nil {
+			log.Fatalf("load builtin package failed: %s", err)
 		} else {
 			if err := bpk.RegisterComponents(); err != nil {
-				log.Fatalf("load builitn  components failed: %s", err)
+				log.Fatalf("load builtin  components failed: %s", err)
 			}
 		}
 

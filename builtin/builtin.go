@@ -1,4 +1,4 @@
-package builitn
+package builtin
 
 import "github.com/wanliu/components"
 
