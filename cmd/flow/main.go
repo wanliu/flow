@@ -6,6 +6,8 @@ import (
 	"log"
 	"reflect"
 
+	"github.com/kr/pretty"
+
 	"github.com/wanliu/flow"
 	goflow "github.com/wanliu/goflow"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
@@ -66,21 +68,21 @@ func main() {
 		// log.Printf("net %# v", pretty.Formatter(net))
 		// net.in
 		inports.SetInPorts(net)
-		outports.SetOutPorts(net)
+		// outports.SetOutPorts(net)
 		goflow.RunNet(net)
+		log.Printf("net: %# v", pretty.Formatter(net))
 
 		// Wait for the network setup
 		<-net.Ready()
-
 		inports.Send()
-		inports.Close()
+		// inports.Close()
 
-		WaitNetEnd(net, outports)
+		// WaitNetEnd(net, outports)
 		// // if len(outports) > 0 {
 		// outports.Wait()
 		// // }
 
-		// <-net.Wait()
+		<-net.Wait()
 
 	case "register":
 		rt, err := flow.LoadConfig(*rtfile)

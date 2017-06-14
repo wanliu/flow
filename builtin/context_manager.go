@@ -17,6 +17,10 @@ type ContextManager struct {
 	// Signal chan<- Context
 }
 
+func NewContextManager() interface{} {
+	return new(ContextManager)
+}
+
 func (cm *ContextManager) Init() {
 	if cm.SendHandle == nil {
 		cm.SendHandle = func(ctx, _ Context) error {
@@ -93,6 +97,14 @@ type CtxControl struct {
 type CtxReset struct {
 	flow.Component
 	In <-chan Context
+}
+
+func NewCtxReset() interface{} {
+	return new(CtxReset)
+}
+
+func func_name() {
+
 }
 
 func (cc *ContextComponent) Init() {
@@ -222,9 +234,9 @@ func (cv *ContextBool) OnField(name string) {
 	cv.fieldName = name
 }
 
-func NewContextManager() *ContextManager {
-	return &ContextManager{}
-}
+// func NewContextManager() *ContextManager {
+// 	return &ContextManager{}
+// }
 
 func (cr *CtxReset) OnIn(ctx Context) {
 	ctx.Reset()

@@ -18,6 +18,12 @@ func ComponentList() map[string]func() interface{} {
 	_components["ReadLine"] = NewReadLine
 	_components["LuisAnalyze"] = NewLuisAnalyze
 	_components["Stringifier"] = NewStringifier
+	_components["IntentCheck"] = NewIntentCheck
+	_components["CtxReset"] = NewCtxReset
+	_components["TryGetProducts"] = NewTryGetProducts
+	_components["MyInput"] = NewMyInput
+	_components["QuerySave"] = NewQuerySave
+	_components["ContextManager"] = NewContextManager
 
 	return _components
 }

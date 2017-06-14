@@ -1,0 +1,146 @@
+{
+  "processes": {
+    "Line": {
+      "component": "MyInput"
+    },
+    "Luis": {
+      "component": "LuisAnalyze"
+    },
+    "Merge": {
+      "component": "QuerySave"
+    },
+    "CM": {
+      "component": "ContextManager"
+    },
+    "OpenOrder": {
+      "component": "IntentCheck"
+    },
+    "TryProducts": {
+      "component": "TryGetProducts"
+    },
+    "Reset": {
+      "component": "CtxReset"
+    }
+  },
+  "connections": [
+    {
+      "src": {
+        "process": "Line",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Luis",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Line",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "Merge",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Luis",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Merge",
+        "port": "Result"
+      }
+    },
+    {
+      "src": {
+        "process": "Merge",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "CM",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CM",
+        "port": "Process"
+      },
+      "tgt": {
+        "process": "OpenOrder",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OpenOrder",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "TryProducts",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "TryProducts",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reset",
+        "port": "In"
+      }
+    },
+    {
+      "data": "8b65b31f-05b0-4da0-ab98-afa62c0e80ae",
+      "tgt": {
+        "process": "Luis",
+        "port": "AppId"
+      }
+    },
+    {
+      "data": "9c6711ad95c846a792248515cb6d1a23",
+      "tgt": {
+        "process": "Luis",
+        "port": "Key"
+      }
+    },
+    {
+      "data": "请输入你的话",
+      "tgt": {
+        "process": "Line",
+        "port": "Prompt"
+      }
+    },
+    {
+      "data": "开单",
+      "tgt": {
+        "process": "OpenOrder",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OpenOrder",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "products",
+      "tgt": {
+        "process": "TryProducts",
+        "port": "Type"
+      }
+    }
+  ],
+  "inports": {
+    "In": {
+      "process": "Line",
+      "port": "Ctx"
+    }
+  },
+  "caseSensitive": true
+}

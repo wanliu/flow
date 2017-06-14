@@ -18,6 +18,10 @@ type IntentCheck struct {
 	Next    chan<- Context
 }
 
+func NewIntentCheck() interface{} {
+	return new(IntentCheck)
+}
+
 func (ic *IntentCheck) OnIntent(intent string) {
 	ic._intent = intent
 }

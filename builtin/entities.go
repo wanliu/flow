@@ -29,6 +29,10 @@ type TryGetProducts struct {
 	Out  chan<- Context
 }
 
+func NewTryGetProducts() interface{} {
+	return new(TryGetProducts)
+}
+
 type ProInfo []Product
 
 func (tr *TryGetEntities) OnType(typ string) {
