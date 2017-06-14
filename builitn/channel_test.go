@@ -49,7 +49,7 @@ func TestChannel(t *testing.T) {
 	log.Printf("running net")
 
 	input <- "纯牛奶12件"
-	input <- "优酸乳20件"
+	// input <- "优酸乳20件"
 
 	close(input)
 

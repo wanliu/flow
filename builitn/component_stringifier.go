@@ -13,11 +13,13 @@ func NewTextReader() interface{} {
 type TextReader struct {
 	flow.Component
 	In  <-chan string
-	Out chan<- string
+	Out []chan<- string
 }
 
 func (s *TextReader) OnIn(input string) {
-	s.Out <- input
+	for index, _ := range s.Out {
+		s.Out[index] <- input
+	}
 }
 
 func NewStringifier() interface{} {
