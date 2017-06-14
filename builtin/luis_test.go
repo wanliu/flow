@@ -21,8 +21,8 @@ func TestLuis(t *testing.T) {
 	// net.Add(cm, "ContextManager")
 	net.Add(luis, "LuisAnalyze")
 	net.Add(stringifier, "Stringifier")
-	net.AddIIP("052297dc-12b9-4044-8220-a21a20d72581", "LuisAnalyze", "AppId")
-	net.AddIIP("6b916f7c107643069c242cf881609a82", "LuisAnalyze", "Key")
+	net.AddIIP("8b65b31f-05b0-4da0-ab98-afa62c0e80ae", "LuisAnalyze", "AppId")
+	net.AddIIP("9c6711ad95c846a792248515cb6d1a23", "LuisAnalyze", "Key")
 
 	// if failed {
 	// 	t.Fatalf("asdfasdf'", ...)

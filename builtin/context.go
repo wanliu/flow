@@ -2,15 +2,18 @@ package builtin
 
 import (
 	"fmt"
+	"log"
 )
 
 type ctxt struct {
-	Stack     *Stack
-	values    map[interface{}]interface{}
-	retry     chan bool
-	cancel    chan bool
-	done      chan bool
-	rece      chan interface{}
+	Stack *Stack
+
+	values map[interface{}]interface{}
+	retry  chan bool
+	cancel chan bool
+	done   chan bool
+	rece   chan interface{}
+
 	isRunning bool
 }
 
@@ -28,6 +31,9 @@ type Context interface {
 	SetValue(interface{}, interface{})
 	GlobalValue(interface{}) interface{}
 	SetGlobalValue(interface{}, interface{})
+	Post(string, ...interface{}) error
+	Reset()
+	IsRunning() bool
 }
 
 var (
@@ -163,4 +169,35 @@ func (ctx *ctxt) Send(raw interface{}) {
 	if ctx.isRunning {
 		ctx.rece <- raw
 	}
+}
+
+func (ctx *ctxt) Post(msg string, args ...interface{}) error {
+	// ctx.Stack.
+	log.Printf(msg, args...)
+	return nil
+}
+
+func (ctx *ctxt) IsRunning() bool {
+	return ctx.isRunning
+}
+
+func (ctx *ctxt) Reset() {
+	for _, child := range ctx.Stack.Children {
+		if child.IsRunning() {
+			go child.Cancel()
+		}
+	}
+
+	if ctx.Stack.Root.IsRunning() {
+		go ctx.Stack.Root.Cancel()
+	}
+
+	root := ctx.Stack.Root
+	root.values = make(map[interface{}]interface{})
+	root.retry = make(chan bool)
+	root.cancel = make(chan bool)
+	root.rece = make(chan interface{})
+	root.done = make(chan bool)
+	root.isRunning = false
+	root.Stack.Children = make([]Context, 0)
 }

@@ -71,7 +71,6 @@ func (c *Component4) Init() {
 
 func (cm *ContextManager2) Init() {
 	cm.SendHandle = func(ctx, parent Context) error {
-		log.Printf("cm ctx: %#v, parent: %#v", ctx, parent)
 		if msg, ok := ctx.GlobalValue("Msg").(string); ok {
 			ctx.Send(msg)
 		}

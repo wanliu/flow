@@ -15,6 +15,7 @@ type IntentCheck struct {
 	Intent  <-chan string
 	Score   <-chan float64
 	Out     chan<- Context
+	Next    chan<- Context
 }
 
 func (ic *IntentCheck) OnIntent(intent string) {
@@ -26,12 +27,12 @@ func (ic *IntentCheck) OnScore(score float64) {
 }
 
 func (ic *IntentCheck) OnCtx(ctx Context) {
-	log.Printf("in ctx")
 	if res, ok := ctx.Value("Result").(ResultParams); ok {
 		top := res.TopScoringIntent
-		log.Printf("top: %#v", top)
 		if top.Intent == ic._intent && top.Score >= ic._score {
 			ic.Out <- ctx
+		} else {
+			ic.Next <- ctx
 		}
 	} else {
 		log.Printf("无效的 Context Value Result")

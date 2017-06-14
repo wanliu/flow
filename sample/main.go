@@ -56,7 +56,10 @@ func (q *QuerySave) Init() {
 		ctx, cok := q.Value("Ctx").(Context)
 		if rok && cok {
 			ctx.SetValue("Result", res)
-			q.Out <- ctx
+
+			go func() {
+				q.Out <- ctx
+			}()
 		}
 
 		return nil
@@ -64,12 +67,12 @@ func (q *QuerySave) Init() {
 }
 
 func (q *QuerySave) OnCtx(ctx Context) {
-	log.Printf("QuerySave Ctx: %#v", ctx)
 	q.SetValue("Ctx", ctx)
 }
 
 func (q *QuerySave) OnResult(res ResultParams) {
-	log.Printf("QuerySave Result: %#v", res)
+	top := res.TopScoringIntent
+	log.Printf("意图解析 -> %s 准确度: %2.2f%%", top.Intent, top.Score*100)
 	q.SetValue("Result", res)
 }
 
@@ -82,8 +85,10 @@ func newLuisGraph() *testNet {
 		input = new(MyInput)
 		luis  = new(LuisAnalyze)
 		// lo    = new(Log)
-		qs = new(QuerySave)
-		ic = new(IntentCheck)
+		qs       = new(QuerySave)
+		ic       = new(IntentCheck)
+		products = new(TryGetProducts)
+		reset    = new(CtxReset)
 	)
 
 	cm.SendHandle = func(ctx, parent Context) error {
@@ -98,23 +103,27 @@ func newLuisGraph() *testNet {
 	// net.Add(lo, "Log")
 	net.Add(ic, "OpenOrder")
 	net.Add(qs, "Merge")
+	net.Add(products, "TryProducts")
+	net.Add(reset, "Reset")
 
-	net.AddIIP("052297dc-12b9-4044-8220-a21a20d72581", "Luis", "AppId")
-	net.AddIIP("6b916f7c107643069c242cf881609a82", "Luis", "Key")
+	net.AddIIP("8b65b31f-05b0-4da0-ab98-afa62c0e80ae", "Luis", "AppId")
+	net.AddIIP("9c6711ad95c846a792248515cb6d1a23", "Luis", "Key")
 	net.AddIIP("请输入你的话:", "Line", "Prompt")
 	net.AddIIP("开单", "OpenOrder", "Intent")
-	net.AddIIP(0.75, "OpenOrder", "Score")
+	net.AddIIP(0.70, "OpenOrder", "Score")
+	net.AddIIP("products", "TryProducts", "Type")
 
 	net.Connect("Line", "Out", "Luis", "In")
 	net.Connect("Line", "Next", "Merge", "Ctx")
 	net.Connect("Luis", "Out", "Merge", "Result")
 	net.Connect("Merge", "Out", "CM", "Ctx")
 	net.Connect("CM", "Process", "OpenOrder", "Ctx")
-
+	net.Connect("OpenOrder", "Out", "TryProducts", "Ctx")
+	net.Connect("TryProducts", "Out", "Reset", "In")
 	// net.Connect("OpenOrder", "Out", "Log", "In")
 
 	net.MapInPort("In", "Line", "Ctx")
-	net.MapOutPort("Out", "OpenOrder", "Out")
+	// net.MapOutPort("Out", "TryProducts", "Out")
 
 	// net.MapOutPort("Out", "luis", "Out")
 	return net
@@ -124,17 +133,17 @@ func main() {
 	net := newLuisGraph()
 
 	in := make(chan Context)
-	out := make(chan Context)
+	// out := make(chan Context)
 
 	net.SetInPort("In", in)
-	net.SetOutPort("Out", out)
+	// net.SetOutPort("Out", out)
 
 	goflow.RunNet(net)
 	<-net.Ready()
 	log.Printf("net: %# v", pretty.Formatter(net))
 	ctx := NewContext()
 	in <- ctx
-	<-out
+	// <-out
 
 	<-net.Wait()
 }

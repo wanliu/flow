@@ -90,6 +90,11 @@ type CtxControl struct {
 	ctx     Context
 }
 
+type CtxReset struct {
+	flow.Component
+	In <-chan Context
+}
+
 func (cc *ContextComponent) Init() {
 	if cc.TaskHandle == nil {
 		cc.TaskHandle = func(ctx Context, raw interface{}) error {
@@ -219,4 +224,8 @@ func (cv *ContextBool) OnField(name string) {
 
 func NewContextManager() *ContextManager {
 	return &ContextManager{}
+}
+
+func (cr *CtxReset) OnIn(ctx Context) {
+	ctx.Reset()
 }

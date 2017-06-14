@@ -1,8 +1,9 @@
 package builtin
 
 import (
+	"bufio"
 	"fmt"
-	"log"
+	"os"
 	"strings"
 
 	flow "github.com/wanliu/goflow"
@@ -41,13 +42,11 @@ func (r *ReadInput) Loop() {
 func (r *ReadInput) GetLine() <-chan string {
 	ch := make(chan string)
 	go func() {
-		var in string
+		reader := bufio.NewReader(os.Stdin)
 		fmt.Printf(r._prompt)
-		_, err := fmt.Scanf("%s", &in)
-		if err != nil {
-			log.Printf("err: %s", err)
-		}
-		ch <- in
+		text, _ := reader.ReadString('\n')
+		text = strings.TrimRight(text, "\n")
+		ch <- text
 	}()
 	return ch
 }

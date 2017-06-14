@@ -46,7 +46,10 @@ type IntentScore struct {
 }
 
 type Resolution struct {
-	Date string
+	Value  string
+	Date   string
+	Time   string
+	Values []string
 }
 
 type EntityScore struct {

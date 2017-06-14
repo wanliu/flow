@@ -3,13 +3,14 @@ package builtin
 import (
 	"reflect"
 	"sync"
+	"time"
 )
 
 type ProcessHandle func() error
 
 type MultiField struct {
-	sync.Once
-	cond    sync.Cond
+	cond    *sync.Cond
+	once    *sync.Once
 	Fields  []string
 	Process ProcessHandle
 	ms      *MultiFieldSet
@@ -26,40 +27,54 @@ type MultiFieldValue struct {
 }
 
 func (mf *MultiField) Run() {
-	mf.Do(func() {
+	if mf.ms == nil {
 		mf.ms = &MultiFieldSet{
 			Fields: mf.Fields,
 			Values: make([]MultiFieldValue, 0),
 		}
+	}
 
-		if mf.cond.L == nil {
-			mf.cond.L = &sync.Mutex{}
-		}
+	if mf.once == nil {
+		mf.once = new(sync.Once)
+	}
+
+	mf.once.Do(func() {
+		mf.cond = sync.NewCond(&sync.Mutex{})
 		mf.cond.L.Lock()
-
 		for !mf.ms.Valid() {
 			mf.cond.Wait()
 		}
+
 		if mf.Process != nil {
 			mf.Process()
 		}
-		// mf.Reset()
-		mf.ms = nil
 		mf.cond.L.Unlock()
-
+		mf.Reset()
 	})
+
 }
 
 func (mf *MultiField) SetValue(name string, val interface{}) {
-	mf.Run()
+	go mf.Run()
+	time.Sleep(1 * time.Millisecond)
 	mf.ms.SetValue(name, val)
+	mf.cond.Signal()
 }
 
 func (mf *MultiField) Value(name string) interface{} {
 	if mf.ms != nil {
-		return mf.Value(name)
+		return mf.ms.Value(name)
 	}
 	return nil
+}
+
+func (mf *MultiField) Reset() {
+	mf.ms = &MultiFieldSet{
+		Fields: mf.Fields,
+		Values: make([]MultiFieldValue, 0),
+	}
+
+	mf.once = nil
 }
 
 func (ms *MultiFieldSet) Valid() bool {
@@ -67,7 +82,8 @@ func (ms *MultiFieldSet) Valid() bool {
 		var match bool
 		for _, val := range ms.Values {
 			v := reflect.ValueOf(val.Value)
-			if val.Name == field && isZero(v) {
+
+			if val.Name == field && !isZero(v) {
 				match = true
 				break
 			}
