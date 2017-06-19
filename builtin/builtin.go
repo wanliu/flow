@@ -24,6 +24,7 @@ func ComponentList() map[string]func() interface{} {
 	_components["MyInput"] = NewMyInput
 	_components["QuerySave"] = NewQuerySave
 	_components["ContextManager"] = NewContextManager
+	_components["Final"] = NewFinal
 
 	return _components
 }
