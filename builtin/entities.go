@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 
+	. "github.com/wanliu/flow/context"
 	flow "github.com/wanliu/goflow"
 )
 
