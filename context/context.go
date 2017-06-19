@@ -2,7 +2,7 @@ package context
 
 import (
 	"fmt"
-	"log"
+	"time"
 )
 
 type ErrorHandle func(error) error
@@ -11,7 +11,7 @@ type TaskHandle func(ctx Context, raw interface{}) error
 
 type ctxt struct {
 	Stack *Stack
-	reply Replyer
+	Reply Replyer
 
 	values map[interface{}]interface{}
 	retry  chan bool
@@ -19,7 +19,12 @@ type ctxt struct {
 	done   chan bool
 	rece   chan interface{}
 
+	send      chan string
+	sendTable chan *Table
+	quit      chan bool
+
 	isRunning bool
+	counter   int
 
 	errHandle      ErrorHandle
 	replyErrHandle ErrorHandle
@@ -30,17 +35,24 @@ type Context interface {
 	Peek() Context
 	Push(Context)
 	Pop() Context
+
 	Wait(TaskHandle)
 	Retry()
 	Cancel()
 	Done()
 	Send(interface{})
+
 	Value(interface{}) interface{}
 	SetValue(interface{}, interface{})
 	GlobalValue(interface{}) interface{}
 	SetGlobalValue(interface{}, interface{})
+
 	Post(string, ...interface{}) error
 	PostTable(Table) error
+
+	Run()
+	Close()
+
 	Reset()
 	IsRunning() bool
 }
@@ -55,22 +67,27 @@ type ContextOption struct {
 	Error ErrorHandle
 }
 
-func NewContext(args ...CtxOptFunc) *ctxt {
+func NewContext(args ...CtxOptFunc) (*ctxt, error) {
 	opt, err := ctxOption(args)
 	if err != nil {
 		return nil, err
 	}
 
 	root := &ctxt{
-		values: make(map[interface{}]interface{}),
-		retry:  make(chan bool),
-		cancel: make(chan bool),
-		rece:   make(chan interface{}),
-		done:   make(chan bool),
+		values:    make(map[interface{}]interface{}),
+		retry:     make(chan bool),
+		cancel:    make(chan bool),
+		rece:      make(chan interface{}),
+		done:      make(chan bool),
+		send:      make(chan string),
+		sendTable: make(chan *Table),
+		quit:      make(chan bool),
+		errHandle: opt.Error,
+		Reply:     opt.Reply,
 	}
 
 	root.Stack = NewStack(root)
-	return root
+	return root, nil
 }
 
 func ctxOption(args []CtxOptFunc) (*ContextOption, error) {
@@ -102,7 +119,7 @@ func OnError(errHandle ErrorHandle) CtxOptFunc {
 }
 
 func (ctx *ctxt) NewContext() Context {
-	childCtx := NewContext()
+	childCtx, _ := NewContext()
 	childCtx.Stack = ctx.Stack
 
 	return childCtx
@@ -182,10 +199,41 @@ func (ctx *ctxt) Send(raw interface{}) {
 	}
 }
 
-func (ctx *ctxt) Post(msg string, args ...interface{}) error {
-	// ctx.Stack.
-	log.Printf(msg, args...)
+// func (ctx *ctxt) Post(msg string, args ...interface{}) error {
+// 	// ctx.Stack.
+// 	log.Printf(msg, args...)
+// 	return nil
+// }
+
+func (ctx *ctxt) Post(text string, args ...interface{}) error {
+	ctx.counter++
+	ctx.Stack.Root.send <- fmt.Sprintf(text, args...)
 	return nil
+}
+
+func (ctx *ctxt) PostTable(table Table) error {
+	ctx.counter++
+	ctx.Stack.Root.sendTable <- &table
+	return nil
+}
+
+func (ctx *ctxt) Run() {
+	var err error
+LOOP:
+	for {
+		select {
+		case txt := <-ctx.send:
+			ctx.counter--
+			err = ctx.Reply.Text(txt)
+		case table := <-ctx.sendTable:
+			ctx.counter--
+			err = ctx.Reply.Table(table)
+		case <-ctx.quit:
+			// ctx.waitingEnd()
+			break LOOP
+		}
+		ctx.doReplyError(err)
+	}
 }
 
 func (ctx *ctxt) IsRunning() bool {
@@ -211,6 +259,38 @@ func (ctx *ctxt) Reset() {
 	root.done = make(chan bool)
 	root.isRunning = false
 	root.Stack.Children = make([]Context, 0)
+}
+
+func (ctx *ctxt) Close() {
+	var (
+		tick = 1
+		tt   = time.NewTimer(15 * time.Second)
+		exit bool
+	)
+
+	for !exit {
+		select {
+		case <-time.After(time.Duration(tick) * time.Millisecond):
+			if ctx.counter > 0 {
+				tick *= 2
+			} else {
+				exit = true
+				break
+			}
+		case <-tt.C:
+			exit = true
+			break
+		}
+	}
+	ctx.quit <- true
+}
+
+func (ctx *ctxt) OnError(handle ErrorHandle) {
+	ctx.errHandle = handle
+}
+
+func (ctx *ctxt) OnReplyError(handle ErrorHandle) {
+	ctx.replyErrHandle = handle
 }
 
 func (ctx *ctxt) doError(err error) error {

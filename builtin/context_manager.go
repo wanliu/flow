@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	. "github.com/wanliu/flow/context"
 	flow "github.com/wanliu/goflow"
 )
 

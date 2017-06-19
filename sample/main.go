@@ -5,6 +5,7 @@ import (
 
 	"github.com/kr/pretty"
 	. "github.com/wanliu/flow/builtin"
+	. "github.com/wanliu/flow/context"
 	goflow "github.com/wanliu/goflow"
 )
 
@@ -77,7 +78,7 @@ func main() {
 	goflow.RunNet(net)
 	<-net.Ready()
 	log.Printf("net: %# v", pretty.Formatter(net))
-	ctx := NewContext()
+	ctx, _ := NewContext()
 	in <- ctx
 	// <-out
 
