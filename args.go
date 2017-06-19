@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wanliu/flow/builtin"
+	"github.com/wanliu/flow/context"
 	goflow "github.com/wanliu/goflow"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -138,8 +138,8 @@ func GuessType(typ string, val string) (ch interface{}, name string, v interface
 			ch = make(chan float64)
 			return
 		case "context":
-			v = builtin.NewContext()
-			ch = make(chan builtin.Context)
+			v, _ = context.NewContext()
+			ch = make(chan context.Context)
 
 			return
 		default:
