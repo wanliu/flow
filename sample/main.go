@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"strings"
 
 	"github.com/kr/pretty"
 	. "github.com/wanliu/flow/builtin"
