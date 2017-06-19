@@ -6,7 +6,7 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/kr/pretty"
+	// "github.com/kr/pretty"
 
 	"github.com/wanliu/flow"
 	goflow "github.com/wanliu/goflow"
@@ -70,7 +70,7 @@ func main() {
 		inports.SetInPorts(net)
 		// outports.SetOutPorts(net)
 		goflow.RunNet(net)
-		log.Printf("net: %# v", pretty.Formatter(net))
+		// log.Printf("net: %# v", pretty.Formatter(net))
 
 		// Wait for the network setup
 		<-net.Ready()

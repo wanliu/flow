@@ -1,7 +1,8 @@
 package builtin
 
 import (
-	"log"
+	"fmt"
+	// "log"
 	"strings"
 
 	. "github.com/wanliu/flow/context"
@@ -12,6 +13,11 @@ type Product struct {
 	Name   string
 	Price  float64
 	Number int
+}
+
+type ReplyData struct {
+	Reply string
+	Ctx   Context
 }
 
 type TryGetEntities struct {
@@ -27,7 +33,7 @@ type TryGetProducts struct {
 	TryGetEntities
 	Ctx  <-chan Context
 	Type <-chan string
-	Out  chan<- Context
+	Out  chan<- ReplyData
 }
 
 func NewTryGetProducts() interface{} {
@@ -66,14 +72,20 @@ func (tr *TryGetProducts) OnCtx(ctx Context) {
 
 		if len(products) > 0 {
 			ctx.SetGlobalValue("products", &products)
-			log.Printf("找到 %d 产品 (%s)", len(products), ProInfo(products))
-			tr.Out <- ctx
-
+			// log.Printf("找到 %d 产品 (%s)", len(products), ProInfo(products))
+			// tr.No <- ctx
+			reply := fmt.Sprintf("找到 %d 产品 (%s)", len(products), ProInfo(products))
+			replyData := ReplyData{reply, ctx}
+			tr.Out <- replyData
 		} else {
-			tr.No <- ctx
+			// tr.No <- ctx
+			replyData := ReplyData{"没有相关的产品", ctx}
+			tr.Out <- replyData
 		}
 	} else {
-		tr.No <- ctx
+		// tr.No <- ctx
+		replyData := ReplyData{"出现错误，请稍后重试", ctx}
+		tr.Out <- replyData
 	}
 }
 

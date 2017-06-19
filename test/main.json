@@ -1,8 +1,5 @@
 {
   "processes": {
-    "Line": {
-      "component": "MyInput"
-    },
     "Luis": {
       "component": "LuisAnalyze"
     },
@@ -18,31 +15,11 @@
     "TryProducts": {
       "component": "TryGetProducts"
     },
-    "Reset": {
-      "component": "CtxReset"
+    "reply": {
+      "component": "Final"
     }
   },
   "connections": [
-    {
-      "src": {
-        "process": "Line",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Luis",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "Line",
-        "port": "Next"
-      },
-      "tgt": {
-        "process": "Merge",
-        "port": "Ctx"
-      }
-    },
     {
       "src": {
         "process": "Luis",
@@ -89,7 +66,7 @@
         "port": "Out"
       },
       "tgt": {
-        "process": "Reset",
+        "process": "reply",
         "port": "In"
       }
     },
@@ -105,13 +82,6 @@
       "tgt": {
         "process": "Luis",
         "port": "Key"
-      }
-    },
-    {
-      "data": "请输入你的话",
-      "tgt": {
-        "process": "Line",
-        "port": "Prompt"
       }
     },
     {
@@ -137,8 +107,12 @@
     }
   ],
   "inports": {
-    "In": {
-      "process": "Line",
+    "Text": {
+      "process": "Luis",
+      "port": "In"
+    },
+    "Ctx": {
+      "process": "Merge",
       "port": "Ctx"
     }
   },

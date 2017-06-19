@@ -542,7 +542,7 @@ func TestLuisTalk(t *testing.T) {
 
 	flow.RunNet(net)
 	<-net.Ready()
-	log.Printf("net: %# v", pretty.Formatter(net))
+	// log.Printf("net: %# v", pretty.Formatter(net))
 
 	ctx := NewContext()
 	in <- ctx
