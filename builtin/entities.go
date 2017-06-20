@@ -60,6 +60,7 @@ func (tr *TryGetEntities) OnCtx(ctx Context) {
 }
 
 func (tr *TryGetProducts) OnCtx(ctx Context) {
+
 	if res, ok := ctx.Value("Result").(ResultParams); ok {
 		var products = make([]Product, 0)
 		for _, entity := range res.Entities {

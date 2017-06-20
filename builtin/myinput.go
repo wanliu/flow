@@ -59,7 +59,8 @@ func (q *QuerySave) Init() {
 		ctx, cok := q.Value("Ctx").(Context)
 		if rok && cok {
 			ctx.SetValue("Result", res)
-
+			top := res.TopScoringIntent
+			log.Printf("意图解析 -> %s 准确度: %2.2f%%", top.Intent, top.Score*100)
 			go func() {
 				q.Out <- ctx
 			}()
@@ -74,7 +75,5 @@ func (q *QuerySave) OnCtx(ctx Context) {
 }
 
 func (q *QuerySave) OnResult(res ResultParams) {
-	top := res.TopScoringIntent
-	log.Printf("意图解析 -> %s 准确度: %2.2f%%", top.Intent, top.Score*100)
 	q.SetValue("Result", res)
 }
