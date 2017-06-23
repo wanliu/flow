@@ -126,6 +126,7 @@ func (cc *ContextComponent) OnEnter(ctx Context) {
 	ctx.Push(childCtx)
 
 	go func(task Context) {
+
 		task.Wait(cc.TaskHandle)
 		ctx.Pop()
 		cc.Next <- ctx
@@ -198,6 +199,7 @@ func (cc *CtxControl) OnDone(do bool) {
 
 func (cv *ContextString) OnCtx(ctx Context) {
 	if str, ok := ctx.GlobalValue(cv.fieldName).(string); ok {
+
 		cv.Out <- str
 		cv.Next <- ctx
 	} else {

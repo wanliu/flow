@@ -1,5 +1,8 @@
 {
   "processes": {
+    "Line": {
+      "component": "MyInput"
+    },
     "Luis": {
       "component": "LuisAnalyze"
     },
@@ -9,17 +12,37 @@
     "CM": {
       "component": "ContextManager"
     },
-    "OpenOrder": {
+    "IntentDispatcher": {
       "component": "IntentCheck"
     },
-    "TryProducts": {
-      "component": "TryGetProducts"
+    "OpenOrder": {
+      "component": "Order"
     },
     "reply": {
       "component": "Final"
     }
   },
   "connections": [
+    {
+      "src": {
+        "process": "Line",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Luis",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Line",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "Merge",
+        "port": "Ctx"
+      }
+    },
     {
       "src": {
         "process": "Luis",
@@ -46,23 +69,23 @@
         "port": "Process"
       },
       "tgt": {
-        "process": "OpenOrder",
+        "process": "IntentDispatcher",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "OpenOrder",
+        "process": "IntentDispatcher",
         "port": "Out"
       },
       "tgt": {
-        "process": "TryProducts",
+        "process": "OpenOrder",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "TryProducts",
+        "process": "OpenOrder",
         "port": "Out"
       },
       "tgt": {
@@ -85,34 +108,30 @@
       }
     },
     {
+      "data": "请输入你的话",
+      "tgt": {
+        "process": "Line",
+        "port": "Prompt"
+      }
+    },
+    {
       "data": "开单",
       "tgt": {
-        "process": "OpenOrder",
+        "process": "IntentDispatcher",
         "port": "Intent"
       }
     },
     {
       "data": 0.7,
       "tgt": {
-        "process": "OpenOrder",
+        "process": "IntentDispatcher",
         "port": "Score"
-      }
-    },
-    {
-      "data": "products",
-      "tgt": {
-        "process": "TryProducts",
-        "port": "Type"
       }
     }
   ],
   "inports": {
-    "Text": {
-      "process": "Luis",
-      "port": "In"
-    },
-    "Ctx": {
-      "process": "Merge",
+    "In": {
+      "process": "Line",
       "port": "Ctx"
     }
   },
