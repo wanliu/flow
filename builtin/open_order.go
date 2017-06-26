@@ -21,7 +21,7 @@ type OpenOrderResolve struct {
 	Products   ProductsResolve
 	Address    AddressResolve
 	Time       OrderTimeResolve
-	current    Resolve
+	Current    Resolve
 }
 
 func NewOpenOrderResolve(ctx Context) *OpenOrderResolve {
@@ -31,6 +31,21 @@ func NewOpenOrderResolve(ctx Context) *OpenOrderResolve {
 	resolve.ExtractFromLuis()
 
 	return resolve
+}
+
+func (t *OpenOrderResolve) Solve(luis ResultParams) (bool, error) {
+	solved, err := t.Current.Solve(luis)
+	log.Printf("==================== solved: %v", solved)
+	if solved {
+		t.Current = t.Next()
+	}
+
+	log.Printf("==================== NEXT NAME: %V", t.Current)
+	return solved, err
+}
+
+func (t OpenOrderResolve) Hint() string {
+	return t.Current.Hint()
 }
 
 // 从ｌｕｉｓ数据构造结构数据
@@ -106,15 +121,15 @@ func (t OpenOrderResolve) Fullfilled() bool {
 func (t *OpenOrderResolve) Next() Resolve {
 	if !t.ProductsFullfilled() {
 		unsolved := t.NextProduct()
-		t.current = unsolved
+		t.Current = unsolved
 		return unsolved
 	} else if !t.AddressFullfilled() {
-		unsolved := new(AddressResolve)
-		t.current = unsolved
+		unsolved := AddressResolve{parent: t}
+		t.Current = unsolved
 		return unsolved
 	} else if !t.TimeFullfilled() {
-		unsolved := new(OrderTimeResolve)
-		t.current = unsolved
+		unsolved := OrderTimeResolve{parent: t}
+		t.Current = unsolved
 		return unsolved
 	} else {
 		return nil

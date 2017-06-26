@@ -4,7 +4,7 @@ import (
 	// . "github.com/wanliu/flow/context"
 	// goflow "github.com/wanliu/goflow"
 	// "fmt"
-	// "log"
+	"log"
 	// "strings"
 	"errors"
 	"time"
@@ -17,28 +17,43 @@ type Resolve interface {
 
 type ProductsResolve struct {
 	Products []ProductResolve
+	Current  ProductResolve
 }
 
-func (prs *ProductsResolve) add(pr ProductResolve) {
-	prs.Products = append(prs.Products, pr)
+func (psr ProductsResolve) Hint() string {
+	return psr.Current.Hint()
 }
 
-func (prs ProductsResolve) NextProduct() Resolve {
-	for _, product := range prs.Products {
-		if !product.Resolved {
-			return product
+func (psr ProductsResolve) Solve(luis ResultParams) (bool, error) {
+	solved, err := psr.Current.Solve(luis)
+	if solved {
+		psr.NextProduct()
+	}
+
+	return solved, err
+}
+
+func (psr *ProductsResolve) add(pr ProductResolve) {
+	psr.Products = append(psr.Products, pr)
+}
+
+func (psr ProductsResolve) NextProduct() Resolve {
+	for _, pr := range psr.Products {
+		if !pr.Resolved {
+			psr.Current = pr
+			return pr
 		}
 	}
 
 	return ProductResolve{}
 }
 
-func (prs ProductsResolve) Fullfilled() bool {
-	if len(prs.Products) == 0 {
+func (psr ProductsResolve) Fullfilled() bool {
+	if len(psr.Products) == 0 {
 		return false
 	}
 
-	for _, product := range prs.Products {
+	for _, product := range psr.Products {
 		if !product.Resolved {
 			return false
 		}
@@ -55,7 +70,7 @@ type ProductResolve struct {
 	Number     int
 	Product    string
 	Resolution Resolution
-	current    *Resolve
+	Current    Resolve
 }
 
 func (pr ProductResolve) Hint() string {
@@ -84,11 +99,14 @@ func (pr ProductResolve) Hint() string {
 }
 
 func (pr ProductResolve) Solve(luis ResultParams) (bool, error) {
+	log.Printf("......................SOLVE.......................... %v", pr.Name)
+	pr.Resolved = true
 	return true, errors.New("err")
 }
 
 type AddressResolve struct {
 	Address string
+	parent  *OpenOrderResolve
 }
 
 func (ar AddressResolve) Hint() string {
@@ -104,7 +122,8 @@ func (ar AddressResolve) Fullfilled() bool {
 }
 
 type OrderTimeResolve struct {
-	Time time.Time
+	Time   time.Time
+	parent *OpenOrderResolve
 }
 
 func (ar OrderTimeResolve) Hint() string {

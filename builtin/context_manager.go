@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	_ "log"
 	"sync"
 	"time"
 
@@ -24,8 +25,10 @@ func NewContextManager() interface{} {
 
 func (cm *ContextManager) Init() {
 	if cm.SendHandle == nil {
-		cm.SendHandle = func(ctx, _ Context) error {
-			ctx.Send("Hello")
+		cm.SendHandle = func(childCtx, ctx Context) error {
+			// childCtx.Send("Hello")
+			// log.Printf("................. params: ........%v", ctx.Value("Result").(ResultParams))
+			childCtx.Send(ctx)
 			return nil
 		}
 	}
