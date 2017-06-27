@@ -53,7 +53,7 @@ func (order *Order) TaskHandle(ctx Context, raw interface{}) error {
 		log.Printf("=== SOLVED ===" + finishNotition)
 		ctx.Pop() // 将当前任务踢出队列
 	} else {
-		log.Printf("======= OOOO %v", nextNotition)
+		log.Printf("测试输出打印: %v, \n %v", nextNotition, orderResolve.Products)
 		reply := ReplyData{nextNotition, ctx}
 		order.Out <- reply
 	}

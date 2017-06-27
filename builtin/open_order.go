@@ -47,7 +47,7 @@ func (t *OpenOrderResolve) Solve(luis ResultParams) (bool, string, string) {
 			t.Current = t.Next()
 			hint := t.Current.Hint()
 
-			return false, finishNotition, hint
+			return false, finishNotition, finishNotition + "\n" + hint
 		}
 	} else {
 		return solved, finishNotition, nextNotition

@@ -5,7 +5,8 @@ import (
 	// goflow "github.com/wanliu/goflow"
 	// "fmt"
 	_ "errors"
-	_ "log"
+	// "log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -35,7 +36,7 @@ func (psr ProductsResolve) Solve(luis ResultParams) (bool, string, string) {
 				selected = append(selected, resolve.Product)
 			}
 
-			notition := "您已经选择了 " + strings.Join(selected, ", ") + "等" + string(len(selected)) + "件商品"
+			notition := "您已经选择了 " + strings.Join(selected, ", ") + "等" + strconv.Itoa(len(selected)) + "件商品"
 
 			return solved, notition, ""
 		} else {
@@ -102,7 +103,7 @@ func (pr ProductResolve) Hint() string {
 		choses := "\n"
 
 		for _, value := range pr.Resolution.Values {
-			choses = choses + string(index) + ": " + value + "\n"
+			choses = choses + strconv.Itoa(index) + ": " + value + "\n"
 			index = index + 1
 		}
 
@@ -118,21 +119,29 @@ func (pr ProductResolve) Hint() string {
 }
 
 func (pr ProductResolve) Solve(luis ResultParams) (bool, string, string) {
-	// log.Printf("......................SOLVE.......................... %v, %V", pr.Name, len(pr.Parent.Products))
 	if luis.TopScoringIntent.Intent == "选择" {
+		// TODO 无法识别全角数字
+		number := strings.Trim(luis.Entities[0].Entity, " ")
+		chose, _ := strconv.ParseInt(number, 10, 64)
+
 		for _, product := range pr.Parent.Products {
 			if product.Name == pr.Name {
-				// log.Printf("------------------------------- FOUND ------------------------%v", product)
-				product.Resolved = true
-				// log.Printf("------------------------------- MODIFIED ------------------------%v", product)
+				if len(product.Resolution.Values) >= int(chose) {
+					prdName := product.Resolution.Values[chose-1]
+
+					product.Product = prdName
+					product.Resolved = true
+					return true, "已选择" + prdName, "err"
+				} else {
+					return false, "", "超出选择范围\n" + product.Hint()
+				}
 			}
 		}
-		// pr.Resolved = true
-		return true, "已选择ｘｘｘｘ商品", "err"
+
+		return false, "", "错误的操作，没有可供选择的商品"
 	} else {
 		return false, "", "无效的输入\n" + pr.Hint()
 	}
-
 }
 
 type AddressResolve struct {
@@ -154,10 +163,6 @@ func (pr AddressResolve) Solve(luis ResultParams) (bool, string, string) {
 	}
 }
 
-// func (ar AddressResolve) Fullfilled() bool {
-// 	return ar.Address != ""
-// }
-
 type OrderTimeResolve struct {
 	// Time   time.Time
 	Parent *OpenOrderResolve
@@ -175,10 +180,6 @@ func (pr OrderTimeResolve) Solve(luis ResultParams) (bool, string, string) {
 		return false, "", "无效的输入\n" + pr.Hint()
 	}
 }
-
-// func (ar OrderTimeResolve) Fullfilled() bool {
-// 	return !ar.Time.IsZero()
-// }
 
 func (pr *ProductResolve) CheckResolved() {
 	if len(pr.Resolution.Values) == 0 {
