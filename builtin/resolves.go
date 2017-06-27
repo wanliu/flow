@@ -4,15 +4,15 @@ import (
 	// . "github.com/wanliu/flow/context"
 	// goflow "github.com/wanliu/goflow"
 	// "fmt"
+	_ "errors"
 	_ "log"
-	// "strings"
-	"errors"
+	"strings"
 	"time"
 )
 
 type Resolve interface {
 	Hint() string
-	Solve(ResultParams) (bool, error)
+	Solve(ResultParams) (bool, string, string) // 是否全部完成，完成提示，下一步动作提醒
 }
 
 type ProductsResolve struct {
@@ -24,16 +24,30 @@ func (psr ProductsResolve) Hint() string {
 	return psr.Current.Hint()
 }
 
-func (psr ProductsResolve) Solve(luis ResultParams) (bool, error) {
-	solved, err := psr.Current.Solve(luis)
-	if solved && !psr.Fullfilled() {
-		solve := psr.NextProduct()
+func (psr ProductsResolve) Solve(luis ResultParams) (bool, string, string) {
+	solved, finishNotition, nextNotition := psr.Current.Solve(luis)
+	if solved {
+		if psr.Fullfilled() {
+			// selected = "您已经选择了:"
+			selected := make([]string, 10)
 
-		hint := errors.New(solve.Hint())
-		return false, hint
+			for _, resolve := range psr.Products {
+				selected = append(selected, resolve.Product)
+			}
+
+			notition := "您已经选择了 " + strings.Join(selected, ", ") + "等" + string(len(selected)) + "件商品"
+
+			return solved, notition, ""
+		} else {
+			solve := psr.NextProduct()
+
+			hint := solve.Hint()
+			return false, finishNotition, hint
+		}
+	} else {
+		return solved, finishNotition, nextNotition
 	}
 
-	return solved, err
 }
 
 func (psr *ProductsResolve) add(pr ProductResolve) {
@@ -103,18 +117,22 @@ func (pr ProductResolve) Hint() string {
 
 }
 
-func (pr ProductResolve) Solve(luis ResultParams) (bool, error) {
+func (pr ProductResolve) Solve(luis ResultParams) (bool, string, string) {
 	// log.Printf("......................SOLVE.......................... %v, %V", pr.Name, len(pr.Parent.Products))
-
-	for _, product := range pr.Parent.Products {
-		if product.Name == pr.Name {
-			// log.Printf("------------------------------- FOUND ------------------------%v", product)
-			product.Resolved = true
-			// log.Printf("------------------------------- MODIFIED ------------------------%v", product)
+	if luis.TopScoringIntent.Intent == "选择" {
+		for _, product := range pr.Parent.Products {
+			if product.Name == pr.Name {
+				// log.Printf("------------------------------- FOUND ------------------------%v", product)
+				product.Resolved = true
+				// log.Printf("------------------------------- MODIFIED ------------------------%v", product)
+			}
 		}
+		// pr.Resolved = true
+		return true, "已选择ｘｘｘｘ商品", "err"
+	} else {
+		return false, "", "无效的输入\n" + pr.Hint()
 	}
-	// pr.Resolved = true
-	return true, errors.New("err")
+
 }
 
 type AddressResolve struct {
@@ -126,10 +144,14 @@ func (ar AddressResolve) Hint() string {
 	return "请告诉我送货地址"
 }
 
-func (pr AddressResolve) Solve(luis ResultParams) (bool, error) {
+func (pr AddressResolve) Solve(luis ResultParams) (bool, string, string) {
 	// pr.Address = "some where"
-	pr.Parent.Address = "some where"
-	return true, errors.New("err")
+	if luis.TopScoringIntent.Intent == "地址" {
+		pr.Parent.Address = "some where"
+		return true, "已经定好了送货地址", "err"
+	} else {
+		return false, "", "无效的输入\n" + pr.Hint()
+	}
 }
 
 // func (ar AddressResolve) Fullfilled() bool {
@@ -145,9 +167,13 @@ func (ar OrderTimeResolve) Hint() string {
 	return "请告诉我送货时间"
 }
 
-func (pr OrderTimeResolve) Solve(luis ResultParams) (bool, error) {
-	pr.Parent.Time = time.Now()
-	return true, errors.New("err")
+func (pr OrderTimeResolve) Solve(luis ResultParams) (bool, string, string) {
+	if luis.TopScoringIntent.Intent == "时间" {
+		pr.Parent.Time = time.Now()
+		return true, "已经定好了送货时间", "err"
+	} else {
+		return false, "", "无效的输入\n" + pr.Hint()
+	}
 }
 
 // func (ar OrderTimeResolve) Fullfilled() bool {

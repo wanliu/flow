@@ -4,7 +4,7 @@ import (
 	. "github.com/wanliu/flow/context"
 	// goflow "github.com/wanliu/goflow"
 	// "fmt"
-	"errors"
+	// "errors"
 	"log"
 	"time"
 	// "strings"
@@ -37,18 +37,22 @@ func NewOpenOrderResolve(ctx Context) *OpenOrderResolve {
 	return resolve
 }
 
-func (t *OpenOrderResolve) Solve(luis ResultParams) (bool, error) {
-	solved, err := t.Current.Solve(luis)
-	// log.Printf("==================== solved: %v", solved)
-	if solved && !t.Fullfilled() {
-		t.Current = t.Next()
-		hint := errors.New(t.Current.Hint())
+func (t *OpenOrderResolve) Solve(luis ResultParams) (bool, string, string) {
+	solved, finishNotition, nextNotition := t.Current.Solve(luis)
 
-		return false, hint
+	if solved {
+		if t.Fullfilled() {
+			return true, "订单输入完成", ""
+		} else {
+			t.Current = t.Next()
+			hint := t.Current.Hint()
+
+			return false, finishNotition, hint
+		}
+	} else {
+		return solved, finishNotition, nextNotition
 	}
 
-	// log.Printf("==================== NEXT NAME: %V", t.Current)
-	return solved, err
 }
 
 func (t OpenOrderResolve) Hint() string {

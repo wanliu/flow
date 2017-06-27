@@ -36,22 +36,25 @@ func (order *Order) OnCtx(ctx Context) {
 
 	go func(task Context) {
 		task.Wait(order.TaskHandle)
+		// if ctx.
 		// ctx.Pop()
 	}(childCtx)
 }
 
 func (order *Order) TaskHandle(ctx Context, raw interface{}) error {
+
 	params := raw.(Context).Value("Result").(ResultParams)
 
 	orderResolve := ctx.Value("orderResolve").(*OpenOrderResolve)
 
-	solved, err := orderResolve.Solve(params)
+	solved, finishNotition, nextNotition := orderResolve.Solve(params)
 
 	if solved {
-		// reply := ReplyData{}
+		log.Printf("=== SOLVED ===" + finishNotition)
+		ctx.Pop() // 将当前任务踢出队列
 	} else {
-		log.Printf("======= OOOO %v", err.Error())
-		reply := ReplyData{err.Error(), ctx}
+		log.Printf("======= OOOO %v", nextNotition)
+		reply := ReplyData{nextNotition, ctx}
 		order.Out <- reply
 	}
 	// ctx.Send(raw)
