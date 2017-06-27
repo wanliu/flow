@@ -118,8 +118,8 @@ func (pr ProductResolve) Solve(luis ResultParams) (bool, error) {
 }
 
 type AddressResolve struct {
-	Address string
-	Parent  *OpenOrderResolve
+	// Address string
+	Parent *OpenOrderResolve
 }
 
 func (ar AddressResolve) Hint() string {
@@ -127,16 +127,17 @@ func (ar AddressResolve) Hint() string {
 }
 
 func (pr AddressResolve) Solve(luis ResultParams) (bool, error) {
-
+	// pr.Address = "some where"
+	pr.Parent.Address = "some where"
 	return true, errors.New("err")
 }
 
-func (ar AddressResolve) Fullfilled() bool {
-	return ar.Address != ""
-}
+// func (ar AddressResolve) Fullfilled() bool {
+// 	return ar.Address != ""
+// }
 
 type OrderTimeResolve struct {
-	Time   time.Time
+	// Time   time.Time
 	Parent *OpenOrderResolve
 }
 
@@ -145,12 +146,13 @@ func (ar OrderTimeResolve) Hint() string {
 }
 
 func (pr OrderTimeResolve) Solve(luis ResultParams) (bool, error) {
+	pr.Parent.Time = time.Now()
 	return true, errors.New("err")
 }
 
-func (ar OrderTimeResolve) Fullfilled() bool {
-	return !ar.Time.IsZero()
-}
+// func (ar OrderTimeResolve) Fullfilled() bool {
+// 	return !ar.Time.IsZero()
+// }
 
 func (pr *ProductResolve) CheckResolved() {
 	if len(pr.Resolution.Values) == 0 {

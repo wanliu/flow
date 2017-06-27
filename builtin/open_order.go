@@ -6,6 +6,7 @@ import (
 	// "fmt"
 	"errors"
 	"log"
+	"time"
 	// "strings"
 )
 
@@ -20,9 +21,11 @@ type OpenOrderResolve struct {
 	// Products   []ProductResolve
 	LuisParams ResultParams
 	Products   ProductsResolve
-	Address    AddressResolve
-	Time       OrderTimeResolve
-	Current    Resolve
+	// Address    AddressResolve
+	// Time       OrderTimeResolve
+	Address string
+	Time    time.Time
+	Current Resolve
 }
 
 func NewOpenOrderResolve(ctx Context) *OpenOrderResolve {
@@ -107,11 +110,13 @@ func (t OpenOrderResolve) ProductsFullfilled() bool {
 }
 
 func (t OpenOrderResolve) TimeFullfilled() bool {
-	return t.Time.Fullfilled()
+	// return t.Time.Fullfilled()
+	return !t.Time.IsZero()
 }
 
 func (t OpenOrderResolve) AddressFullfilled() bool {
-	return t.Address.Fullfilled()
+	// return t.Address.Fullfilled()
+	return t.Address != ""
 }
 
 // 是否条件全部满足
