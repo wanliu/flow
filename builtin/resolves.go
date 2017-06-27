@@ -4,7 +4,7 @@ import (
 	// . "github.com/wanliu/flow/context"
 	// goflow "github.com/wanliu/goflow"
 	// "fmt"
-	"log"
+	_ "log"
 	// "strings"
 	"errors"
 	"time"
@@ -16,8 +16,8 @@ type Resolve interface {
 }
 
 type ProductsResolve struct {
-	Products []ProductResolve
-	Current  ProductResolve
+	Products []*ProductResolve
+	Current  *ProductResolve
 }
 
 func (psr ProductsResolve) Hint() string {
@@ -26,18 +26,22 @@ func (psr ProductsResolve) Hint() string {
 
 func (psr ProductsResolve) Solve(luis ResultParams) (bool, error) {
 	solved, err := psr.Current.Solve(luis)
-	if solved {
-		psr.NextProduct()
+	if solved && !psr.Fullfilled() {
+		solve := psr.NextProduct()
+
+		hint := errors.New(solve.Hint())
+		return false, hint
 	}
 
 	return solved, err
 }
 
 func (psr *ProductsResolve) add(pr ProductResolve) {
-	psr.Products = append(psr.Products, pr)
+	pr.Parent = psr
+	psr.Products = append(psr.Products, &pr)
 }
 
-func (psr ProductsResolve) NextProduct() Resolve {
+func (psr *ProductsResolve) NextProduct() Resolve {
 	for _, pr := range psr.Products {
 		if !pr.Resolved {
 			psr.Current = pr
@@ -71,6 +75,7 @@ type ProductResolve struct {
 	Product    string
 	Resolution Resolution
 	Current    Resolve
+	Parent     *ProductsResolve
 }
 
 func (pr ProductResolve) Hint() string {
@@ -99,14 +104,22 @@ func (pr ProductResolve) Hint() string {
 }
 
 func (pr ProductResolve) Solve(luis ResultParams) (bool, error) {
-	log.Printf("......................SOLVE.......................... %v", pr.Name)
-	pr.Resolved = true
+	// log.Printf("......................SOLVE.......................... %v, %V", pr.Name, len(pr.Parent.Products))
+
+	for _, product := range pr.Parent.Products {
+		if product.Name == pr.Name {
+			// log.Printf("------------------------------- FOUND ------------------------%v", product)
+			product.Resolved = true
+			// log.Printf("------------------------------- MODIFIED ------------------------%v", product)
+		}
+	}
+	// pr.Resolved = true
 	return true, errors.New("err")
 }
 
 type AddressResolve struct {
 	Address string
-	parent  *OpenOrderResolve
+	Parent  *OpenOrderResolve
 }
 
 func (ar AddressResolve) Hint() string {
@@ -114,6 +127,7 @@ func (ar AddressResolve) Hint() string {
 }
 
 func (pr AddressResolve) Solve(luis ResultParams) (bool, error) {
+
 	return true, errors.New("err")
 }
 
@@ -123,7 +137,7 @@ func (ar AddressResolve) Fullfilled() bool {
 
 type OrderTimeResolve struct {
 	Time   time.Time
-	parent *OpenOrderResolve
+	Parent *OpenOrderResolve
 }
 
 func (ar OrderTimeResolve) Hint() string {

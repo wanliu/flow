@@ -44,7 +44,16 @@ func (order *Order) TaskHandle(ctx Context, raw interface{}) error {
 	params := raw.(Context).Value("Result").(ResultParams)
 
 	orderResolve := ctx.Value("orderResolve").(*OpenOrderResolve)
-	orderResolve.Solve(params)
+
+	solved, err := orderResolve.Solve(params)
+
+	if solved {
+		// reply := ReplyData{}
+	} else {
+		log.Printf("======= OOOO %v", err.Error())
+		reply := ReplyData{err.Error(), ctx}
+		order.Out <- reply
+	}
 	// ctx.Send(raw)
 	return nil
 }

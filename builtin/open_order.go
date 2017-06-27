@@ -4,6 +4,7 @@ import (
 	. "github.com/wanliu/flow/context"
 	// goflow "github.com/wanliu/goflow"
 	// "fmt"
+	"errors"
 	"log"
 	// "strings"
 )
@@ -35,12 +36,15 @@ func NewOpenOrderResolve(ctx Context) *OpenOrderResolve {
 
 func (t *OpenOrderResolve) Solve(luis ResultParams) (bool, error) {
 	solved, err := t.Current.Solve(luis)
-	log.Printf("==================== solved: %v", solved)
-	if solved {
+	// log.Printf("==================== solved: %v", solved)
+	if solved && !t.Fullfilled() {
 		t.Current = t.Next()
+		hint := errors.New(t.Current.Hint())
+
+		return false, hint
 	}
 
-	log.Printf("==================== NEXT NAME: %V", t.Current)
+	// log.Printf("==================== NEXT NAME: %V", t.Current)
 	return solved, err
 }
 
@@ -124,11 +128,11 @@ func (t *OpenOrderResolve) Next() Resolve {
 		t.Current = unsolved
 		return unsolved
 	} else if !t.AddressFullfilled() {
-		unsolved := AddressResolve{parent: t}
+		unsolved := AddressResolve{Parent: t}
 		t.Current = unsolved
 		return unsolved
 	} else if !t.TimeFullfilled() {
-		unsolved := OrderTimeResolve{parent: t}
+		unsolved := OrderTimeResolve{Parent: t}
 		t.Current = unsolved
 		return unsolved
 	} else {
