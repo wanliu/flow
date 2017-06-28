@@ -81,9 +81,7 @@ func (ms *MultiFieldSet) Valid() bool {
 	for _, field := range ms.Fields {
 		var match bool
 		for _, val := range ms.Values {
-			v := reflect.ValueOf(val.Value)
-
-			if val.Name == field && !isZero(v) {
+			if val.Name == field {
 				match = true
 				break
 			}
@@ -109,13 +107,19 @@ func isZero(v reflect.Value) bool {
 	case reflect.Struct:
 		z := true
 		for i := 0; i < v.NumField(); i++ {
-			z = z && isZero(v.Field(i))
+			if v.Field(i).CanSet() {
+				z = z && isZero(v.Field(i))
+			}
 		}
 		return z
+	case reflect.Ptr:
+		return isZero(reflect.Indirect(v))
 	}
 	// Compare other types directly:
 	z := reflect.Zero(v.Type())
-	return v.Interface() == z.Interface()
+	result := v.Interface() == z.Interface()
+
+	return result
 }
 
 func (ms *MultiFieldSet) SetValue(name string, val interface{}) {

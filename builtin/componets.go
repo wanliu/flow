@@ -41,6 +41,13 @@ type ReadLine struct {
 	Error chan<- error
 }
 
+type Component struct {
+	Name        string
+	Description string
+	Icon        string
+	Constructor func() interface{}
+}
+
 func NewGetElement() interface{} {
 	return new(GetElement)
 }

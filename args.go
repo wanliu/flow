@@ -138,7 +138,7 @@ func GuessType(typ string, val string) (ch interface{}, name string, v interface
 			ch = make(chan float64)
 			return
 		case "context":
-			v, err = context.NewContext()
+			v, _ = context.NewContext()
 			ch = make(chan context.Context)
 
 			return
