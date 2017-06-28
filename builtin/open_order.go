@@ -90,7 +90,7 @@ func (t *OpenOrderResolve) ExtractQuantity() []int {
 
 	for _, item := range t.LuisParams.Entities {
 		if item.Type == "builtin.number" {
-			number := strings.Trim(item.Entity, " ")
+			number := strings.Trim(item.Resolution.Value, " ")
 			q, _ := strconv.ParseInt(number, 10, 64)
 			result = append(result, int(q))
 		}

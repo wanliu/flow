@@ -121,7 +121,7 @@ func (pr ProductResolve) Hint() string {
 func (pr ProductResolve) Solve(luis ResultParams) (bool, string, string) {
 	if luis.TopScoringIntent.Intent == "选择" {
 		// TODO 无法识别全角数字
-		number := strings.Trim(luis.Entities[0].Entity, " ")
+		number := strings.Trim(luis.Entities[0].Resolution.Value, " ")
 		chose, _ := strconv.ParseInt(number, 10, 64)
 
 		for _, product := range pr.Parent.Products {
