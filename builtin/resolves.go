@@ -5,7 +5,7 @@ import (
 	// goflow "github.com/wanliu/goflow"
 	// "fmt"
 	_ "errors"
-	// "log"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -86,7 +86,7 @@ type ProductResolve struct {
 	Resolved   bool
 	Name       string
 	Price      float64
-	Number     int
+	Quantity   int
 	Product    string
 	Resolution Resolution
 	Current    Resolve
@@ -110,7 +110,7 @@ func (pr ProductResolve) Hint() string {
 		choses = choses + "\n"
 
 		result = "我们有下列的 " + pr.Name + " 产品:" + choses + "请输入序号选择"
-	} else if pr.Number == 0 {
+	} else if pr.Quantity == 0 {
 		result = "请告诉我您要购买的数量\n"
 	}
 
@@ -156,8 +156,10 @@ func (ar AddressResolve) Hint() string {
 func (pr AddressResolve) Solve(luis ResultParams) (bool, string, string) {
 	// pr.Address = "some where"
 	if luis.TopScoringIntent.Intent == "地址" {
-		pr.Parent.Address = "some where"
-		return true, "已经定好了送货地址", "err"
+		address := strings.Trim(luis.Entities[0].Entity, " ")
+		pr.Parent.Address = address
+
+		return true, "已经定好了送货地址:" + address, "err"
 	} else {
 		return false, "", "无效的输入\n" + pr.Hint()
 	}
@@ -174,8 +176,24 @@ func (ar OrderTimeResolve) Hint() string {
 
 func (pr OrderTimeResolve) Solve(luis ResultParams) (bool, string, string) {
 	if luis.TopScoringIntent.Intent == "时间" {
-		pr.Parent.Time = time.Now()
-		return true, "已经定好了送货时间", "err"
+		dTime := time.Now()
+
+		for _, e := range luis.Entities {
+			if e.Type == "builtin.datetime.date" {
+				luisTime, err := time.Parse("2006-01-02", e.Resolution.Date)
+
+				if err != nil {
+					log.Printf("::::::::ERROR: %v", err)
+				} else {
+					dTime = luisTime
+				}
+			}
+		}
+
+		// dTime := strings.Trim(luis.Entities[0].Entity, " ")
+
+		pr.Parent.Time = dTime
+		return true, "已经定好了送货时间:" + dTime.String(), "err"
 	} else {
 		return false, "", "无效的输入\n" + pr.Hint()
 	}

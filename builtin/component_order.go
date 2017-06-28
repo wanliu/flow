@@ -50,10 +50,15 @@ func (order *Order) TaskHandle(ctx Context, raw interface{}) error {
 	solved, finishNotition, nextNotition := orderResolve.Solve(params)
 
 	if solved {
-		log.Printf("=== SOLVED ===" + finishNotition)
+		log.Printf("测试输出打印: \n%v", finishNotition)
+
+		reply := ReplyData{finishNotition, ctx}
+		order.Out <- reply
+
 		ctx.Pop() // 将当前任务踢出队列
 	} else {
-		log.Printf("测试输出打印: %v, \n %v", nextNotition, orderResolve.Products)
+		log.Printf("测试输出打印: \n%v\n", nextNotition)
+
 		reply := ReplyData{nextNotition, ctx}
 		order.Out <- reply
 	}

@@ -6,8 +6,9 @@ import (
 	// "fmt"
 	// "errors"
 	"log"
+	"strconv"
+	"strings"
 	"time"
-	// "strings"
 )
 
 // 处理开单的逻辑结构, 不需要是组件
@@ -42,7 +43,7 @@ func (t *OpenOrderResolve) Solve(luis ResultParams) (bool, string, string) {
 
 	if solved {
 		if t.Fullfilled() {
-			return true, "订单输入完成", ""
+			return true, finishNotition + "\n" + t.String(), ""
 		} else {
 			t.Current = t.Next()
 			hint := t.Current.Hint()
@@ -63,12 +64,39 @@ func (t OpenOrderResolve) Hint() string {
 func (t *OpenOrderResolve) ExtractFromLuis() {
 	// log.Printf("====:: %v", t.LuisParams.Entities)
 
-	t.ExtractProducts()
+	// t.ExtractProducts()
+	t.ExtractItems()
 	t.ExtractAddress()
 	t.ExtractTime()
 	// t.ExtractQuantity()
 
 	// log.Printf("----> %v", t.Products)
+}
+
+// TODO 无法识别全角数字
+func (t *OpenOrderResolve) ExtractItems() {
+	t.ExtractProducts()
+	quantities := t.ExtractQuantity()
+
+	for i, q := range quantities {
+		if len(t.Products.Products) >= i+1 {
+			t.Products.Products[i].Quantity = q
+		}
+	}
+}
+
+func (t *OpenOrderResolve) ExtractQuantity() []int {
+	result := make([]int, 0, 10)
+
+	for _, item := range t.LuisParams.Entities {
+		if item.Type == "builtin.number" {
+			number := strings.Trim(item.Entity, " ")
+			q, _ := strconv.ParseInt(number, 10, 64)
+			result = append(result, int(q))
+		}
+	}
+
+	return result
 }
 
 func (t *OpenOrderResolve) ExtractProducts() {
@@ -78,7 +106,7 @@ func (t *OpenOrderResolve) ExtractProducts() {
 				Resolved:   false,
 				Name:       item.Entity,
 				Price:      0,
-				Number:     1, // 默认值
+				Quantity:   1, // 默认值
 				Product:    "",
 				Resolution: item.Resolution,
 			}
@@ -161,4 +189,21 @@ func (t OpenOrderResolve) PostService() string {
 
 func (t OpenOrderResolve) NextProduct() Resolve {
 	return t.Products.NextProduct()
+}
+
+func (t OpenOrderResolve) String() string {
+	result := ""
+
+	result = result + "=== 订单输入完成 ===\n"
+	result = result + "本订单包含如下商品：" + "\n"
+
+	for _, p := range t.Products.Products {
+		result = result + p.Product + " " + strconv.Itoa(p.Quantity) + "件\n"
+	}
+
+	result = result + "地址:" + t.Address + "\n"
+	result = result + "送货时间" + t.Time.String() + "\n"
+	result = result + "=== 结束 ===\n"
+
+	return result
 }
