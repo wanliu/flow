@@ -177,6 +177,10 @@ func (t *OpenOrderResolve) Next() Resolve {
 	}
 }
 
+func (t OpenOrderResolve) EmptyProducts() bool {
+	return len(t.Products.Products) == 0
+}
+
 func (t OpenOrderResolve) NextNotify() string {
 	unsolved := t.Next()
 	return unsolved.Hint()

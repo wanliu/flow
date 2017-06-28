@@ -20,14 +20,18 @@ func NewOrder() interface{} {
 }
 
 func (order *Order) OnCtx(ctx Context) {
-	// if _, ok := ctx.Value("Result").(ResultParams); ok {
-	// orderResolve := NewOpenOrderResolve(ctx)
 	orderResolve := NewOpenOrderResolve(ctx)
 	childCtx := ctx.NewContext()
 	childCtx.SetValue("orderResolve", orderResolve)
-	ctx.Push(childCtx)
-	// orderResolve.AddressFullfilled()
-	output := orderResolve.Next().Hint()
+
+	output := ""
+
+	if orderResolve.EmptyProducts() {
+		output = "没有相关的产品"
+	} else {
+		ctx.Push(childCtx)
+		output = orderResolve.Next().Hint()
+	}
 
 	log.Printf("OUTPUT: %v", output)
 
