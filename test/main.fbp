@@ -1,32 +1,33 @@
-# INPORT=Luis.In:Text
-# INPORT=Merge.Ctx:Ctx
+INPORT=Luis.In:Text
+INPORT=Merge.Ctx:Ctx
 
-# Luis(LuisAnalyze) Out -> Result Merge()
-# Merge(QuerySave) Out -> Ctx CM(ContextManager)
-# CM() Process -> Ctx OpenOrder(IntentCheck)
-# OpenOrder() Out -> Ctx TryProducts(TryGetProducts)
-# # TryProducts() Out -> In Reset(CtxReset)
-# TryProducts() Out -> In reply(Final)
-
-# '8b65b31f-05b0-4da0-ab98-afa62c0e80ae' -> AppId Luis()
-# '9c6711ad95c846a792248515cb6d1a23' -> Key Luis()
-# '开单' -> Intent OpenOrder()
-# 0.70 -> Score OpenOrder()
-# 'products' -> Type TryProducts()
-
-INPORT=Line.Ctx:In
- 
-Line(MyInput) Out -> In Luis(LuisAnalyze)
-Line() Next -> Ctx Merge(QuerySave)
-Luis() Out -> Result Merge()
-Merge() Out -> Ctx CM(ContextManager)
+Luis(LuisAnalyze) Out -> Result Merge()
+Merge(QuerySave) Out -> Ctx CM(ContextManager)
 CM() Process -> Ctx IntentDispatcher(IntentCheck)
 IntentDispatcher() Out -> Ctx OpenOrder(Order)
 OpenOrder() Out -> In reply(Final)
 
 '8b65b31f-05b0-4da0-ab98-afa62c0e80ae' -> AppId Luis()
 '9c6711ad95c846a792248515cb6d1a23' -> Key Luis()
-'请输入你的话' -> Prompt Line()
 '开单' -> Intent IntentDispatcher()
 0.70 -> Score IntentDispatcher()
-# 'products' -> Type OpenOrder() 
+# 'products' -> Type TryProducts()
+
+
+
+# # FOR TEST
+# INPORT=Line.Ctx:In
+ 
+# Line(MyInput) Out -> In Luis(LuisAnalyze)
+# Line() Next -> Ctx Merge(QuerySave)
+# Luis() Out -> Result Merge()
+# Merge() Out -> Ctx CM(ContextManager)
+# CM() Process -> Ctx IntentDispatcher(IntentCheck)
+# IntentDispatcher() Out -> Ctx OpenOrder(Order)
+# OpenOrder() Out -> In reply(Final)
+
+# '8b65b31f-05b0-4da0-ab98-afa62c0e80ae' -> AppId Luis()
+# '9c6711ad95c846a792248515cb6d1a23' -> Key Luis()
+# '请输入你的话' -> Prompt Line()
+# '开单' -> Intent IntentDispatcher()
+# 0.70 -> Score IntentDispatcher()
