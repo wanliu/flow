@@ -34,98 +34,98 @@ func ComponentInfos() map[string]Component {
 	result["dom/GetElement"] = Component{
 		Name:        "dom/GetElement",
 		Description: "get dom element object for demo",
-		Icon:        "",
+		Icon:        "external-link",
 		Constructor: NewGetElement,
 	}
 
 	result["Split"] = Component{
 		Name:        "Split",
 		Description: "Split ports",
-		Icon:        "",
+		Icon:        "cut",
 		Constructor: NewSplit,
 	}
 
 	result["Output"] = Component{
 		Name:        "Output",
 		Description: "Print string to terminal",
-		Icon:        "",
+		Icon:        "sign-out",
 		Constructor: NewOutput,
 	}
 
 	result["ReadFile"] = Component{
 		Name:        "ReadFile",
 		Description: "Read File data",
-		Icon:        "",
+		Icon:        "file-o",
 		Constructor: NewReadFile,
 	}
 
-	result["ReadFile"] = Component{
+	result["ReadLine"] = Component{
 		Name:        "ReadLine",
 		Description: "Read *File Stream from stdin",
-		Icon:        "",
+		Icon:        "file-text-o",
 		Constructor: NewReadLine,
 	}
 
 	result["LuisAnalyze"] = Component{
 		Name:        "LuisAnalyze",
 		Description: "Call LUIS Service to analyze query string",
-		Icon:        "",
+		Icon:        "microchip",
 		Constructor: NewLuisAnalyze,
 	}
 
 	result["Stringifier"] = Component{
 		Name:        "Stringifier",
 		Description: "stringify Luis Query response data",
-		Icon:        "",
+		Icon:        "ellipsis-h",
 		Constructor: NewStringifier,
 	}
 
 	result["IntentCheck"] = Component{
 		Name:        "IntentCheck",
 		Description: "Check LuisQuery result with Intent and Score",
-		Icon:        "",
+		Icon:        "search-plus",
 		Constructor: NewIntentCheck,
 	}
 
 	result["CtxReset"] = Component{
 		Name:        "CtxReset",
 		Description: "Reset Context to initial status",
-		Icon:        "",
+		Icon:        "refresh",
 		Constructor: NewCtxReset,
 	}
 
 	result["TryGetProducts"] = Component{
 		Name:        "TryGetProducts",
 		Description: "Try to query products data from Entities of Luis Query Result",
-		Icon:        "",
+		Icon:        "product-hunt",
 		Constructor: NewTryGetProducts,
 	}
 
 	result["MyInput"] = Component{
 		Name:        "MyInput",
 		Description: "Input with stdin stream",
-		Icon:        "",
+		Icon:        "keyboard-o",
 		Constructor: NewMyInput,
 	}
 
 	result["QuerySave"] = Component{
 		Name:        "QuerySave",
 		Description: "Merge Context with Value",
-		Icon:        "",
+		Icon:        "save",
 		Constructor: NewQuerySave,
 	}
 
 	result["ContextManager"] = Component{
 		Name:        "ContextManager",
 		Description: "Context Manager must be use in Context Component",
-		Icon:        "",
+		Icon:        "server",
 		Constructor: NewQuerySave,
 	}
 
 	result["Final"] = Component{
 		Name:        "Final",
 		Description: "Context Final Component",
-		Icon:        "",
+		Icon:        "stop-circle",
 		Constructor: NewFinal,
 	}
 	return result
