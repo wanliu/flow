@@ -106,7 +106,7 @@ func (t *OpenOrderResolve) ExtractProducts() {
 				Resolved:   false,
 				Name:       item.Entity,
 				Price:      0,
-				Quantity:   1, // 默认值
+				Quantity:   0, // 默认值
 				Product:    "",
 				Resolution: item.Resolution,
 			}

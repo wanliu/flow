@@ -89,8 +89,8 @@ type ProductResolve struct {
 	Quantity   int
 	Product    string
 	Resolution Resolution
-	Current    Resolve
 	Parent     *ProductsResolve
+	// Current    string
 }
 
 func (pr ProductResolve) Hint() string {
@@ -123,17 +123,31 @@ func (pr ProductResolve) Solve(luis ResultParams) (bool, string, string) {
 		// TODO 无法识别全角数字
 		number := strings.Trim(luis.Entities[0].Resolution.Value, " ")
 		chose, _ := strconv.ParseInt(number, 10, 64)
+		inNum := int(chose)
 
 		for _, product := range pr.Parent.Products {
 			if product.Name == pr.Name {
-				if len(product.Resolution.Values) >= int(chose) {
-					prdName := product.Resolution.Values[chose-1]
+				if product.Product == "" {
+					if len(product.Resolution.Values) >= inNum {
+						prdName := product.Resolution.Values[chose-1]
 
-					product.Product = prdName
-					product.Resolved = true
-					return true, "已选择" + prdName, "err"
-				} else {
-					return false, "", "超出选择范围\n" + product.Hint()
+						product.Product = prdName
+						product.CheckResolved()
+
+						return true, "已选择" + prdName, "err"
+					} else {
+						return false, "", "超出选择范围\n" + product.Hint()
+					}
+				} else if product.Quantity == 0 {
+					if 0 < inNum {
+						product.Quantity = inNum
+						product.CheckResolved()
+
+						return true, "购买的数量为：" + strconv.Itoa(inNum), ""
+					} else {
+						return false, "", "购买的数量必须大于零, 请重新输入\n"
+					}
+
 				}
 			}
 		}
@@ -202,5 +216,9 @@ func (pr OrderTimeResolve) Solve(luis ResultParams) (bool, string, string) {
 func (pr *ProductResolve) CheckResolved() {
 	if len(pr.Resolution.Values) == 0 {
 		pr.Product = pr.Name
+	}
+
+	if pr.Product != "" && pr.Quantity > 0 {
+		pr.Resolved = true
 	}
 }

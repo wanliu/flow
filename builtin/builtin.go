@@ -129,9 +129,10 @@ func ComponentInfos() map[string]Component {
 		Icon:        "",
 		Constructor: NewFinal,
 	}
+
 	result["Order"] = Component{
 		Name:        "Order",
-		Description: "Context Final Component",
+		Description: "New Order Component",
 		Icon:        "",
 		Constructor: NewOrder,
 	}
