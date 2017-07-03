@@ -25,6 +25,7 @@ func ComponentList() map[string]func() interface{} {
 	_components["QuerySave"] = NewQuerySave
 	_components["ContextManager"] = NewContextManager
 	_components["Final"] = NewFinal
+	_components["Order"] = NewOrder
 
 	return _components
 }
@@ -127,6 +128,13 @@ func ComponentInfos() map[string]Component {
 		Description: "Context Final Component",
 		Icon:        "stop-circle",
 		Constructor: NewFinal,
+	}
+
+	result["Order"] = Component{
+		Name:        "Order",
+		Description: "New Order Component",
+		Icon:        "",
+		Constructor: NewOrder,
 	}
 	return result
 }

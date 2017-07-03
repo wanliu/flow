@@ -9,11 +9,11 @@
     "CM": {
       "component": "ContextManager"
     },
-    "OpenOrder": {
+    "IntentDispatcher": {
       "component": "IntentCheck"
     },
-    "TryProducts": {
-      "component": "TryGetProducts"
+    "OpenOrder": {
+      "component": "Order"
     },
     "reply": {
       "component": "Final"
@@ -46,23 +46,23 @@
         "port": "Process"
       },
       "tgt": {
-        "process": "OpenOrder",
+        "process": "IntentDispatcher",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "OpenOrder",
+        "process": "IntentDispatcher",
         "port": "Out"
       },
       "tgt": {
-        "process": "TryProducts",
+        "process": "OpenOrder",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "TryProducts",
+        "process": "OpenOrder",
         "port": "Out"
       },
       "tgt": {
@@ -87,22 +87,15 @@
     {
       "data": "开单",
       "tgt": {
-        "process": "OpenOrder",
+        "process": "IntentDispatcher",
         "port": "Intent"
       }
     },
     {
       "data": 0.7,
       "tgt": {
-        "process": "OpenOrder",
+        "process": "IntentDispatcher",
         "port": "Score"
-      }
-    },
-    {
-      "data": "products",
-      "tgt": {
-        "process": "TryProducts",
-        "port": "Type"
       }
     }
   ],

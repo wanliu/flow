@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kr/pretty"
+	. "github.com/wanliu/flow/context"
 	flow "github.com/wanliu/goflow"
 )
 
@@ -348,7 +348,7 @@ func TestContextManager2(t *testing.T) {
 	<-net.Ready()
 	// log.Printf("%# v", pretty.Formatter(net))
 
-	ctx := NewContext()
+	ctx, _ := NewContext()
 	in <- ctx
 	time.Sleep(1 * time.Millisecond)
 	in <- ctx
@@ -383,7 +383,7 @@ func BenchmarkContextGraph(b *testing.B) {
 	<-net.Ready()
 
 	for i := 0; i < b.N; i++ {
-		ctx := NewContext()
+		ctx, _ := NewContext()
 		in <- ctx
 		time.Sleep(1 * time.Millisecond)
 		in <- ctx
@@ -409,7 +409,7 @@ func BenchmarkContextGraph2(b *testing.B) {
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			ctx := NewContext()
+			ctx, _ := NewContext()
 			in <- ctx
 			time.Sleep(1 * time.Millisecond)
 			in <- ctx
@@ -434,17 +434,17 @@ func TestContextManager3(t *testing.T) {
 	<-net.Ready()
 	// log.Printf("%# v", pretty.Formatter(net))
 
-	ctx := NewContext()
+	ctx, _ := NewContext()
 	in <- ctx
 	time.Sleep(1 * time.Millisecond)
 	in <- ctx
 	time.Sleep(1 * time.Millisecond)
-	ctx = NewContext()
+	ctx, _ = NewContext()
 	in <- ctx
 	time.Sleep(1 * time.Millisecond)
 	in <- ctx
 	time.Sleep(1 * time.Millisecond)
-	ctx = NewContext()
+	ctx, _ = NewContext()
 	in <- ctx
 	time.Sleep(1 * time.Millisecond)
 	in <- ctx
@@ -484,16 +484,15 @@ func TestContextManager4(t *testing.T) {
 	flow.RunNet(net)
 	<-net.Ready()
 
-	ctx1 := NewContext()
+	ctx1, _ := NewContext()
 	in <- ctx1
+
 	time.Sleep(1 * time.Millisecond)
 	ctx1.SetValue("Msg", "Hello")
-
 	in <- ctx1
 
 	time.Sleep(2 * time.Millisecond)
 	ctx1.SetValue("Msg", "World")
-
 	in <- ctx1
 
 	go func() {
@@ -544,7 +543,7 @@ func TestLuisTalk(t *testing.T) {
 	<-net.Ready()
 	// log.Printf("net: %# v", pretty.Formatter(net))
 
-	ctx := NewContext()
+	ctx, _ := NewContext()
 	in <- ctx
 
 	<-net.Wait()

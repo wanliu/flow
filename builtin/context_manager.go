@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	_ "log"
 	"sync"
 	"time"
 
@@ -24,8 +25,10 @@ func NewContextManager() interface{} {
 
 func (cm *ContextManager) Init() {
 	if cm.SendHandle == nil {
-		cm.SendHandle = func(ctx, _ Context) error {
-			ctx.Send("Hello")
+		cm.SendHandle = func(childCtx, ctx Context) error {
+			// childCtx.Send("Hello")
+			// log.Printf("................. params: ........%v", ctx.Value("Result").(ResultParams))
+			childCtx.Send(ctx)
 			return nil
 		}
 	}
@@ -126,6 +129,7 @@ func (cc *ContextComponent) OnEnter(ctx Context) {
 	ctx.Push(childCtx)
 
 	go func(task Context) {
+
 		task.Wait(cc.TaskHandle)
 		ctx.Pop()
 		cc.Next <- ctx
@@ -198,6 +202,7 @@ func (cc *CtxControl) OnDone(do bool) {
 
 func (cv *ContextString) OnCtx(ctx Context) {
 	if str, ok := ctx.GlobalValue(cv.fieldName).(string); ok {
+
 		cv.Out <- str
 		cv.Next <- ctx
 	} else {
