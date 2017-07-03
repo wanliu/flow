@@ -121,11 +121,27 @@ func (t *OpenOrderResolve) ExtractProducts() {
 }
 
 func (t *OpenOrderResolve) ExtractAddress() {
+	for _, item := range t.LuisParams.Entities {
 
+		if item.Type == "address" {
+			t.Address = item.Entity
+		}
+	}
 }
 
 func (t *OpenOrderResolve) ExtractTime() {
+	for _, item := range t.LuisParams.Entities {
+		if item.Type == "builtin.datetime.date" {
+			luisTime, err := time.Parse("2006-01-02", item.Resolution.Date)
 
+			if err != nil {
+				log.Printf("::::::::ERROR: %v", err)
+			} else {
+				// dTime = luisTime
+				t.Time = luisTime
+			}
+		}
+	}
 }
 
 // func (t *OpenOrderResolve) ExtractQuantity() {
