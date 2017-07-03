@@ -3,14 +3,23 @@ INPORT=Merge.Ctx:Ctx
 
 Luis(LuisAnalyze) Out -> Result Merge()
 Merge(QuerySave) Out -> Ctx CM(ContextManager)
-CM() Process -> Ctx IntentDispatcher(IntentCheck)
-IntentDispatcher() Out -> Ctx OpenOrder(Order)
-OpenOrder() Out -> In reply(Final)
+CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
+PraiseIntDispatcher() Out -> Ctx Praise(Praise)
+Praise() Out -> In Reply(Final)
+PraiseIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
+OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
+OpenOrder() Out -> In Reply()
+OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
+Unimplemented() Out -> In Reply()
 
 '8b65b31f-05b0-4da0-ab98-afa62c0e80ae' -> AppId Luis()
 '9c6711ad95c846a792248515cb6d1a23' -> Key Luis()
-'开单' -> Intent IntentDispatcher()
-0.70 -> Score IntentDispatcher()
+
+'表扬' -> Intent PraiseIntDispatcher()
+0.40 -> Score PraiseIntDispatcher()
+
+'开单' -> Intent OrderIntDispatcher()
+0.70 -> Score OrderIntDispatcher()
 # # 'products' -> Type TryProducts()
 
 
