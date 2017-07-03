@@ -9,14 +9,23 @@
     "CM": {
       "component": "ContextManager"
     },
-    "IntentDispatcher": {
+    "PraiseIntDispatcher": {
+      "component": "IntentCheck"
+    },
+    "Praise": {
+      "component": "Praise"
+    },
+    "Reply": {
+      "component": "Final"
+    },
+    "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
     "OpenOrder": {
       "component": "Order"
     },
-    "reply": {
-      "component": "Final"
+    "Unimplemented": {
+      "component": "Unimplemented"
     }
   },
   "connections": [
@@ -46,13 +55,43 @@
         "port": "Process"
       },
       "tgt": {
-        "process": "IntentDispatcher",
+        "process": "PraiseIntDispatcher",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "IntentDispatcher",
+        "process": "PraiseIntDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Praise",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Praise",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "PraiseIntDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderIntDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderIntDispatcher",
         "port": "Out"
       },
       "tgt": {
@@ -66,7 +105,27 @@
         "port": "Out"
       },
       "tgt": {
-        "process": "reply",
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderIntDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "Unimplemented",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Unimplemented",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
         "port": "In"
       }
     },
@@ -85,16 +144,30 @@
       }
     },
     {
+      "data": "表扬",
+      "tgt": {
+        "process": "PraiseIntDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.4,
+      "tgt": {
+        "process": "PraiseIntDispatcher",
+        "port": "Score"
+      }
+    },
+    {
       "data": "开单",
       "tgt": {
-        "process": "IntentDispatcher",
+        "process": "OrderIntDispatcher",
         "port": "Intent"
       }
     },
     {
       "data": 0.7,
       "tgt": {
-        "process": "IntentDispatcher",
+        "process": "OrderIntDispatcher",
         "port": "Score"
       }
     }

@@ -26,6 +26,8 @@ func ComponentList() map[string]func() interface{} {
 	_components["ContextManager"] = NewContextManager
 	_components["Final"] = NewFinal
 	_components["Order"] = NewOrder
+	_components["Praise"] = NewPraise
+	_components["Unimplemented"] = NewUnimplemented
 
 	return _components
 }
@@ -133,6 +135,20 @@ func ComponentInfos() map[string]Component {
 	result["Order"] = Component{
 		Name:        "Order",
 		Description: "New Order Component",
+		Icon:        "",
+		Constructor: NewOrder,
+	}
+
+	result["Praise"] = Component{
+		Name:        "Praise",
+		Description: "Praise Component",
+		Icon:        "",
+		Constructor: NewOrder,
+	}
+
+	result["Unimplemented"] = Component{
+		Name:        "Unimplemented",
+		Description: "Unimplemented Component",
 		Icon:        "",
 		Constructor: NewOrder,
 	}
