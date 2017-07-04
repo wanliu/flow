@@ -18,6 +18,12 @@
     "Reply": {
       "component": "Final"
     },
+    "CriIntDispatcher": {
+      "component": "IntentCheck"
+    },
+    "Critical": {
+      "component": "Critical"
+    },
     "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
@@ -82,6 +88,36 @@
     {
       "src": {
         "process": "PraiseIntDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "CriIntDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CriIntDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Critical",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Critical",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Critical",
         "port": "Next"
       },
       "tgt": {
@@ -154,6 +190,20 @@
       "data": 0.4,
       "tgt": {
         "process": "PraiseIntDispatcher",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "批评",
+      "tgt": {
+        "process": "CriIntDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.4,
+      "tgt": {
+        "process": "CriIntDispatcher",
         "port": "Score"
       }
     },

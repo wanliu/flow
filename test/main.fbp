@@ -6,9 +6,15 @@ Merge(QuerySave) Out -> Ctx CM(ContextManager)
 CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
 PraiseIntDispatcher() Out -> Ctx Praise(Praise)
 Praise() Out -> In Reply(Final)
-PraiseIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
+
+PraiseIntDispatcher() Next -> Ctx CriIntDispatcher(IntentCheck)
+CriIntDispatcher() Out -> Ctx Critical(Critical)
+Critical() Out -> In Reply()
+
+Critical() Next -> Ctx OrderIntDispatcher(IntentCheck)
 OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
 OpenOrder() Out -> In Reply()
+
 OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
 Unimplemented() Out -> In Reply()
 
@@ -17,6 +23,9 @@ Unimplemented() Out -> In Reply()
 
 '表扬' -> Intent PraiseIntDispatcher()
 0.40 -> Score PraiseIntDispatcher()
+
+'批评' -> Intent CriIntDispatcher()
+0.40 -> Score CriIntDispatcher()
 
 '开单' -> Intent OrderIntDispatcher()
 0.70 -> Score OrderIntDispatcher()
