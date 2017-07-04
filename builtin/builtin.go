@@ -29,6 +29,8 @@ func ComponentList() map[string]func() interface{} {
 	_components["Praise"] = NewPraise
 	_components["Unimplemented"] = NewUnimplemented
 	_components["Critical"] = NewCritical
+	_components["Abuse"] = NewAbuse
+	_components["Greet"] = NewGreet
 
 	return _components
 }
@@ -159,6 +161,20 @@ func ComponentInfos() map[string]Component {
 		Description: "Critical Component",
 		Icon:        "",
 		Constructor: NewCritical,
+	}
+
+	result["Abuse"] = Component{
+		Name:        "Abuse",
+		Description: "Abuse Component",
+		Icon:        "",
+		Constructor: NewAbuse,
+	}
+
+	result["Greet"] = Component{
+		Name:        "Greet",
+		Description: "Greet Component",
+		Icon:        "",
+		Constructor: NewGreet,
 	}
 
 	return result

@@ -11,7 +11,15 @@ PraiseIntDispatcher() Next -> Ctx CriIntDispatcher(IntentCheck)
 CriIntDispatcher() Out -> Ctx Critical(Critical)
 Critical() Out -> In Reply()
 
-Critical() Next -> Ctx OrderIntDispatcher(IntentCheck)
+CriIntDispatcher() Next -> Ctx AbuseIntDispatcher(IntentCheck)
+AbuseIntDispatcher() Out -> Ctx Abuse(Abuse)
+Abuse() Out -> In Reply()
+
+AbuseIntDispatcher() Next -> Ctx GreetIntDispatcher(IntentCheck)
+GreetIntDispatcher() Out -> Ctx Greet(Greet)
+Greet() Out -> In Reply()
+
+GreetIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
 OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
 OpenOrder() Out -> In Reply()
 
@@ -26,6 +34,12 @@ Unimplemented() Out -> In Reply()
 
 '批评' -> Intent CriIntDispatcher()
 0.40 -> Score CriIntDispatcher()
+
+'辱骂' -> Intent AbuseIntDispatcher()
+0.40 -> Score AbuseIntDispatcher()
+
+'招呼' -> Intent GreetIntDispatcher()
+0.40 -> Score GreetIntDispatcher()
 
 '开单' -> Intent OrderIntDispatcher()
 0.70 -> Score OrderIntDispatcher()

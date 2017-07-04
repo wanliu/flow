@@ -5,19 +5,21 @@ import (
 	"log"
 )
 
-type Unimplemented struct {
+type Abuse struct {
 	TryGetEntities
 	Ctx  <-chan Context
 	Type <-chan string
 	Out  chan<- ReplyData
 }
 
-func NewUnimplemented() interface{} {
-	return new(Unimplemented)
+func NewAbuse() interface{} {
+	return new(Abuse)
 }
 
-func (order *Unimplemented) OnCtx(ctx Context) {
-	output := "你好，请问有什么可以帮您？"
+// entity: 贬低
+func (order *Abuse) OnCtx(ctx Context) {
+	// entities := ctx.Value("Result").(ResultParams).Entities
+	output := "请不要脏话哦"
 
 	log.Printf("OUTPUT: %v", output)
 

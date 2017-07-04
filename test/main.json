@@ -24,6 +24,18 @@
     "Critical": {
       "component": "Critical"
     },
+    "AbuseIntDispatcher": {
+      "component": "IntentCheck"
+    },
+    "Abuse": {
+      "component": "Abuse"
+    },
+    "GreetIntDispatcher": {
+      "component": "IntentCheck"
+    },
+    "Greet": {
+      "component": "Greet"
+    },
     "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
@@ -117,7 +129,67 @@
     },
     {
       "src": {
-        "process": "Critical",
+        "process": "CriIntDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "AbuseIntDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "AbuseIntDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Abuse",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Abuse",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "AbuseIntDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "GreetIntDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "GreetIntDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Greet",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Greet",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "GreetIntDispatcher",
         "port": "Next"
       },
       "tgt": {
@@ -204,6 +276,34 @@
       "data": 0.4,
       "tgt": {
         "process": "CriIntDispatcher",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "辱骂",
+      "tgt": {
+        "process": "AbuseIntDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.4,
+      "tgt": {
+        "process": "AbuseIntDispatcher",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "招呼",
+      "tgt": {
+        "process": "GreetIntDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.4,
+      "tgt": {
+        "process": "GreetIntDispatcher",
         "port": "Score"
       }
     },

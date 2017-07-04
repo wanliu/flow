@@ -31,7 +31,6 @@ func (order *Praise) OnCtx(ctx Context) {
 	}
 
 	for _, e := range entities {
-		log.Printf("..for.. %v, %v", e.Entity, e.Type)
 		if e.Type == "称赞" {
 			r, hasKey := replies[e.Entity]
 
