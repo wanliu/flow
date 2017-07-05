@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	. "github.com/wanliu/flow/builtin/luis"
 	. "github.com/wanliu/flow/context"
 )
 

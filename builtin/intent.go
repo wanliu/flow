@@ -3,6 +3,7 @@ package builtin
 import (
 	"log"
 
+	. "github.com/wanliu/flow/builtin/luis"
 	. "github.com/wanliu/flow/context"
 	flow "github.com/wanliu/goflow"
 )

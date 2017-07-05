@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	. "github.com/wanliu/flow/builtin/luis"
 	. "github.com/wanliu/flow/context"
 	flow "github.com/wanliu/goflow"
 )

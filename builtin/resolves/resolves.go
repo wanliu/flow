@@ -1,10 +1,11 @@
-package builtin
+package resolves
 
 import (
 	// . "github.com/wanliu/flow/context"
 	// goflow "github.com/wanliu/goflow"
 	// "fmt"
 	_ "errors"
+	. "github.com/wanliu/flow/builtin/luis"
 	"log"
 	"strconv"
 	"strings"
@@ -51,7 +52,7 @@ func (isr ItemsResolve) Solve(luis ResultParams) (bool, string, string) {
 
 }
 
-func (isr *ItemsResolve) add(pr ItemResolve) {
+func (isr *ItemsResolve) Add(pr ItemResolve) {
 	pr.Parent = isr
 	isr.Products = append(isr.Products, &pr)
 }

@@ -3,6 +3,7 @@ package builtin
 import (
 	"encoding/json"
 
+	. "github.com/wanliu/flow/builtin/luis"
 	flow "github.com/wanliu/goflow"
 )
 
