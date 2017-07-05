@@ -21,7 +21,8 @@ type OpenOrderResolve struct {
 	// Time       time.Time
 	// Products   []ProductResolve
 	LuisParams ResultParams
-	Products   ProductsResolve
+	Products   ItemsResolve
+	// Products   ProductsResolve
 	// Address    AddressResolve
 	// Time       OrderTimeResolve
 	Address string
@@ -43,7 +44,7 @@ func (t *OpenOrderResolve) Solve(luis ResultParams) (bool, string, string) {
 
 	if solved {
 		if t.Fullfilled() {
-			return true, finishNotition + "\n" + t.String(), ""
+			return true, finishNotition + "\n" + t.Answer(), ""
 		} else {
 			t.Current = t.Next()
 			hint := t.Current.Hint()
@@ -102,7 +103,7 @@ func (t *OpenOrderResolve) ExtractQuantity() []int {
 func (t *OpenOrderResolve) ExtractProducts() {
 	for _, item := range t.LuisParams.Entities {
 		if item.Type == "products" {
-			product := ProductResolve{
+			product := ItemResolve{
 				Resolved:   false,
 				Name:       item.Entity,
 				Price:      0,
@@ -211,7 +212,7 @@ func (t OpenOrderResolve) NextProduct() Resolve {
 	return t.Products.NextProduct()
 }
 
-func (t OpenOrderResolve) String() string {
+func (t OpenOrderResolve) Answer() string {
 	result := ""
 
 	result = result + "=== 订单输入完成 ===\n"

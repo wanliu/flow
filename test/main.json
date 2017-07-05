@@ -36,6 +36,12 @@
     "Greet": {
       "component": "Greet"
     },
+    "StockIntDispatcher": {
+      "component": "IntentCheck"
+    },
+    "StockQuery": {
+      "component": "StockQuery"
+    },
     "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
@@ -193,6 +199,36 @@
         "port": "Next"
       },
       "tgt": {
+        "process": "StockIntDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "StockIntDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "StockQuery",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "StockQuery",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "StockIntDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
         "process": "OrderIntDispatcher",
         "port": "Ctx"
       }
@@ -304,6 +340,20 @@
       "data": 0.4,
       "tgt": {
         "process": "GreetIntDispatcher",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "问货",
+      "tgt": {
+        "process": "StockIntDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "StockIntDispatcher",
         "port": "Score"
       }
     },

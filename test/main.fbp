@@ -19,7 +19,11 @@ AbuseIntDispatcher() Next -> Ctx GreetIntDispatcher(IntentCheck)
 GreetIntDispatcher() Out -> Ctx Greet(Greet)
 Greet() Out -> In Reply()
 
-GreetIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
+GreetIntDispatcher() Next -> Ctx StockIntDispatcher(IntentCheck)
+StockIntDispatcher() Out -> Ctx StockQuery(StockQuery)
+StockQuery() Out -> In Reply()
+
+StockIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
 OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
 OpenOrder() Out -> In Reply()
 
@@ -40,6 +44,9 @@ Unimplemented() Out -> In Reply()
 
 '招呼' -> Intent GreetIntDispatcher()
 0.40 -> Score GreetIntDispatcher()
+
+'问货' -> Intent StockIntDispatcher()
+0.70 -> Score StockIntDispatcher()
 
 '开单' -> Intent OrderIntDispatcher()
 0.70 -> Score OrderIntDispatcher()

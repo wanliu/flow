@@ -16,23 +16,23 @@ type Resolve interface {
 	Solve(ResultParams) (bool, string, string) // 是否全部完成，完成提示，下一步动作提醒
 }
 
-type ProductsResolve struct {
-	Products []*ProductResolve
-	Current  *ProductResolve
+type ItemsResolve struct {
+	Products []*ItemResolve
+	Current  *ItemResolve
 }
 
-func (psr ProductsResolve) Hint() string {
-	return psr.Current.Hint()
+func (isr ItemsResolve) Hint() string {
+	return isr.Current.Hint()
 }
 
-func (psr ProductsResolve) Solve(luis ResultParams) (bool, string, string) {
-	solved, finishNotition, nextNotition := psr.Current.Solve(luis)
+func (isr ItemsResolve) Solve(luis ResultParams) (bool, string, string) {
+	solved, finishNotition, nextNotition := isr.Current.Solve(luis)
 	if solved {
-		if psr.Fullfilled() {
+		if isr.Fullfilled() {
 			// selected = "您已经选择了:"
 			selected := make([]string, 10)
 
-			for _, resolve := range psr.Products {
+			for _, resolve := range isr.Products {
 				selected = append(selected, resolve.Product)
 			}
 
@@ -40,7 +40,7 @@ func (psr ProductsResolve) Solve(luis ResultParams) (bool, string, string) {
 
 			return solved, notition, ""
 		} else {
-			solve := psr.NextProduct()
+			solve := isr.NextProduct()
 
 			hint := solve.Hint()
 			return false, finishNotition, hint
@@ -51,28 +51,28 @@ func (psr ProductsResolve) Solve(luis ResultParams) (bool, string, string) {
 
 }
 
-func (psr *ProductsResolve) add(pr ProductResolve) {
-	pr.Parent = psr
-	psr.Products = append(psr.Products, &pr)
+func (isr *ItemsResolve) add(pr ItemResolve) {
+	pr.Parent = isr
+	isr.Products = append(isr.Products, &pr)
 }
 
-func (psr *ProductsResolve) NextProduct() Resolve {
-	for _, pr := range psr.Products {
+func (isr *ItemsResolve) NextProduct() Resolve {
+	for _, pr := range isr.Products {
 		if !pr.Resolved {
-			psr.Current = pr
+			isr.Current = pr
 			return pr
 		}
 	}
 
-	return ProductResolve{}
+	return ItemResolve{}
 }
 
-func (psr ProductsResolve) Fullfilled() bool {
-	if len(psr.Products) == 0 {
+func (isr ItemsResolve) Fullfilled() bool {
+	if len(isr.Products) == 0 {
 		return false
 	}
 
-	for _, product := range psr.Products {
+	for _, product := range isr.Products {
 		if !product.Resolved {
 			return false
 		}
@@ -81,7 +81,7 @@ func (psr ProductsResolve) Fullfilled() bool {
 	return true
 }
 
-type ProductResolve struct {
+type ItemResolve struct {
 	// Original_string string
 	Resolved   bool
 	Name       string
@@ -89,11 +89,11 @@ type ProductResolve struct {
 	Quantity   int
 	Product    string
 	Resolution Resolution
-	Parent     *ProductsResolve
+	Parent     *ItemsResolve
 	// Current    string
 }
 
-func (pr ProductResolve) Hint() string {
+func (pr ItemResolve) Hint() string {
 	// choses := "\n" + strings.Join(pr.Resolution.Values, "\n")
 
 	var result string
@@ -118,7 +118,7 @@ func (pr ProductResolve) Hint() string {
 
 }
 
-func (pr ProductResolve) Solve(luis ResultParams) (bool, string, string) {
+func (pr ItemResolve) Solve(luis ResultParams) (bool, string, string) {
 	if luis.TopScoringIntent.Intent == "选择" {
 		// TODO 无法识别全角数字
 		number := strings.Trim(luis.Entities[0].Resolution.Value, " ")
@@ -213,7 +213,7 @@ func (pr OrderTimeResolve) Solve(luis ResultParams) (bool, string, string) {
 	}
 }
 
-func (pr *ProductResolve) CheckResolved() {
+func (pr *ItemResolve) CheckResolved() {
 	if len(pr.Resolution.Values) == 0 {
 		pr.Product = pr.Name
 	}
