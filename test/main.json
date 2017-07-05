@@ -42,6 +42,12 @@
     "StockQuery": {
       "component": "StockQuery"
     },
+    "PriceIntDispatcher": {
+      "component": "IntentCheck"
+    },
+    "PriceQuery": {
+      "component": "PriceQuery"
+    },
     "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
@@ -229,6 +235,36 @@
         "port": "Next"
       },
       "tgt": {
+        "process": "PriceIntDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "PriceIntDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "PriceQuery",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "PriceQuery",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "PriceIntDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
         "process": "OrderIntDispatcher",
         "port": "Ctx"
       }
@@ -354,6 +390,20 @@
       "data": 0.7,
       "tgt": {
         "process": "StockIntDispatcher",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "问价",
+      "tgt": {
+        "process": "PriceIntDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "PriceIntDispatcher",
         "port": "Score"
       }
     },

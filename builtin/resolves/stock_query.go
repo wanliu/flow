@@ -22,14 +22,14 @@ func NewStockQueryResolve(ctx Context) *StockQueryResolve {
 
 type StockQueryResolve struct {
 	LuisParams ResultParams
-	Products   []*ProductResolve
-	Current    *ProductResolve
+	Products   []*StockProductResolve
+	Current    *StockProductResolve
 }
 
-func (sqr *StockQueryResolve) ExtractFromLuis() {
-	for _, item := range sqr.LuisParams.Entities {
+func (r *StockQueryResolve) ExtractFromLuis() {
+	for _, item := range r.LuisParams.Entities {
 		if item.Type == "products" {
-			product := ProductResolve{
+			product := StockProductResolve{
 				Resolved:   false,
 				Name:       item.Entity,
 				Stock:      0,
@@ -38,35 +38,35 @@ func (sqr *StockQueryResolve) ExtractFromLuis() {
 
 			product.CheckResolved()
 
-			product.Parent = sqr
-			sqr.Products = append(sqr.Products, &product)
+			product.Parent = r
+			r.Products = append(r.Products, &product)
 		} else {
 			log.Printf("type: %v", item.Type)
 		}
 	}
 }
 
-func (sqr *StockQueryResolve) Next() Resolve {
-	for _, pr := range sqr.Products {
+func (r *StockQueryResolve) Next() Resolve {
+	for _, pr := range r.Products {
 		if !pr.Resolved {
-			sqr.Current = pr
+			r.Current = pr
 			return pr
 		}
 	}
 
-	return ProductResolve{}
+	return StockProductResolve{}
 }
 
-func (sqr *StockQueryResolve) Solve(luis ResultParams) (bool, string, string) {
+func (r *StockQueryResolve) Solve(luis ResultParams) (bool, string, string) {
 
-	solved, finishedNotition, nextNotition := sqr.Current.Solve(luis)
+	solved, finishedNotition, nextNotition := r.Current.Solve(luis)
 
 	if solved {
-		if sqr.Fullfilled() {
-			finishedNotition = finishedNotition + "\n" + sqr.Answer()
+		if r.Fullfilled() {
+			finishedNotition = finishedNotition + "\n" + r.Answer()
 			return true, finishedNotition, nextNotition
 		} else {
-			next := finishedNotition + "\n" + sqr.Next().Hint()
+			next := finishedNotition + "\n" + r.Next().Hint()
 
 			return false, finishedNotition, next
 		}
@@ -75,8 +75,8 @@ func (sqr *StockQueryResolve) Solve(luis ResultParams) (bool, string, string) {
 	}
 }
 
-func (sqr StockQueryResolve) Fullfilled() bool {
-	for _, p := range sqr.Products {
+func (r StockQueryResolve) Fullfilled() bool {
+	for _, p := range r.Products {
 		if !p.Resolved {
 			return false
 		}
@@ -85,13 +85,13 @@ func (sqr StockQueryResolve) Fullfilled() bool {
 	return true
 }
 
-func (sqr StockQueryResolve) Answer() string {
+func (r StockQueryResolve) Answer() string {
 	selected := make([]string, 0, 10)
 
 	// TODO 查询后台商品价格
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	for _, p := range sqr.Products {
+	for _, p := range r.Products {
 		p.Stock = rand.Intn(100)
 
 		if p.Stock <= 50 {
@@ -104,6 +104,6 @@ func (sqr StockQueryResolve) Answer() string {
 	return strings.Join(selected, ", ")
 }
 
-func (sqr StockQueryResolve) EmptyProducts() bool {
-	return len(sqr.Products) == 0
+func (r StockQueryResolve) EmptyProducts() bool {
+	return len(r.Products) == 0
 }

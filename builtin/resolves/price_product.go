@@ -8,25 +8,25 @@ import (
 	. "github.com/wanliu/flow/builtin/luis"
 )
 
-type ProductResolve struct {
+type PriceProductResolve struct {
 	Resolved   bool
 	Name       string
 	Price      float64
 	Stock      int
 	Product    string
 	Resolution Resolution
-	Parent     *StockQueryResolve
+	Parent     *PriceQueryResolve
 }
 
-func (pr ProductResolve) Solve(luis ResultParams) (bool, string, string) {
+func (r PriceProductResolve) Solve(luis ResultParams) (bool, string, string) {
 	if luis.TopScoringIntent.Intent == "选择" {
 		// TODO 无法识别全角数字
 		number := strings.Trim(luis.Entities[0].Resolution.Value, " ")
 		chose, _ := strconv.ParseInt(number, 10, 64)
 		inNum := int(chose)
 
-		for _, product := range pr.Parent.Products {
-			if product.Name == pr.Name {
+		for _, product := range r.Parent.Products {
+			if product.Name == r.Name {
 				if product.Product == "" {
 					if len(product.Resolution.Values) >= inNum {
 						prdName := product.Resolution.Values[chose-1]
@@ -43,36 +43,36 @@ func (pr ProductResolve) Solve(luis ResultParams) (bool, string, string) {
 
 		return false, "", "错误的操作，没有可供选择的商品"
 	} else {
-		return false, "", "无效的输入\n" + pr.Hint()
+		return false, "", "无效的输入\n" + r.Hint()
 	}
 }
 
-func (pr ProductResolve) Hint() string {
+func (r PriceProductResolve) Hint() string {
 	result := ""
 
-	if pr.Product == "" && len(pr.Resolution.Values) > 0 {
+	if r.Product == "" && len(r.Resolution.Values) > 0 {
 		index := 1
 		choses := "\n"
 
-		for _, value := range pr.Resolution.Values {
+		for _, value := range r.Resolution.Values {
 			choses = choses + strconv.Itoa(index) + ": " + value + "\n"
 			index = index + 1
 		}
 
 		choses = choses + "\n"
 
-		result = "我们有下列的 " + pr.Name + " 产品:" + choses + "请输入序号选择你要查询的商品"
+		result = "我们有下列的 " + r.Name + " 产品:" + choses + "请输入序号选择你要查询的商品"
 	}
 
 	return result
 }
 
-func (pr *ProductResolve) CheckResolved() {
-	if len(pr.Resolution.Values) == 0 {
-		pr.Product = pr.Name
+func (r *PriceProductResolve) CheckResolved() {
+	if len(r.Resolution.Values) == 0 {
+		r.Product = r.Name
 	}
 
-	if pr.Product != "" {
-		pr.Resolved = true
+	if r.Product != "" {
+		r.Resolved = true
 	}
 }
