@@ -1,15 +1,13 @@
 package resolves
 
 import (
-	. "github.com/wanliu/flow/builtin/luis"
-	. "github.com/wanliu/flow/context"
-	// goflow "github.com/wanliu/goflow"
-	// "fmt"
-	// "errors"
 	"log"
 	"strconv"
 	"strings"
 	"time"
+
+	. "github.com/wanliu/flow/builtin/luis"
+	. "github.com/wanliu/flow/context"
 )
 
 // 处理开单的逻辑结构, 不需要是组件
