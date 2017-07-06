@@ -42,8 +42,6 @@ func (order *Order) OnCtx(ctx Context) {
 
 	go func(task Context) {
 		task.Wait(order.TaskHandle)
-		// if ctx.
-		// ctx.Pop()
 	}(childCtx)
 }
 

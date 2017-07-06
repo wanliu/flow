@@ -40,8 +40,6 @@ func (query *PriceQuery) OnCtx(ctx Context) {
 
 	go func(task Context) {
 		task.Wait(query.TaskHandle)
-		// if ctx.
-		// ctx.Pop()
 	}(childCtx)
 }
 
