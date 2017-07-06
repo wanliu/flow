@@ -28,6 +28,8 @@ func (query *PriceQuery) OnCtx(ctx Context) {
 
 	if priceQuery.EmptyProducts() {
 		output = "没有相关的产品"
+	} else if priceQuery.Fullfilled() {
+		output = priceQuery.Answer()
 	} else {
 		ctx.Push(childCtx)
 		output = priceQuery.Next().Hint()

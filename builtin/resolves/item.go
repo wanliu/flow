@@ -87,6 +87,8 @@ func (pr ItemResolve) Solve(luis ResultParams) (bool, string, string) {
 func (pr *ItemResolve) CheckResolved() {
 	if len(pr.Resolution.Values) == 0 {
 		pr.Product = pr.Name
+	} else if len(pr.Resolution.Values) == 1 {
+		pr.Product = pr.Resolution.Values[0]
 	}
 
 	if pr.Product != "" && pr.Quantity > 0 {

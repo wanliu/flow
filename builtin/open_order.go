@@ -30,6 +30,8 @@ func (order *Order) OnCtx(ctx Context) {
 
 	if orderResolve.EmptyProducts() {
 		output = "没有相关的产品"
+	} else if orderResolve.Fullfilled() {
+		output = orderResolve.Answer()
 	} else {
 		ctx.Push(childCtx)
 		output = orderResolve.Next().Hint()

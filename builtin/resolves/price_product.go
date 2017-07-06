@@ -70,6 +70,8 @@ func (r PriceProductResolve) Hint() string {
 func (r *PriceProductResolve) CheckResolved() {
 	if len(r.Resolution.Values) == 0 {
 		r.Product = r.Name
+	} else if len(r.Resolution.Values) == 1 {
+		r.Product = r.Resolution.Values[0]
 	}
 
 	if r.Product != "" {

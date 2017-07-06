@@ -25,7 +25,7 @@ func (order *Robot) OnCtx(ctx Context) {
 		"身份":   "你是要问我吗？",
 		"生理":   "我是虚拟的，这是没有意义的",
 		"亲缘":   "我也不知道有没有",
-		"亲密关系": "我还没有过这样的关系",
+		"亲密关系": "没有哦~",
 	}
 
 	replies := map[string][]string{

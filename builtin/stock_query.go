@@ -28,6 +28,8 @@ func (query *StockQuery) OnCtx(ctx Context) {
 
 	if stockQuery.EmptyProducts() {
 		output = "没有相关的产品"
+	} else if stockQuery.Fullfilled() {
+		output = stockQuery.Answer()
 	} else {
 		ctx.Push(childCtx)
 		output = stockQuery.Next().Hint()
