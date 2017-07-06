@@ -36,6 +36,12 @@
     "Greet": {
       "component": "Greet"
     },
+    "RobotIntDispatcher": {
+      "component": "IntentCheck"
+    },
+    "Robot": {
+      "component": "Robot"
+    },
     "StockIntDispatcher": {
       "component": "IntentCheck"
     },
@@ -202,6 +208,36 @@
     {
       "src": {
         "process": "GreetIntDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "RobotIntDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "RobotIntDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Robot",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Robot",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "RobotIntDispatcher",
         "port": "Next"
       },
       "tgt": {
@@ -376,6 +412,20 @@
       "data": 0.4,
       "tgt": {
         "process": "GreetIntDispatcher",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "关于机器人",
+      "tgt": {
+        "process": "RobotIntDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.4,
+      "tgt": {
+        "process": "RobotIntDispatcher",
         "port": "Score"
       }
     },
