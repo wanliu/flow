@@ -14,7 +14,16 @@ import (
 func NewPriceQueryResolve(ctx Context) *PriceQueryResolve {
 	resolve := new(PriceQueryResolve)
 
-	resolve.LuisParams = ctx.Value("Result").(ResultParams)
+	luis := ctx.Value("Result").(ResultParams)
+
+	log.Printf("BEFORE: %v", luis)
+
+	luis.Entities = DistinctEntites(luis.Entities)
+	luis.Entities = DeduplicateEntities(luis.Entities)
+
+	log.Printf("AFTER: %v", luis)
+
+	resolve.LuisParams = luis
 	resolve.ExtractFromLuis()
 
 	return resolve

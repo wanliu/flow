@@ -14,7 +14,12 @@ import (
 func NewStockQueryResolve(ctx Context) *StockQueryResolve {
 	resolve := new(StockQueryResolve)
 
-	resolve.LuisParams = ctx.Value("Result").(ResultParams)
+	luis := ctx.Value("Result").(ResultParams)
+
+	luis.Entities = DistinctEntites(luis.Entities)
+	luis.Entities = DeduplicateEntities(luis.Entities)
+
+	resolve.LuisParams = luis
 	resolve.ExtractFromLuis()
 
 	return resolve

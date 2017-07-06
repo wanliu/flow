@@ -64,3 +64,54 @@ type ResultParams struct {
 	Intents          []IntentScore `json:"intents"`
 	Entities         []EntityScore `json:"entities"`
 }
+
+func DistinctEntites(in []EntityScore) []EntityScore {
+	var (
+		result = make([]EntityScore, 0, len(in))
+		tags   = make(map[string]bool)
+	)
+
+	for _, entity := range in {
+		if _, ok := tags[entity.Entity]; !ok {
+			result = append(result, entity)
+			tags[entity.Entity] = true
+		}
+
+	}
+
+	return result
+}
+
+// TODO 修复输入全称（如：250ml伊利纯牛奶）时，返回的结果空的bug
+func DeduplicateEntities(in []EntityScore) []EntityScore {
+	var sections = make(map[*EntityScore]bool)
+	var result = make([]EntityScore, 0, len(in))
+
+	for i, _ := range in {
+
+		sections[&in[i]] = true
+	}
+
+	for i := 0; i < len(in)-1; i++ {
+		var (
+			a = in[i]
+		)
+
+		for j := 1; j < len(in); j++ {
+
+			b := in[j]
+			if HasContain(a, b) {
+				delete(sections, &in[j])
+			}
+		}
+	}
+	for entity, _ := range sections {
+		result = append(result, *entity)
+	}
+
+	return result
+}
+
+func HasContain(a, b EntityScore) bool {
+	return a.StartIndex <= b.StartIndex && a.EndIndex >= b.EndIndex
+}

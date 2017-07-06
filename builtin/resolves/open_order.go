@@ -32,7 +32,12 @@ type OpenOrderResolve struct {
 func NewOpenOrderResolve(ctx Context) *OpenOrderResolve {
 	resolve := new(OpenOrderResolve)
 
-	resolve.LuisParams = ctx.Value("Result").(ResultParams)
+	luis := ctx.Value("Result").(ResultParams)
+
+	luis.Entities = DistinctEntites(luis.Entities)
+	luis.Entities = DeduplicateEntities(luis.Entities)
+
+	resolve.LuisParams = luis
 	resolve.ExtractFromLuis()
 
 	return resolve
