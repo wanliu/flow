@@ -82,7 +82,6 @@ func DistinctEntites(in []EntityScore) []EntityScore {
 	return result
 }
 
-// TODO 修复输入全称（如：250ml伊利纯牛奶）时，返回的结果空的bug
 func DeduplicateEntities(in []EntityScore) []EntityScore {
 	var sections = make(map[*EntityScore]bool)
 	var result = make([]EntityScore, 0, len(in))
@@ -113,5 +112,6 @@ func DeduplicateEntities(in []EntityScore) []EntityScore {
 }
 
 func HasContain(a, b EntityScore) bool {
-	return a.StartIndex <= b.StartIndex && a.EndIndex >= b.EndIndex
+	return a.StartIndex <= b.StartIndex && a.EndIndex >= b.EndIndex &&
+		((a.StartIndex != b.StartIndex) || (a.EndIndex != b.EndIndex))
 }
