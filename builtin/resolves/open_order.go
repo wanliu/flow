@@ -1,7 +1,11 @@
 package resolves
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -217,18 +221,60 @@ func (t OpenOrderResolve) NextProduct() Resolve {
 }
 
 func (t OpenOrderResolve) Answer() string {
-	result := ""
+	desc := ""
 
-	result = result + "=== 订单输入完成 ===\n"
-	result = result + "本订单包含如下商品：" + "\n"
+	desc = desc + "=== 订单输入完成 ===\n"
+	desc = desc + "本订单包含如下商品：" + "\n"
 
-	for _, p := range t.Products.Products {
-		result = result + p.Product + " " + strconv.Itoa(p.Quantity) + "件\n"
+	params := url.Values{
+		"auth_token":   {"5f567b5efc3e4d0aa0d9c40922ae07aa"},
+		"street":       {t.Address},
+		"deliver_time": {t.Time.String()},
 	}
 
-	result = result + "地址:" + t.Address + "\n"
-	result = result + "送货时间" + t.Time.String() + "\n"
-	result = result + "=== 结束 ===\n"
+	for i, p := range t.Products.Products {
+		desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + "件\n"
 
-	return result
+		nk := "items[" + strconv.Itoa(i) + "][name]"
+		nv := p.Product
+		params.Add(nk, nv)
+
+		qk := "items[" + strconv.Itoa(i) + "][quantity]"
+		qv := strconv.Itoa(p.Quantity)
+		params.Add(qk, qv)
+	}
+
+	desc = desc + "地址:" + t.Address + "\n"
+	desc = desc + "送货时间" + t.Time.String() + "\n"
+	desc = desc + "=== 结束 ===\n"
+
+	res, err := http.PostForm("http://127.0.0.1:3000/api/v1/temp_orders", params)
+
+	if err != nil {
+		// return err.Error()
+		return "服务暂时不可用，请稍后再试"
+	} else {
+		defer res.Body.Close()
+		body, e := ioutil.ReadAll(res.Body)
+
+		if e != nil {
+			return e.Error()
+		} else {
+			var result Res
+			json.Unmarshal(body, &result)
+
+			if res.StatusCode == 422 {
+				return result.Error
+			} else {
+				return desc + "请通过一下地址完成订单操作：" + result.Confirm_path
+			}
+
+		}
+	}
+}
+
+type Res struct {
+	Id           int
+	Confirm_path string
+	Error        string
 }
