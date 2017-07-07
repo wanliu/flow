@@ -47,7 +47,6 @@ func (r *PriceQueryResolve) ExtractFromLuis() {
 
 			product.CheckResolved()
 
-			product.Parent = r
 			r.Products = append(r.Products, &product)
 		} else {
 			log.Printf("type: %v", item.Type)
@@ -63,7 +62,7 @@ func (r *PriceQueryResolve) Next() Resolve {
 		}
 	}
 
-	return PriceProductResolve{}
+	return new(PriceProductResolve)
 }
 
 func (r *PriceQueryResolve) Solve(luis ResultParams) (bool, string, string) {

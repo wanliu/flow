@@ -43,7 +43,6 @@ func (r *StockQueryResolve) ExtractFromLuis() {
 
 			product.CheckResolved()
 
-			product.Parent = r
 			r.Products = append(r.Products, &product)
 		} else {
 			log.Printf("type: %v", item.Type)
@@ -59,7 +58,7 @@ func (r *StockQueryResolve) Next() Resolve {
 		}
 	}
 
-	return StockProductResolve{}
+	return new(StockProductResolve)
 }
 
 func (r *StockQueryResolve) Solve(luis ResultParams) (bool, string, string) {

@@ -43,7 +43,6 @@ func (isr ItemsResolve) Solve(luis ResultParams) (bool, string, string) {
 }
 
 func (isr *ItemsResolve) Add(pr ItemResolve) {
-	pr.Parent = isr
 	isr.Products = append(isr.Products, &pr)
 }
 
@@ -55,7 +54,7 @@ func (isr *ItemsResolve) NextProduct() Resolve {
 		}
 	}
 
-	return ItemResolve{}
+	return new(ItemResolve)
 }
 
 func (isr ItemsResolve) Fullfilled() bool {

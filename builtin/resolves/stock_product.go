@@ -15,29 +15,24 @@ type StockProductResolve struct {
 	Stock      int
 	Product    string
 	Resolution Resolution
-	Parent     *StockQueryResolve
 }
 
-func (r StockProductResolve) Solve(luis ResultParams) (bool, string, string) {
+func (r *StockProductResolve) Solve(luis ResultParams) (bool, string, string) {
 	if luis.TopScoringIntent.Intent == "选择" {
 		// TODO 无法识别全角数字
 		number := strings.Trim(luis.Entities[0].Resolution.Value, " ")
 		chose, _ := strconv.ParseInt(number, 10, 64)
 		inNum := int(chose)
 
-		for _, product := range r.Parent.Products {
-			if product.Name == r.Name {
-				if product.Product == "" {
-					if len(product.Resolution.Values) >= inNum {
-						prdName := product.Resolution.Values[chose-1]
-						product.Product = prdName
-						product.CheckResolved()
+		if r.Product == "" {
+			if len(r.Resolution.Values) >= inNum {
+				prdName := r.Resolution.Values[chose-1]
+				r.Product = prdName
+				r.CheckResolved()
 
-						return true, "已选择" + prdName, "err"
-					} else {
-						return false, "", "超出选择范围\n" + product.Hint()
-					}
-				}
+				return true, "已选择" + prdName, "err"
+			} else {
+				return false, "", "超出选择范围\n" + r.Hint()
 			}
 		}
 

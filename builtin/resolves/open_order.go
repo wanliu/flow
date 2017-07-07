@@ -85,7 +85,9 @@ func (t *OpenOrderResolve) ExtractItems() {
 
 	for i, q := range quantities {
 		if len(t.Products.Products) >= i+1 {
-			t.Products.Products[i].Quantity = q
+			qr := t.Products.Products[i]
+			qr.Quantity = q
+			qr.CheckResolved()
 		}
 	}
 }
@@ -115,8 +117,6 @@ func (t *OpenOrderResolve) ExtractProducts() {
 				Product:    "",
 				Resolution: item.Resolution,
 			}
-
-			product.CheckResolved()
 
 			t.Products.Add(product)
 		} else {
