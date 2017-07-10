@@ -74,7 +74,10 @@ func DistinctEntites(in []EntityScore) []EntityScore {
 	for _, entity := range in {
 		if _, ok := tags[entity.Entity]; !ok {
 			result = append(result, entity)
-			tags[entity.Entity] = true
+
+			if entity.Type != "builtin.number" {
+				tags[entity.Entity] = true
+			}
 		}
 
 	}
@@ -97,7 +100,6 @@ func DeduplicateEntities(in []EntityScore) []EntityScore {
 		)
 
 		for j := 1; j < len(in); j++ {
-
 			b := in[j]
 			if HasContain(a, b) {
 				delete(sections, &in[j])

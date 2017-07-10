@@ -12,19 +12,30 @@ import (
 
 type Order struct {
 	TryGetEntities
-	Ctx  <-chan Context
-	Type <-chan string
-	Out  chan<- ReplyData
+	DefTime string
+	Ctx     <-chan Context
+	Type    <-chan string
+	Deftime <-chan string
+	Out     chan<- ReplyData
 }
 
 func NewOrder() interface{} {
 	return new(Order)
 }
 
+// 默认送货时间
+func (order *Order) OnDeftime(t string) {
+	order.DefTime = t
+}
+
 func (order *Order) OnCtx(ctx Context) {
 	orderResolve := NewOpenOrderResolve(ctx)
 	childCtx := ctx.NewContext()
 	childCtx.SetValue("orderResolve", orderResolve)
+
+	if order.DefTime != "" {
+		orderResolve.SetDefTime(order.DefTime)
+	}
 
 	output := ""
 
