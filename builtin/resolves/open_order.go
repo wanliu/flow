@@ -248,7 +248,7 @@ func (t OpenOrderResolve) Answer() string {
 	desc = desc + "送货时间" + t.Time.String() + "\n"
 	desc = desc + "=== 结束 ===\n"
 
-	res, err := http.PostForm("http://127.0.0.1:3000/api/v1/temp_orders", params)
+	res, err := http.PostForm("http://192.168.0.155:3000/api/v1/temp_orders", params)
 
 	if err != nil {
 		// return err.Error()
@@ -266,7 +266,7 @@ func (t OpenOrderResolve) Answer() string {
 			if res.StatusCode == 422 {
 				return result.Error
 			} else {
-				return desc + "请通过一下地址完成订单操作：" + result.Confirm_path
+				return desc + "请通过以下地址完成订单操作：" + result.Confirm_path
 			}
 
 		}
