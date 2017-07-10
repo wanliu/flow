@@ -72,7 +72,7 @@ func (r *ItemResolve) Solve(luis ResultParams) (bool, string, string) {
 
 		return false, "", "错误的操作，没有可供选择的商品"
 	} else {
-		return false, "", "无效的输入\n" + r.Hint()
+		return false, "", "无效的输入: \"" + luis.Query + "\"。\n" + r.Hint()
 	}
 }
 
