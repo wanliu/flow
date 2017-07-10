@@ -89,10 +89,13 @@ func (t *OpenOrderResolve) ExtractItems() {
 
 	for i, q := range quantities {
 		if len(t.Products.Products) >= i+1 {
-			qr := t.Products.Products[i]
-			qr.Quantity = q
-			qr.CheckResolved()
+			pr := t.Products.Products[i]
+			pr.Quantity = q
 		}
+	}
+
+	for _, p := range t.Products.Products {
+		p.CheckResolved()
 	}
 }
 
@@ -132,7 +135,8 @@ func (t *OpenOrderResolve) ExtractProducts() {
 func (t *OpenOrderResolve) ExtractAddress() {
 	for _, item := range t.LuisParams.Entities {
 
-		if item.Type == "address" {
+		if item.Type == "address" || item.Type == "地点" {
+			log.Printf("Address ... %v", item.Entity)
 			t.Address = item.Entity
 		}
 	}

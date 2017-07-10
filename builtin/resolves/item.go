@@ -1,6 +1,7 @@
 package resolves
 
 import (
+	"log"
 	"strconv"
 	"strings"
 
@@ -35,7 +36,7 @@ func (r ItemResolve) Hint() string {
 
 		result = "我们有下列的 " + r.Name + " 产品:" + choses + "请输入序号选择"
 	} else if r.Quantity == 0 {
-		result = "请告诉我您要购买的数量\n"
+		result = "请告诉我您要购买" + r.Product + "的数量\n"
 	}
 
 	return result
@@ -72,6 +73,7 @@ func (r *ItemResolve) Solve(luis ResultParams) (bool, string, string) {
 
 		return false, "", "错误的操作，没有可供选择的商品"
 	} else {
+		log.Printf("luis: %v", luis)
 		return false, "", "无效的输入: \"" + luis.Query + "\"。\n" + r.Hint()
 	}
 }
