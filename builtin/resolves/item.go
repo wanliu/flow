@@ -45,7 +45,13 @@ func (r ItemResolve) Hint() string {
 
 func (r *ItemResolve) Solve(luis ResultParams) (bool, string, string) {
 	if luis.TopScoringIntent.Intent == "选择" {
-		number := strings.Trim(luis.Entities[0].Resolution.Value, " ")
+		input, exist := FetchEntity("builtin.number", luis.Entities)
+
+		if !exist {
+			return false, "", "无效的输入: \"" + luis.Query + "\"。\n" + r.Hint()
+		}
+
+		number := strings.Trim(input.Resolution.Value, " ")
 		chose, _ := strconv.ParseInt(number, 10, 64)
 		inNum := int(chose)
 
