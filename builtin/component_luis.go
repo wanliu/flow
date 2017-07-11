@@ -2,8 +2,10 @@ package builtin
 
 import (
 	"fmt"
-	"github.com/franela/goreq"
+	"log"
 	"time"
+
+	"github.com/franela/goreq"
 
 	. "github.com/wanliu/flow/builtin/luis"
 	flow "github.com/wanliu/goflow"
@@ -49,6 +51,7 @@ func (l *LuisAnalyze) OnIn(input string) {
 	ch <- true
 	if err != nil {
 		// l.Out <- err.Error()
+		log.Printf("luis query error %s", err)
 		l.Out <- *new(ResultParams)
 	} else {
 		// result, _ = res.Body.ToString()
