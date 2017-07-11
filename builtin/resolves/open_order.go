@@ -136,8 +136,7 @@ func (r *OpenOrderResolve) ExtractProducts() {
 func (r *OpenOrderResolve) ExtractAddress() {
 	for _, item := range r.LuisParams.Entities {
 
-		if item.Type == "address" || item.Type == "地点" {
-			log.Printf("Address ... %v", item.Entity)
+		if item.Type == "地址" {
 			r.Address = item.Entity
 		}
 	}
