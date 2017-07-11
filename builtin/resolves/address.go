@@ -23,6 +23,13 @@ func (pr AddressResolve) Solve(luis ResultParams) (bool, string, string) {
 
 		return true, "已经定好了送货地址:" + address, "err"
 	} else {
-		return false, "", "无效的输入\n" + pr.Hint()
+		entity, exist := FetchEntity("地址", luis.Entities)
+
+		if exist {
+			pr.Parent.Address = strings.Trim(entity.Entity, " ")
+			return true, "已经定好了送货地址:" + pr.Parent.Address, "err"
+		} else {
+			return false, "", "无效的输入:\"" + luis.Query + "\"\n" + pr.Hint()
+		}
 	}
 }

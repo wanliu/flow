@@ -117,3 +117,13 @@ func HasContain(a, b EntityScore) bool {
 	return a.StartIndex <= b.StartIndex && a.EndIndex >= b.EndIndex &&
 		((a.StartIndex != b.StartIndex) || (a.EndIndex != b.EndIndex))
 }
+
+func FetchEntity(t string, es []EntityScore) (EntityScore, bool) {
+	for _, e := range es {
+		if e.Type == t {
+			return e, true
+		}
+	}
+
+	return EntityScore{}, false
+}
