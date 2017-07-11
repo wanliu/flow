@@ -22,7 +22,7 @@ func NewLuis(appid, key, secret string) *Luis {
 		Key:       key,
 		Secret:    secret,
 		CookieJar: jar,
-		// Proxy:     "http://192.168.0.151:1087",
+		Proxy:     "http://192.168.0.151:1087",
 	}
 }
 
