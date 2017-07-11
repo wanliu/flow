@@ -62,6 +62,8 @@ Unimplemented() Out -> In Reply()
 '问价' -> Intent PriceIntDispatcher()
 0.70 -> Score PriceIntDispatcher()
 
+'今天' -> Deftime OpenOrder()
+
 '开单' -> Intent OrderIntDispatcher()
 0.70 -> Score OrderIntDispatcher()
 # # 'products' -> Type TryProducts()

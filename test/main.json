@@ -458,6 +458,13 @@
       }
     },
     {
+      "data": "今天",
+      "tgt": {
+        "process": "OpenOrder",
+        "port": "Deftime"
+      }
+    },
+    {
       "data": "开单",
       "tgt": {
         "process": "OrderIntDispatcher",

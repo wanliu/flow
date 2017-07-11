@@ -2,10 +2,13 @@ package resolves
 
 import (
 	"log"
-	"math/rand"
-	"strconv"
+	// "math/rand"
+	// "strconv"
 	"strings"
-	"time"
+	// "time"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
 
 	. "github.com/wanliu/flow/builtin/luis"
 	. "github.com/wanliu/flow/context"
@@ -16,12 +19,8 @@ func NewPriceQueryResolve(ctx Context) *PriceQueryResolve {
 
 	luis := ctx.Value("Result").(ResultParams)
 
-	log.Printf("BEFORE: %v", luis)
-
 	luis.Entities = DistinctEntites(luis.Entities)
 	luis.Entities = DeduplicateEntities(luis.Entities)
-
-	log.Printf("AFTER: %v", luis)
 
 	resolve.LuisParams = luis
 	resolve.ExtractFromLuis()
@@ -96,18 +95,60 @@ func (r PriceQueryResolve) Fullfilled() bool {
 func (r PriceQueryResolve) Answer() string {
 	selected := make([]string, 0, 10)
 
-	// TODO 查询后台商品价格
-	rand.Seed(time.Now().UTC().UnixNano())
-
 	for _, p := range r.Products {
-		p.Price = rand.Float64()
-		notition := p.Product + "的价格为" + strconv.FormatFloat(p.Price, 'f', 2, 64) + "元"
-		selected = append(selected, notition)
+		selected = append(selected, "name[]="+p.Product)
 	}
 
-	return strings.Join(selected, ", ")
+	query := "?auth_token=5f567b5efc3e4d0aa0d9c40922ae07aa&" + strings.Join(selected, "&")
+
+	res, err := http.Get("http://192.168.0.155:3000/api/v1/query_items/price" + query)
+
+	if err != nil {
+		// return err.Error()
+		return "服务暂时不可用，请稍后再试"
+	} else {
+		defer res.Body.Close()
+		body, e := ioutil.ReadAll(res.Body)
+
+		if e != nil {
+			return e.Error()
+		} else {
+			var result PriceRes
+			json.Unmarshal(body, &result)
+
+			if res.StatusCode == 422 {
+				return result.Error
+			} else {
+				return result.String()
+			}
+		}
+	}
 }
 
 func (r PriceQueryResolve) EmptyProducts() bool {
 	return len(r.Products) == 0
+}
+
+type PriceRes struct {
+	Items []ItemRes
+	Error string
+}
+
+func (p PriceRes) String() string {
+	result := make([]string, 0, 10)
+
+	for _, i := range p.Items {
+		result = append(result, i.String())
+	}
+
+	return strings.Join(result, ",")
+}
+
+type ItemRes struct {
+	Name  string
+	Price string
+}
+
+func (i ItemRes) String() string {
+	return i.Name + "的价格为" + i.Price + "元"
 }

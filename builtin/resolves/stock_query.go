@@ -1,11 +1,11 @@
 package resolves
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
-	"math/rand"
-	"strconv"
+	"net/http"
 	"strings"
-	"time"
 
 	. "github.com/wanliu/flow/builtin/luis"
 	. "github.com/wanliu/flow/context"
@@ -92,22 +92,66 @@ func (r StockQueryResolve) Fullfilled() bool {
 func (r StockQueryResolve) Answer() string {
 	selected := make([]string, 0, 10)
 
-	// TODO 查询后台商品价格
-	rand.Seed(time.Now().UTC().UnixNano())
-
 	for _, p := range r.Products {
-		p.Stock = rand.Intn(100)
-
-		if p.Stock <= 50 {
-			selected = append(selected, p.Product+"已经没货")
-		} else {
-			selected = append(selected, p.Product+"还有库存："+strconv.Itoa(p.Stock))
-		}
+		selected = append(selected, "name[]="+p.Product)
 	}
 
-	return strings.Join(selected, ", ")
+	query := "?auth_token=5f567b5efc3e4d0aa0d9c40922ae07aa&" + strings.Join(selected, "&")
+
+	res, err := http.Get("http://192.168.0.155:3000/api/v1/query_items/stock" + query)
+
+	if err != nil {
+		// return err.Error()
+		return "服务暂时不可用，请稍后再试"
+	} else {
+		defer res.Body.Close()
+		body, e := ioutil.ReadAll(res.Body)
+
+		if e != nil {
+			return e.Error()
+		} else {
+			var result StockRes
+			json.Unmarshal(body, &result)
+
+			if res.StatusCode == 422 {
+				return result.Error
+			} else {
+				return result.String()
+			}
+		}
+	}
 }
 
 func (r StockQueryResolve) EmptyProducts() bool {
 	return len(r.Products) == 0
+}
+
+type StockRes struct {
+	Items []ItemStockRes
+	Error string
+}
+
+func (p StockRes) String() string {
+	result := make([]string, 0, 10)
+
+	for _, i := range p.Items {
+		result = append(result, i.String())
+	}
+
+	return strings.Join(result, ",")
+}
+
+type ItemStockRes struct {
+	Name          string
+	Current_stock int
+}
+
+func (i ItemStockRes) String() string {
+	if i.Current_stock <= 0 {
+		return i.Name + "没有货"
+	} else if i.Current_stock <= 20 {
+		return i.Name + "的库存不多"
+	} else {
+		return i.Name + "有货"
+	}
 }

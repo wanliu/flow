@@ -30,6 +30,7 @@ type OpenOrderResolve struct {
 	// Time       OrderTimeResolve
 	Address string
 	Time    time.Time
+	DefTime string
 	Current Resolve
 }
 
@@ -47,15 +48,15 @@ func NewOpenOrderResolve(ctx Context) *OpenOrderResolve {
 	return resolve
 }
 
-func (t *OpenOrderResolve) Solve(luis ResultParams) (bool, string, string) {
-	solved, finishNotition, nextNotition := t.Current.Solve(luis)
+func (r *OpenOrderResolve) Solve(luis ResultParams) (bool, string, string) {
+	solved, finishNotition, nextNotition := r.Current.Solve(luis)
 
 	if solved {
-		if t.Fullfilled() {
-			return true, finishNotition + "\n" + t.Answer(), ""
+		if r.Fullfilled() {
+			return true, finishNotition + "\n" + r.Answer(), ""
 		} else {
-			t.Current = t.Next()
-			hint := t.Current.Hint()
+			r.Current = r.Next()
+			hint := r.Current.Hint()
 
 			return false, finishNotition, finishNotition + "\n" + hint
 		}
@@ -65,44 +66,44 @@ func (t *OpenOrderResolve) Solve(luis ResultParams) (bool, string, string) {
 
 }
 
-func (t OpenOrderResolve) Hint() string {
-	return t.Current.Hint()
+func (r OpenOrderResolve) Hint() string {
+	return r.Current.Hint()
 }
 
 // 从ｌｕｉｓ数据构造结构数据
-func (t *OpenOrderResolve) ExtractFromLuis() {
-	// log.Printf("====:: %v", t.LuisParams.Entities)
+func (r *OpenOrderResolve) ExtractFromLuis() {
+	// log.Printf("====:: %v", r.LuisParams.Entities)
 
-	// t.ExtractProducts()
-	t.ExtractItems()
-	t.ExtractAddress()
-	t.ExtractTime()
-	// t.ExtractQuantity()
+	// r.ExtractProducts()
+	r.ExtractItems()
+	r.ExtractAddress()
+	r.ExtractTime()
+	// r.ExtractQuantity()
 
-	// log.Printf("----> %v", t.Products)
+	// log.Printf("----> %v", r.Products)
 }
 
 // TODO 无法识别全角数字
-func (t *OpenOrderResolve) ExtractItems() {
-	t.ExtractProducts()
-	quantities := t.ExtractQuantity()
+func (r *OpenOrderResolve) ExtractItems() {
+	r.ExtractProducts()
+	quantities := r.ExtractQuantity()
 
 	for i, q := range quantities {
-		if len(t.Products.Products) >= i+1 {
-			pr := t.Products.Products[i]
+		if len(r.Products.Products) >= i+1 {
+			pr := r.Products.Products[i]
 			pr.Quantity = q
 		}
 	}
 
-	for _, p := range t.Products.Products {
+	for _, p := range r.Products.Products {
 		p.CheckResolved()
 	}
 }
 
-func (t *OpenOrderResolve) ExtractQuantity() []int {
+func (r *OpenOrderResolve) ExtractQuantity() []int {
 	result := make([]int, 0, 10)
 
-	for _, item := range t.LuisParams.Entities {
+	for _, item := range r.LuisParams.Entities {
 		if item.Type == "builtin.number" {
 			number := strings.Trim(item.Resolution.Value, " ")
 			q, _ := strconv.ParseInt(number, 10, 64)
@@ -113,8 +114,8 @@ func (t *OpenOrderResolve) ExtractQuantity() []int {
 	return result
 }
 
-func (t *OpenOrderResolve) ExtractProducts() {
-	for _, item := range t.LuisParams.Entities {
+func (r *OpenOrderResolve) ExtractProducts() {
+	for _, item := range r.LuisParams.Entities {
 		if item.Type == "products" {
 			product := ItemResolve{
 				Resolved:   false,
@@ -125,25 +126,25 @@ func (t *OpenOrderResolve) ExtractProducts() {
 				Resolution: item.Resolution,
 			}
 
-			t.Products.Add(product)
+			r.Products.Add(product)
 		} else {
 			log.Printf("type: %v", item.Type)
 		}
 	}
 }
 
-func (t *OpenOrderResolve) ExtractAddress() {
-	for _, item := range t.LuisParams.Entities {
+func (r *OpenOrderResolve) ExtractAddress() {
+	for _, item := range r.LuisParams.Entities {
 
 		if item.Type == "address" || item.Type == "地点" {
 			log.Printf("Address ... %v", item.Entity)
-			t.Address = item.Entity
+			r.Address = item.Entity
 		}
 	}
 }
 
-func (t *OpenOrderResolve) ExtractTime() {
-	for _, item := range t.LuisParams.Entities {
+func (r *OpenOrderResolve) ExtractTime() {
+	for _, item := range r.LuisParams.Entities {
 		if item.Type == "builtin.datetime.date" {
 			luisTime, err := time.Parse("2006-01-02", item.Resolution.Date)
 
@@ -151,80 +152,87 @@ func (t *OpenOrderResolve) ExtractTime() {
 				log.Printf("::::::::ERROR: %v", err)
 			} else {
 				// dTime = luisTime
-				t.Time = luisTime
+				r.Time = luisTime
 			}
 		}
 	}
 }
 
-// func (t *OpenOrderResolve) ExtractQuantity() {
-// 	// type: builtin.number
-// }
+func (r *OpenOrderResolve) SetDefTime(t string) {
+	r.DefTime = t
 
-// 去除重复产品
-func (t *OpenOrderResolve) UniqProducts() {
-
+	if r.Time.IsZero() && r.DefTime != "" {
+		r.SetTimeByDef()
+	}
 }
 
-func (t OpenOrderResolve) ProductsFullfilled() bool {
-	return t.Products.Fullfilled()
+func (r *OpenOrderResolve) SetTimeByDef() {
+	if r.DefTime == "今天" {
+		r.Time = time.Now()
+	} else if r.DefTime == "明天" {
+		r.Time = time.Now().Add(24 * time.Hour)
+	}
 }
 
-func (t OpenOrderResolve) TimeFullfilled() bool {
-	// return t.Time.Fullfilled()
-	return !t.Time.IsZero()
+func (r OpenOrderResolve) ProductsFullfilled() bool {
+	return r.Products.Fullfilled()
 }
 
-func (t OpenOrderResolve) AddressFullfilled() bool {
-	// return t.Address.Fullfilled()
-	return t.Address != ""
+func (r OpenOrderResolve) TimeFullfilled() bool {
+	// return r.Time.Fullfilled()
+	return !r.Time.IsZero()
+}
+
+func (r OpenOrderResolve) AddressFullfilled() bool {
+	// return r.Address.Fullfilled()
+	return r.Address != ""
 }
 
 // 是否条件全部满足
-func (t OpenOrderResolve) Fullfilled() bool {
-	return t.ProductsFullfilled() &&
-		t.TimeFullfilled() &&
-		t.AddressFullfilled()
+func (r OpenOrderResolve) Fullfilled() bool {
+	return r.ProductsFullfilled() &&
+		r.TimeFullfilled() &&
+		r.AddressFullfilled()
 }
 
 // 下一个为满足项目
-func (t *OpenOrderResolve) Next() Resolve {
-	if !t.ProductsFullfilled() {
-		unsolved := t.NextProduct()
-		t.Current = unsolved
+func (r *OpenOrderResolve) Next() Resolve {
+	if !r.ProductsFullfilled() {
+		unsolved := r.NextProduct()
+		r.Current = unsolved
 		return unsolved
-	} else if !t.AddressFullfilled() {
-		unsolved := AddressResolve{Parent: t}
-		t.Current = unsolved
+	} else if !r.AddressFullfilled() {
+		unsolved := AddressResolve{Parent: r}
+		r.Current = unsolved
 		return unsolved
-	} else if !t.TimeFullfilled() {
-		unsolved := OrderTimeResolve{Parent: t}
-		t.Current = unsolved
+	} else if !r.TimeFullfilled() {
+		unsolved := OrderTimeResolve{Parent: r}
+		r.Current = unsolved
 		return unsolved
 	} else {
 		return nil
 	}
 }
 
-func (t OpenOrderResolve) EmptyProducts() bool {
-	return len(t.Products.Products) == 0
+func (r OpenOrderResolve) EmptyProducts() bool {
+	return len(r.Products.Products) == 0
 }
 
-func (t OpenOrderResolve) NextNotify() string {
-	unsolved := t.Next()
+func (r OpenOrderResolve) NextNotify() string {
+	unsolved := r.Next()
 	return unsolved.Hint()
 }
 
 //
-func (t OpenOrderResolve) PostService() string {
+func (r OpenOrderResolve) PostService() string {
 	return ""
 }
 
-func (t OpenOrderResolve) NextProduct() Resolve {
-	return t.Products.NextProduct()
+func (r OpenOrderResolve) NextProduct() Resolve {
+	return r.Products.NextProduct()
 }
 
-func (t OpenOrderResolve) Answer() string {
+func (r OpenOrderResolve) Answer() string {
 	desc := ""
 
 	desc = desc + "=== 订单输入完成 ===\n"
@@ -232,11 +240,11 @@ func (t OpenOrderResolve) Answer() string {
 
 	params := url.Values{
 		"auth_token":   {"5f567b5efc3e4d0aa0d9c40922ae07aa"},
-		"street":       {t.Address},
-		"deliver_time": {t.Time.String()},
+		"street":       {r.Address},
+		"deliver_time": {r.Time.Format("2006年01月02日")},
 	}
 
-	for i, p := range t.Products.Products {
+	for i, p := range r.Products.Products {
 		desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + "件\n"
 
 		nk := "items[" + strconv.Itoa(i) + "][name]"
@@ -248,8 +256,8 @@ func (t OpenOrderResolve) Answer() string {
 		params.Add(qk, qv)
 	}
 
-	desc = desc + "地址:" + t.Address + "\n"
-	desc = desc + "送货时间" + t.Time.String() + "\n"
+	desc = desc + "地址:" + r.Address + "\n"
+	desc = desc + "送货时间" + r.Time.Format("2006年01月02日") + "\n"
 	desc = desc + "=== 结束 ===\n"
 
 	res, err := http.PostForm("http://192.168.0.155:3000/api/v1/temp_orders", params)
