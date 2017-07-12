@@ -19,6 +19,7 @@ type LuisAnalyze struct {
 	flow.Component
 	appid string
 	key   string
+	Echo  <-chan bool
 	In    <-chan string
 	AppId <-chan string
 	Key   <-chan string
@@ -44,7 +45,7 @@ func (l *LuisAnalyze) OnIn(input string) {
 	res, err := goreq.Request{
 		Uri:         url,
 		QueryString: params,
-		Timeout:     10 * time.Second,
+		Timeout:     20 * time.Second,
 		CookieJar:   luis.CookieJar,
 		Proxy:       luis.Proxy,
 	}.Do()
