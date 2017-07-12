@@ -2,6 +2,7 @@ package luis
 
 import (
 	"net/http/cookiejar"
+	"sort"
 )
 
 type Luis struct {
@@ -51,6 +52,20 @@ type EntityScore struct {
 	Resolution Resolution `json:"resolution"`
 }
 
+type Entities []EntityScore
+
+func (s Entities) Len() int {
+	return len(s)
+}
+
+func (s Entities) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s Entities) Less(i, j int) bool {
+	return s[i].StartIndex < s[j].StartIndex
+}
+
 type QueryParams struct {
 	Key      string `url:"subscription-key"`
 	TimeZone string `url:"timezoneOffset"`
@@ -62,12 +77,12 @@ type ResultParams struct {
 	Query            string        `json:"query"`
 	TopScoringIntent IntentScore   `json:"topScoringIntent"`
 	Intents          []IntentScore `json:"intents"`
-	Entities         []EntityScore `json:"entities"`
+	Entities         Entities      `json:"entities"`
 }
 
-func DistinctEntites(in []EntityScore) []EntityScore {
+func DistinctEntites(in Entities) Entities {
 	var (
-		result = make([]EntityScore, 0, len(in))
+		result = make(Entities, 0, len(in))
 		tags   = make(map[string]bool)
 	)
 
@@ -85,9 +100,9 @@ func DistinctEntites(in []EntityScore) []EntityScore {
 	return result
 }
 
-func DeduplicateEntities(in []EntityScore) []EntityScore {
+func DeduplicateEntities(in Entities) Entities {
 	var sections = make(map[*EntityScore]bool)
-	var result = make([]EntityScore, 0, len(in))
+	var result = make(Entities, 0, len(in))
 
 	for i, _ := range in {
 
@@ -101,6 +116,7 @@ func DeduplicateEntities(in []EntityScore) []EntityScore {
 
 		for j := 0; j < len(in); j++ {
 			b := in[j]
+
 			if HasContain(a, b) {
 				delete(sections, &in[j])
 			}
@@ -113,12 +129,16 @@ func DeduplicateEntities(in []EntityScore) []EntityScore {
 	return result
 }
 
+func SortEntities(in Entities) {
+	sort.Sort(in)
+}
+
 func HasContain(a, b EntityScore) bool {
 	return a.StartIndex <= b.StartIndex && a.EndIndex >= b.EndIndex &&
 		((a.StartIndex != b.StartIndex) || (a.EndIndex != b.EndIndex))
 }
 
-func FetchEntity(t string, es []EntityScore) (EntityScore, bool) {
+func FetchEntity(t string, es Entities) (EntityScore, bool) {
 	for _, e := range es {
 		if e.Type == t {
 			return e, true

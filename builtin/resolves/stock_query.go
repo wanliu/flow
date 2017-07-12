@@ -18,6 +18,7 @@ func NewStockQueryResolve(ctx Context) *StockQueryResolve {
 
 	luis.Entities = DistinctEntites(luis.Entities)
 	luis.Entities = DeduplicateEntities(luis.Entities)
+	SortEntities(luis.Entities)
 
 	resolve.LuisParams = luis
 	resolve.ExtractFromLuis()
