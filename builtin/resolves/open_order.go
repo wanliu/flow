@@ -202,11 +202,11 @@ func (r *OpenOrderResolve) Next() Resolve {
 		r.Current = unsolved
 		return unsolved
 	} else if !r.AddressFullfilled() {
-		unsolved := AddressResolve{Parent: r}
+		unsolved := &AddressResolve{Parent: r}
 		r.Current = unsolved
 		return unsolved
 	} else if !r.TimeFullfilled() {
-		unsolved := OrderTimeResolve{Parent: r}
+		unsolved := &OrderTimeResolve{Parent: r}
 		r.Current = unsolved
 		return unsolved
 	} else {
