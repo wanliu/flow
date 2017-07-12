@@ -56,7 +56,7 @@ func (r *ItemResolve) Solve(luis ResultParams) (bool, string, string) {
 		inNum := int(chose)
 
 		if r.Product == "" {
-			if len(r.Resolution.Values) >= inNum {
+			if len(r.Resolution.Values) >= inNum && inNum > 0 {
 				prdName := r.Resolution.Values[chose-1]
 
 				r.Product = prdName
