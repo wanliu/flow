@@ -19,12 +19,18 @@ type PriceProductResolve struct {
 
 func (r *PriceProductResolve) Solve(luis ResultParams) (bool, string, string) {
 	if luis.TopScoringIntent.Intent == "选择" {
-		number := strings.Trim(luis.Entities[0].Resolution.Value, " ")
+		input, exist := FetchEntity("builtin.number", luis.Entities)
+
+		if !exist {
+			return false, "", "无效的输入: \"" + luis.Query + "\"。\n" + r.Hint()
+		}
+
+		number := strings.Trim(input.Resolution.Value, " ")
 		chose, _ := strconv.ParseInt(number, 10, 64)
 		inNum := int(chose)
 
 		if r.Product == "" {
-			if len(r.Resolution.Values) >= inNum {
+			if len(r.Resolution.Values) >= inNum && inNum > 0 {
 				prdName := r.Resolution.Values[chose-1]
 				r.Product = prdName
 				r.CheckResolved()
