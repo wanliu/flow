@@ -437,7 +437,7 @@
       }
     },
     {
-      "data": 0.7,
+      "data": 0.4,
       "tgt": {
         "process": "StockIntDispatcher",
         "port": "Score"
@@ -451,7 +451,7 @@
       }
     },
     {
-      "data": 0.7,
+      "data": 0.4,
       "tgt": {
         "process": "PriceIntDispatcher",
         "port": "Score"
@@ -472,7 +472,7 @@
       }
     },
     {
-      "data": 0.7,
+      "data": 0.35,
       "tgt": {
         "process": "OrderIntDispatcher",
         "port": "Score"

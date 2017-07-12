@@ -57,15 +57,15 @@ Unimplemented() Out -> In Reply()
 0.40 -> Score RobotIntDispatcher()
 
 '问货' -> Intent StockIntDispatcher()
-0.70 -> Score StockIntDispatcher()
+0.40 -> Score StockIntDispatcher()
 
 '问价' -> Intent PriceIntDispatcher()
-0.70 -> Score PriceIntDispatcher()
+0.40 -> Score PriceIntDispatcher()
 
 '今天' -> Deftime OpenOrder()
 
 '开单' -> Intent OrderIntDispatcher()
-0.70 -> Score OrderIntDispatcher()
+0.35 -> Score OrderIntDispatcher()
 # # 'products' -> Type TryProducts()
 
 
