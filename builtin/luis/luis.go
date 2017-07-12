@@ -94,12 +94,12 @@ func DeduplicateEntities(in []EntityScore) []EntityScore {
 		sections[&in[i]] = true
 	}
 
-	for i := 0; i < len(in)-1; i++ {
+	for i := 0; i < len(in); i++ {
 		var (
 			a = in[i]
 		)
 
-		for j := 1; j < len(in); j++ {
+		for j := 0; j < len(in); j++ {
 			b := in[j]
 			if HasContain(a, b) {
 				delete(sections, &in[j])
