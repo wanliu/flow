@@ -14,6 +14,7 @@ type PriceProductResolve struct {
 	Price      float64
 	Stock      int
 	Product    string
+	Quantity   int
 	Resolution Resolution
 }
 
