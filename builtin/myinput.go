@@ -4,7 +4,7 @@ import (
 	"log"
 	"strings"
 
-	. "github.com/wanliu/flow/builtin/luis"
+	"github.com/hysios/apiai-go"
 	. "github.com/wanliu/flow/context"
 	goflow "github.com/wanliu/goflow"
 )
@@ -27,7 +27,7 @@ func NewQuerySave() interface{} {
 type QuerySave struct {
 	goflow.Component
 	MultiField
-	Result <-chan ResultParams
+	Result <-chan apiai.Result
 	Ctx    <-chan Context
 	Out    chan<- Context
 }
@@ -56,12 +56,15 @@ func (in *MyInput) Loop() {
 func (q *QuerySave) Init() {
 	q.Fields = []string{"Ctx", "Result"}
 	q.Process = func() error {
-		res, rok := q.Value("Result").(ResultParams)
+		res, rok := q.Value("Result").(apiai.Result)
 		ctx, cok := q.Value("Ctx").(Context)
 		if rok && cok {
 			ctx.SetValue("Result", res)
-			top := res.TopScoringIntent
-			log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%", res.Query, top.Intent, top.Score*100)
+			intent := res.Metadata.IntentName
+			score := res.Score
+			query := res.ResolvedQuery
+
+			log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%", query, intent, score*100)
 			go func() {
 				q.Out <- ctx
 			}()
@@ -75,6 +78,6 @@ func (q *QuerySave) OnCtx(ctx Context) {
 	q.SetValue("Ctx", ctx)
 }
 
-func (q *QuerySave) OnResult(res ResultParams) {
+func (q *QuerySave) OnResult(res apiai.Result) {
 	q.SetValue("Result", res)
 }

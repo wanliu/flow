@@ -3,7 +3,9 @@ package builtin
 import (
 	"log"
 
-	. "github.com/wanliu/flow/builtin/luis"
+	// . "github.com/wanliu/flow/builtin/luis"
+
+	"github.com/hysios/apiai-go"
 	. "github.com/wanliu/flow/context"
 	flow "github.com/wanliu/goflow"
 )
@@ -33,9 +35,9 @@ func (ic *IntentCheck) OnScore(score float64) {
 }
 
 func (ic *IntentCheck) OnCtx(ctx Context) {
-	if res, ok := ctx.Value("Result").(ResultParams); ok {
-		top := res.TopScoringIntent
-		if top.Intent == ic._intent && top.Score >= ic._score {
+	if res, ok := ctx.Value("Result").(apiai.Result); ok {
+		log.Printf("ai: %v", res)
+		if res.Metadata.IntentName == ic._intent && res.Score >= ic._score {
 			ic.Out <- ctx
 		} else {
 			ic.Next <- ctx

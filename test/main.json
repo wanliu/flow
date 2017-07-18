@@ -1,7 +1,7 @@
 {
   "processes": {
-    "Luis": {
-      "component": "LuisAnalyze"
+    "Ai": {
+      "component": "ApiAi"
     },
     "Merge": {
       "component": "QuerySave"
@@ -9,56 +9,14 @@
     "CM": {
       "component": "ContextManager"
     },
-    "PraiseIntDispatcher": {
-      "component": "IntentCheck"
-    },
-    "Praise": {
-      "component": "Praise"
-    },
-    "Reply": {
-      "component": "Final"
-    },
-    "CriIntDispatcher": {
-      "component": "IntentCheck"
-    },
-    "Critical": {
-      "component": "Critical"
-    },
-    "AbuseIntDispatcher": {
-      "component": "IntentCheck"
-    },
-    "Abuse": {
-      "component": "Abuse"
-    },
-    "GreetIntDispatcher": {
-      "component": "IntentCheck"
-    },
-    "Greet": {
-      "component": "Greet"
-    },
-    "RobotIntDispatcher": {
-      "component": "IntentCheck"
-    },
-    "Robot": {
-      "component": "Robot"
-    },
-    "StockIntDispatcher": {
-      "component": "IntentCheck"
-    },
-    "StockQuery": {
-      "component": "StockQuery"
-    },
-    "PriceIntDispatcher": {
-      "component": "IntentCheck"
-    },
-    "PriceQuery": {
-      "component": "PriceQuery"
-    },
     "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
     "OpenOrder": {
       "component": "Order"
+    },
+    "Reply": {
+      "component": "Final"
     },
     "Unimplemented": {
       "component": "Unimplemented"
@@ -67,7 +25,7 @@
   "connections": [
     {
       "src": {
-        "process": "Luis",
+        "process": "Ai",
         "port": "Out"
       },
       "tgt": {
@@ -91,216 +49,6 @@
         "port": "Process"
       },
       "tgt": {
-        "process": "PraiseIntDispatcher",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "PraiseIntDispatcher",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Praise",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "Praise",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "PraiseIntDispatcher",
-        "port": "Next"
-      },
-      "tgt": {
-        "process": "CriIntDispatcher",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "CriIntDispatcher",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Critical",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "Critical",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "CriIntDispatcher",
-        "port": "Next"
-      },
-      "tgt": {
-        "process": "AbuseIntDispatcher",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "AbuseIntDispatcher",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Abuse",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "Abuse",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "AbuseIntDispatcher",
-        "port": "Next"
-      },
-      "tgt": {
-        "process": "GreetIntDispatcher",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "GreetIntDispatcher",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Greet",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "Greet",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "GreetIntDispatcher",
-        "port": "Next"
-      },
-      "tgt": {
-        "process": "RobotIntDispatcher",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "RobotIntDispatcher",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Robot",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "Robot",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "RobotIntDispatcher",
-        "port": "Next"
-      },
-      "tgt": {
-        "process": "StockIntDispatcher",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "StockIntDispatcher",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "StockQuery",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "StockQuery",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "StockIntDispatcher",
-        "port": "Next"
-      },
-      "tgt": {
-        "process": "PriceIntDispatcher",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "PriceIntDispatcher",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "PriceQuery",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "PriceQuery",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "PriceIntDispatcher",
-        "port": "Next"
-      },
-      "tgt": {
         "process": "OrderIntDispatcher",
         "port": "Ctx"
       }
@@ -346,115 +94,17 @@
       }
     },
     {
-      "data": "8b65b31f-05b0-4da0-ab98-afa62c0e80ae",
+      "data": "b56957fa6f8c4f94aeaace533390b685",
       "tgt": {
-        "process": "Luis",
-        "port": "AppId"
+        "process": "Ai",
+        "port": "Token"
       }
     },
     {
-      "data": "9c6711ad95c846a792248515cb6d1a23",
+      "data": "123456789",
       "tgt": {
-        "process": "Luis",
-        "port": "Key"
-      }
-    },
-    {
-      "data": "表扬",
-      "tgt": {
-        "process": "PraiseIntDispatcher",
-        "port": "Intent"
-      }
-    },
-    {
-      "data": 0.4,
-      "tgt": {
-        "process": "PraiseIntDispatcher",
-        "port": "Score"
-      }
-    },
-    {
-      "data": "批评",
-      "tgt": {
-        "process": "CriIntDispatcher",
-        "port": "Intent"
-      }
-    },
-    {
-      "data": 0.4,
-      "tgt": {
-        "process": "CriIntDispatcher",
-        "port": "Score"
-      }
-    },
-    {
-      "data": "辱骂",
-      "tgt": {
-        "process": "AbuseIntDispatcher",
-        "port": "Intent"
-      }
-    },
-    {
-      "data": 0.4,
-      "tgt": {
-        "process": "AbuseIntDispatcher",
-        "port": "Score"
-      }
-    },
-    {
-      "data": "招呼",
-      "tgt": {
-        "process": "GreetIntDispatcher",
-        "port": "Intent"
-      }
-    },
-    {
-      "data": 0.4,
-      "tgt": {
-        "process": "GreetIntDispatcher",
-        "port": "Score"
-      }
-    },
-    {
-      "data": "关于机器人",
-      "tgt": {
-        "process": "RobotIntDispatcher",
-        "port": "Intent"
-      }
-    },
-    {
-      "data": 0.4,
-      "tgt": {
-        "process": "RobotIntDispatcher",
-        "port": "Score"
-      }
-    },
-    {
-      "data": "问货",
-      "tgt": {
-        "process": "StockIntDispatcher",
-        "port": "Intent"
-      }
-    },
-    {
-      "data": 0.4,
-      "tgt": {
-        "process": "StockIntDispatcher",
-        "port": "Score"
-      }
-    },
-    {
-      "data": "问价",
-      "tgt": {
-        "process": "PriceIntDispatcher",
-        "port": "Intent"
-      }
-    },
-    {
-      "data": 0.4,
-      "tgt": {
-        "process": "PriceIntDispatcher",
-        "port": "Score"
+        "process": "Ai",
+        "port": "SessionId"
       }
     },
     {
@@ -481,7 +131,7 @@
   ],
   "inports": {
     "Text": {
-      "process": "Luis",
+      "process": "Ai",
       "port": "In"
     },
     "Ctx": {

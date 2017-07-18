@@ -1,66 +1,69 @@
-INPORT=Luis.In:Text
+INPORT=Ai.In:Text
 INPORT=Merge.Ctx:Ctx
 
-Luis(LuisAnalyze) Out -> Result Merge()
+Ai(ApiAi) Out -> Result Merge()
 Merge(QuerySave) Out -> Ctx CM(ContextManager)
-CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
-PraiseIntDispatcher() Out -> Ctx Praise(Praise)
-Praise() Out -> In Reply(Final)
+CM() Process -> Ctx OrderIntDispatcher(IntentCheck)
 
-PraiseIntDispatcher() Next -> Ctx CriIntDispatcher(IntentCheck)
-CriIntDispatcher() Out -> Ctx Critical(Critical)
-Critical() Out -> In Reply()
+# CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
+# PraiseIntDispatcher() Out -> Ctx Praise(Praise)
+# Praise() Out -> In Reply(Final)
 
-CriIntDispatcher() Next -> Ctx AbuseIntDispatcher(IntentCheck)
-AbuseIntDispatcher() Out -> Ctx Abuse(Abuse)
-Abuse() Out -> In Reply()
+# PraiseIntDispatcher() Next -> Ctx CriIntDispatcher(IntentCheck)
+# CriIntDispatcher() Out -> Ctx Critical(Critical)
+# Critical() Out -> In Reply()
 
-AbuseIntDispatcher() Next -> Ctx GreetIntDispatcher(IntentCheck)
-GreetIntDispatcher() Out -> Ctx Greet(Greet)
-Greet() Out -> In Reply()
+# CriIntDispatcher() Next -> Ctx AbuseIntDispatcher(IntentCheck)
+# AbuseIntDispatcher() Out -> Ctx Abuse(Abuse)
+# Abuse() Out -> In Reply()
 
-GreetIntDispatcher() Next -> Ctx RobotIntDispatcher(IntentCheck)
-RobotIntDispatcher() Out -> Ctx Robot(Robot)
-Robot() Out -> In Reply()
+# AbuseIntDispatcher() Next -> Ctx GreetIntDispatcher(IntentCheck)
+# GreetIntDispatcher() Out -> Ctx Greet(Greet)
+# Greet() Out -> In Reply()
 
-RobotIntDispatcher() Next -> Ctx StockIntDispatcher(IntentCheck)
-StockIntDispatcher() Out -> Ctx StockQuery(StockQuery)
-StockQuery() Out -> In Reply()
+# GreetIntDispatcher() Next -> Ctx RobotIntDispatcher(IntentCheck)
+# RobotIntDispatcher() Out -> Ctx Robot(Robot)
+# Robot() Out -> In Reply()
 
-StockIntDispatcher() Next -> Ctx PriceIntDispatcher(IntentCheck)
-PriceIntDispatcher() Out -> Ctx PriceQuery(PriceQuery)
-PriceQuery() Out -> In Reply()
+# RobotIntDispatcher() Next -> Ctx StockIntDispatcher(IntentCheck)
+# StockIntDispatcher() Out -> Ctx StockQuery(StockQuery)
+# StockQuery() Out -> In Reply()
 
-PriceIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
+# StockIntDispatcher() Next -> Ctx PriceIntDispatcher(IntentCheck)
+# PriceIntDispatcher() Out -> Ctx PriceQuery(PriceQuery)
+# PriceQuery() Out -> In Reply()
+
+# PriceIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
+
 OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
-OpenOrder() Out -> In Reply()
+OpenOrder() Out -> In Reply(Final)
 
 OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
 Unimplemented() Out -> In Reply()
 
-'8b65b31f-05b0-4da0-ab98-afa62c0e80ae' -> AppId Luis()
-'9c6711ad95c846a792248515cb6d1a23' -> Key Luis()
+'b56957fa6f8c4f94aeaace533390b685' -> Token Ai()
+'123456789' -> SessionId Ai()
 
-'表扬' -> Intent PraiseIntDispatcher()
-0.40 -> Score PraiseIntDispatcher()
+# '表扬' -> Intent PraiseIntDispatcher()
+# 0.40 -> Score PraiseIntDispatcher()
 
-'批评' -> Intent CriIntDispatcher()
-0.40 -> Score CriIntDispatcher()
+# '批评' -> Intent CriIntDispatcher()
+# 0.40 -> Score CriIntDispatcher()
 
-'辱骂' -> Intent AbuseIntDispatcher()
-0.40 -> Score AbuseIntDispatcher()
+# '辱骂' -> Intent AbuseIntDispatcher()
+# 0.40 -> Score AbuseIntDispatcher()
 
-'招呼' -> Intent GreetIntDispatcher()
-0.40 -> Score GreetIntDispatcher()
+# '招呼' -> Intent GreetIntDispatcher()
+# 0.40 -> Score GreetIntDispatcher()
 
-'关于机器人' -> Intent RobotIntDispatcher()
-0.40 -> Score RobotIntDispatcher()
+# '关于机器人' -> Intent RobotIntDispatcher()
+# 0.40 -> Score RobotIntDispatcher()
 
-'问货' -> Intent StockIntDispatcher()
-0.40 -> Score StockIntDispatcher()
+# '问货' -> Intent StockIntDispatcher()
+# 0.40 -> Score StockIntDispatcher()
 
-'问价' -> Intent PriceIntDispatcher()
-0.40 -> Score PriceIntDispatcher()
+# '问价' -> Intent PriceIntDispatcher()
+# 0.40 -> Score PriceIntDispatcher()
 
 '今天' -> Deftime OpenOrder()
 
