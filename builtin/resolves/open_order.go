@@ -21,6 +21,7 @@ import (
 type OpenOrderResolve struct {
 	AiParams  apiai.Result
 	Products  ItemsResolve
+	Gifts     ItemsResolve
 	Customer  string
 	Time      time.Time
 	DefTime   string
@@ -50,12 +51,12 @@ func (r *OpenOrderResolve) Solve(aiResult apiai.Result) string {
 // 从ｌｕｉｓ数据构造结构数据
 func (r *OpenOrderResolve) ExtractFromLuis() {
 	r.ExtractItems()
+	r.ExtractGiftItems()
 	r.ExtractCustomer()
 	r.ExtractTime()
 	r.ExtractImportant()
 }
 
-// TODO 无法识别全角数字
 func (r *OpenOrderResolve) ExtractItems() {
 	r.ExtractProducts()
 	quantities := r.ExtractQuantity()
@@ -68,10 +69,48 @@ func (r *OpenOrderResolve) ExtractItems() {
 	}
 }
 
+func (r *OpenOrderResolve) ExtractGiftItems() {
+	r.ExtractGiftProducts()
+	quantities := r.ExtractGiftQuantity()
+
+	for i, q := range quantities {
+		if len(r.Gifts.Products) >= i+1 {
+			pr := r.Gifts.Products[i]
+			pr.Quantity = q
+		}
+	}
+}
+
 func (r *OpenOrderResolve) ExtractQuantity() []int {
 	result := make([]int, 0, 50)
 
 	if quantities, exist := r.AiParams.Params["quantity"]; exist {
+		qs := reflect.ValueOf(quantities)
+
+		for i := 0; i < qs.Len(); i++ {
+			q := qs.Index(i).Interface()
+
+			switch t := q.(type) {
+			case string:
+				qs := q.(string)
+				qi := extractQuantity(qs)
+				result = append(result, qi)
+			case float64:
+				qf := q.(float64)
+				result = append(result, int(qf))
+			default:
+				log.Println("Unknown Quantity type: %v", t)
+			}
+		}
+	}
+
+	return result
+}
+
+func (r *OpenOrderResolve) ExtractGiftQuantity() []int {
+	result := make([]int, 0, 50)
+
+	if quantities, exist := r.AiParams.Params["giftNumber"]; exist {
 		qs := reflect.ValueOf(quantities)
 
 		for i := 0; i < qs.Len(); i++ {
@@ -156,6 +195,25 @@ func (r *OpenOrderResolve) ExtractProducts() {
 	}
 }
 
+func (r *OpenOrderResolve) ExtractGiftProducts() {
+	if products, exist := r.AiParams.Params["gifts"]; exist {
+		ps := reflect.ValueOf(products)
+
+		for i := 0; i < ps.Len(); i++ {
+			p := ps.Index(i)
+			product := ItemResolve{
+				Resolved: false,
+				Name:     p.Interface().(string),
+				Price:    0,
+				Quantity: 0, // 默认值
+				Product:  p.Interface().(string),
+			}
+
+			r.Gifts.Add(product)
+		}
+	}
+}
+
 func (r *OpenOrderResolve) ExtractCustomer() {
 	if a, exist := r.AiParams.Params["street-address"]; exist {
 		r.Customer = a.(string)
@@ -222,6 +280,14 @@ func (r OpenOrderResolve) Answer() string {
 		// qk := "items[" + strconv.Itoa(i) + "][quantity]"
 		// qv := strconv.Itoa(p.Quantity)
 		// params.Add(qk, qv)
+	}
+
+	if len(r.Gifts.Products) > 0 {
+		desc = desc + "-------赠品-------\n"
+
+		for _, g := range r.Gifts.Products {
+			desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + "件\n"
+		}
 	}
 
 	desc = desc + "地址:" + r.Customer + "\n"
