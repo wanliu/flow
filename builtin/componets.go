@@ -45,6 +45,7 @@ type Component struct {
 	Name        string
 	Description string
 	Icon        string
+	Group       string
 	Constructor func() interface{}
 }
 
