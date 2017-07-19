@@ -19,12 +19,13 @@ import (
 // 处理开单的逻辑结构, 不需要是组件
 // 作为context的一个部分，或者存在一个Value中
 type OpenOrderResolve struct {
-	AiParams apiai.Result
-	Products ItemsResolve
-	Address  string
-	Time     time.Time
-	DefTime  string
-	Current  Resolve
+	AiParams  apiai.Result
+	Products  ItemsResolve
+	Address   string
+	Time      time.Time
+	DefTime   string
+	Current   Resolve
+	Important string
 }
 
 func NewOpenOrderResolve(ctx Context) *OpenOrderResolve {
@@ -51,6 +52,7 @@ func (r *OpenOrderResolve) ExtractFromLuis() {
 	r.ExtractItems()
 	r.ExtractAddress()
 	r.ExtractTime()
+	r.ExtractImportant()
 }
 
 // TODO 无法识别全角数字
@@ -173,8 +175,8 @@ func (r *OpenOrderResolve) ExtractProducts() {
 }
 
 func (r *OpenOrderResolve) ExtractAddress() {
-	if address, exist := r.AiParams.Params["street-address"]; exist {
-		r.Address = address.(string)
+	if a, exist := r.AiParams.Params["street-address"]; exist {
+		r.Address = a.(string)
 	}
 }
 
@@ -183,6 +185,12 @@ func (r *OpenOrderResolve) ExtractTime() {
 		if aiTime, err := time.Parse("2006-01-02", t.(string)); err == nil {
 			r.Time = aiTime
 		}
+	}
+}
+
+func (r *OpenOrderResolve) ExtractImportant() {
+	if imp, exist := r.AiParams.Params["important"]; exist {
+		r.Important = imp.(string)
 	}
 }
 
@@ -232,6 +240,11 @@ func (r OpenOrderResolve) Answer() string {
 
 	desc = desc + "地址:" + r.Address + "\n"
 	desc = desc + "送货时间" + r.Time.Format("2006年01月02日") + "\n"
+
+	if r.Important != "" {
+		desc = desc + "备注：" + r.Important + "\n"
+	}
+
 	desc = desc + "=== 结束 ===\n"
 
 	return desc
