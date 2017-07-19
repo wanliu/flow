@@ -3,12 +3,13 @@ package resolves
 import (
 	// "encoding/json"
 	// "io/ioutil"
-	// "log"
+	"log"
 	// "net/http"
 	// "net/url"
-	"strconv"
-	// "strings"
 	"reflect"
+	"strconv"
+	"strings"
+	// "regexp"
 	"time"
 
 	"github.com/hysios/apiai-go"
@@ -76,12 +77,66 @@ func (r *OpenOrderResolve) ExtractQuantity() []int {
 		qs := reflect.ValueOf(quantities)
 
 		for i := 0; i < qs.Len(); i++ {
-			q := qs.Index(i).Interface().(float64)
-			result = append(result, int(q))
+			q := qs.Index(i).Interface()
+
+			switch t := q.(type) {
+			case string:
+				qs := q.(string)
+				qi := extractQuantity(qs)
+				result = append(result, qi)
+			case float64:
+				qf := q.(float64)
+				result = append(result, int(qf))
+			default:
+				log.Println("Unknown Quantity type: %v", t)
+			}
 		}
 	}
 
 	return result
+}
+
+func extractQuantity(s string) int {
+	nums := strings.TrimFunc(s, TrimToNum)
+	numsCgd := DBCtoSBC(nums)
+
+	log.Printf("NUMS: %v", numsCgd)
+
+	if len(numsCgd) > 0 {
+		q, _ := strconv.Atoi(numsCgd)
+		return q
+	} else {
+		return 0
+	}
+	// re := regexp.MustCompile("[0-9]+")
+}
+
+func TrimToNum(r rune) bool {
+	if n := r - '0'; n >= 0 && n <= 9 {
+		return false
+	} else if m := r - '０'; m >= 0 && m <= 9 {
+		return false
+	}
+
+	return true
+}
+
+func DBCtoSBC(s string) string {
+	retstr := ""
+	for _, i := range s {
+		inside_code := i
+		if inside_code == 12288 {
+			inside_code = 32
+		} else {
+			inside_code -= 65248
+		}
+		if inside_code < 32 || inside_code > 126 {
+			retstr += string(i)
+		} else {
+			retstr += string(inside_code)
+		}
+	}
+	return retstr
 }
 
 func (r *OpenOrderResolve) ExtractProducts() {
