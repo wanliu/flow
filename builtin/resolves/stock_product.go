@@ -13,6 +13,7 @@ type StockProductResolve struct {
 	Name       string
 	Price      float64
 	Stock      int
+	Quantity   int
 	Product    string
 	Resolution Resolution
 }

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	. "github.com/wanliu/flow/builtin/luis"
@@ -32,19 +33,49 @@ type StockQueryResolve struct {
 	Current    *StockProductResolve
 }
 
+// TODO 无法识别全角数字
 func (r *StockQueryResolve) ExtractFromLuis() {
+	r.ExtractProducts()
+	quantities := r.ExtractQuantity()
+
+	for i, q := range quantities {
+		if len(r.Products) >= i+1 {
+			pr := r.Products[i]
+			pr.Quantity = q
+		}
+	}
+
+	for _, p := range r.Products {
+		p.CheckResolved()
+	}
+}
+
+func (r *StockQueryResolve) ExtractQuantity() []int {
+	result := make([]int, 0, 10)
+
+	for _, item := range r.LuisParams.Entities {
+		if item.Type == "builtin.number" {
+			number := strings.Trim(item.Resolution.Value, " ")
+			q, _ := strconv.ParseInt(number, 10, 64)
+			result = append(result, int(q))
+		}
+	}
+
+	return result
+}
+
+func (r *StockQueryResolve) ExtractProducts() {
 	for _, item := range r.LuisParams.Entities {
 		if item.Type == "products" {
-			product := StockProductResolve{
+			product := &StockProductResolve{
 				Resolved:   false,
 				Name:       item.Entity,
+				Quantity:   0, // 默认值
 				Stock:      0,
 				Resolution: item.Resolution,
 			}
 
-			product.CheckResolved()
-
-			r.Products = append(r.Products, &product)
+			r.Products = append(r.Products, product)
 		} else {
 			log.Printf("type: %v", item.Type)
 		}
@@ -117,6 +148,7 @@ func (r StockQueryResolve) Answer() string {
 			if res.StatusCode == 422 {
 				return result.Error
 			} else {
+				result.Compare(r)
 				return result.String()
 			}
 		}
@@ -128,14 +160,25 @@ func (r StockQueryResolve) EmptyProducts() bool {
 }
 
 type StockRes struct {
-	Items []ItemStockRes
+	Items []*ItemStockRes
 	Error string
 }
 
-func (p StockRes) String() string {
+func (s *StockRes) Compare(r StockQueryResolve) {
+	for _, i := range s.Items {
+		for _, p := range r.Products {
+			if p.Product == i.Name && p.Quantity != 0 {
+				i.Quantity = p.Quantity
+				break
+			}
+		}
+	}
+}
+
+func (s StockRes) String() string {
 	result := make([]string, 0, 10)
 
-	for _, i := range p.Items {
+	for _, i := range s.Items {
 		result = append(result, i.String())
 	}
 
@@ -145,14 +188,23 @@ func (p StockRes) String() string {
 type ItemStockRes struct {
 	Name          string
 	Current_stock int
+	Quantity      int
 }
 
 func (i ItemStockRes) String() string {
-	if i.Current_stock <= 0 {
-		return i.Name + "没有货"
-	} else if i.Current_stock <= 20 {
-		return i.Name + "的库存不多"
+	if i.Quantity == 0 {
+		if i.Current_stock <= 0 {
+			return i.Name + "没有货"
+		} else if i.Current_stock <= 20 {
+			return i.Name + "的库存不多"
+		} else {
+			return i.Name + "有货"
+		}
 	} else {
-		return i.Name + "有货"
+		if i.Current_stock >= i.Quantity {
+			return i.Name + "有超过" + strconv.Itoa(i.Quantity) + "的货可以出售货"
+		} else {
+			return i.Name + "的库存不足" + strconv.Itoa(i.Quantity)
+		}
 	}
 }
