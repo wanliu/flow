@@ -66,10 +66,6 @@ func (r *OpenOrderResolve) ExtractItems() {
 			pr.Quantity = q
 		}
 	}
-
-	// for _, p := range r.Products.Products {
-	// 	p.CheckResolved()
-	// }
 }
 
 func (r *OpenOrderResolve) ExtractQuantity() []int {
@@ -157,26 +153,16 @@ func (r *OpenOrderResolve) ExtractProducts() {
 
 			r.Products.Add(product)
 		}
-
-		// ps := products.([]string)
-
-		// for i, _ := range ps {
-		// 	product := ItemResolve{
-		// 		Resolved: false,
-		// 		Name:     p,
-		// 		Price:    0,
-		// 		Quantity: 0, // 默认值
-		// 		Product:  p,
-		// 	}
-
-		// 	r.Products.Add(product)
-		// }
 	}
 }
 
 func (r *OpenOrderResolve) ExtractCustomer() {
 	if a, exist := r.AiParams.Params["street-address"]; exist {
 		r.Customer = a.(string)
+	}
+
+	if c, exist := r.AiParams.Params["customer"]; exist {
+		r.Customer = r.Customer + c.(string)
 	}
 }
 
