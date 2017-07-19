@@ -31,13 +31,13 @@ func (pr *AddressResolve) Solve(luis ResultParams) (bool, string, string) {
 		}
 
 		address = strings.Trim(address, " ")
-		pr.Parent.Address = address
+		pr.Parent.Customer = address
 
 		return true, "已经定好了送货地址:" + address, ""
 	} else if luis.TopScoringIntent.Intent == "确认" && pr.Confirm != "" {
-		pr.Parent.Address, pr.Confirm = pr.Confirm, ""
+		pr.Parent.Customer, pr.Confirm = pr.Confirm, ""
 
-		return true, "已经定好了送货地址:" + pr.Parent.Address, ""
+		return true, "已经定好了送货地址:" + pr.Parent.Customer, ""
 	} else if luis.TopScoringIntent.Intent == "取消" && pr.Confirm != "" {
 		pr.Confirm = ""
 
@@ -46,8 +46,8 @@ func (pr *AddressResolve) Solve(luis ResultParams) (bool, string, string) {
 		entity, exist := FetchEntity("地址", luis.Entities)
 
 		if exist {
-			pr.Parent.Address = strings.Trim(entity.Entity, " ")
-			return true, "已经定好了送货地址:" + pr.Parent.Address, ""
+			pr.Parent.Customer = strings.Trim(entity.Entity, " ")
+			return true, "已经定好了送货地址:" + pr.Parent.Customer, ""
 		} else {
 			address := strings.Trim(luis.Query, " ")
 			pr.Confirm = address

@@ -21,7 +21,7 @@ import (
 type OpenOrderResolve struct {
 	AiParams  apiai.Result
 	Products  ItemsResolve
-	Address   string
+	Customer  string
 	Time      time.Time
 	DefTime   string
 	Current   Resolve
@@ -50,7 +50,7 @@ func (r *OpenOrderResolve) Solve(aiResult apiai.Result) string {
 // 从ｌｕｉｓ数据构造结构数据
 func (r *OpenOrderResolve) ExtractFromLuis() {
 	r.ExtractItems()
-	r.ExtractAddress()
+	r.ExtractCustomer()
 	r.ExtractTime()
 	r.ExtractImportant()
 }
@@ -174,9 +174,9 @@ func (r *OpenOrderResolve) ExtractProducts() {
 	}
 }
 
-func (r *OpenOrderResolve) ExtractAddress() {
+func (r *OpenOrderResolve) ExtractCustomer() {
 	if a, exist := r.AiParams.Params["street-address"]; exist {
-		r.Address = a.(string)
+		r.Customer = a.(string)
 	}
 }
 
@@ -222,7 +222,7 @@ func (r OpenOrderResolve) Answer() string {
 
 	// params := url.Values{
 	// 	"auth_token":   {"5f567b5efc3e4d0aa0d9c40922ae07aa"},
-	// 	"street":       {r.Address},
+	// 	"street":       {r.Customer},
 	// 	"deliver_time": {r.Time.Format("2006年01月02日")},
 	// }
 
@@ -238,7 +238,7 @@ func (r OpenOrderResolve) Answer() string {
 		// params.Add(qk, qv)
 	}
 
-	desc = desc + "地址:" + r.Address + "\n"
+	desc = desc + "地址:" + r.Customer + "\n"
 	desc = desc + "送货时间" + r.Time.Format("2006年01月02日") + "\n"
 
 	if r.Important != "" {
