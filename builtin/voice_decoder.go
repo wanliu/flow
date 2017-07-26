@@ -7,11 +7,15 @@ package builtin
 // 需要安装依赖 ffmpeg
 
 import (
-	"log"
+	"encoding/base64"
+	"io/ioutil"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 
 	flow "github.com/wanliu/goflow"
 )
@@ -39,31 +43,18 @@ func NewVoiceDecoder() interface{} {
 	return new(VoiceDecoder)
 }
 
-func (c VoiceDecoder) OnIn(input string) {
-	if !strings.HasSuffix(input, "amr") {
-		replyData := ReplyData{"错误，不支持的音频格式", nil}
-		c.Out <- replyData
-		return
-	}
+func (c VoiceDecoder) OnIn(src string) {
+	dst, _ := base64.StdEncoding.DecodeString(src)
 
-	if _, err := os.Stat(input); os.IsNotExist(err) {
-		replyData := ReplyData{"错误，制定的音频文件不存在", nil}
-		c.Out <- replyData
-		return
-	}
+	rand.Seed(time.Now().UnixNano())
+	randId := strconv.Itoa(rand.Intn(10000000))
+	filename := "./.tmp/" + strconv.Itoa(int(time.Now().Unix())) + randId + ".mp3"
+	filename, _ = filepath.Abs(filename)
+	ioutil.WriteFile(filename, dst, 0644)
 
-	shPath, _ := filepath.Abs("./cmd/silk-v3-decoder/converter.sh")
-	comm := exec.Command("/bin/sh", shPath, input, MP3FORMAT)
-	if err := comm.Run(); err != nil {
-		log.Printf("===1 %v", err)
-		replyData := ReplyData{err.Error(), nil}
-		c.Out <- replyData
-		return
-	}
-
-	pathPre := strings.Replace(input, ".amr", "", -1)
+	pathPre := strings.Replace(filename, ".mp3", "", -1)
 	conPath := pathPre + "_copy.amr"
-	comm = exec.Command("ffmpeg", "-i", pathPre+".mp3", "-ab", AudioBitRate, "-ac", NumberOfAudioChannels, "-ar", AudioSamplingRateAMR, conPath)
+	comm := exec.Command("ffmpeg", "-i", filename, "-ab", AudioBitRate, "-ac", NumberOfAudioChannels, "-ar", AudioSamplingRateAMR, conPath)
 	if err := comm.Run(); err != nil {
 		if _, err := os.Stat(conPath); os.IsNotExist(err) {
 			replyData := ReplyData{"解码音频文件失败", nil}

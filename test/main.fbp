@@ -103,9 +103,10 @@
 # '开单' -> Intent IntentDispatcher()
 # 0.70 -> Score IntentDispatcher()
 
-INPORT=Line.Ctx:In
+# INPORT=Line.Ctx:In
+INPORT=VoiceDecoder.In:FPath
 
-Line(MyInput) Out -> In VoiceDecoder(VoiceDecoder)
+# Line(MyInput) Out -> In VoiceDecoder(VoiceDecoder)
 VoiceDecoder() Next -> Path Voice(BaiduVoice)
 VoiceDecoder() Out -> In Reply(Final)
 
@@ -115,4 +116,4 @@ Voice() Out -> In Reply()
 '9926043' -> AppId Voice()
 'dE3SNoLcH5KuhhwVc8hhL5fL' -> ApiKey Voice()
 'fwMleRZAsW9vmMf2GcmlVexXNooTVHGa' -> SecKey Voice()
-'请输入你的话' -> Prompt Line()
+# '请输入你的话' -> Prompt Line()
