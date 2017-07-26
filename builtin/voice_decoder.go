@@ -44,7 +44,7 @@ func NewVoiceDecoder() interface{} {
 }
 
 func (c VoiceDecoder) OnIn(src string) {
-	dst, _ := base64.StdEncoding.DecodeString(src)
+	dst, _ := base64.URLEncoding.DecodeString(src)
 
 	rand.Seed(time.Now().UnixNano())
 	randId := strconv.Itoa(rand.Intn(10000000))
