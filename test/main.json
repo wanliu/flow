@@ -1,91 +1,45 @@
 {
   "processes": {
-    "Ai": {
-      "component": "ApiAi"
+    "Line": {
+      "component": "MyInput"
     },
-    "Merge": {
-      "component": "QuerySave"
+    "VoiceDecoder": {
+      "component": "VoiceDecoder"
     },
-    "CM": {
-      "component": "ContextManager"
-    },
-    "OrderIntDispatcher": {
-      "component": "IntentCheck"
-    },
-    "OpenOrder": {
-      "component": "Order"
+    "Voice": {
+      "component": "BaiduVoice"
     },
     "Reply": {
       "component": "Final"
     },
-    "Unimplemented": {
-      "component": "Unimplemented"
+    "Ai": {
+      "component": "ApiAi"
     }
   },
   "connections": [
     {
       "src": {
-        "process": "Ai",
+        "process": "Line",
         "port": "Out"
       },
       "tgt": {
-        "process": "Merge",
-        "port": "Result"
-      }
-    },
-    {
-      "src": {
-        "process": "Merge",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "CM",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "CM",
-        "port": "Process"
-      },
-      "tgt": {
-        "process": "OrderIntDispatcher",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "OrderIntDispatcher",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "OpenOrder",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "OpenOrder",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
+        "process": "VoiceDecoder",
         "port": "In"
       }
     },
     {
       "src": {
-        "process": "OrderIntDispatcher",
+        "process": "VoiceDecoder",
         "port": "Next"
       },
       "tgt": {
-        "process": "Unimplemented",
-        "port": "Ctx"
+        "process": "Voice",
+        "port": "Path"
       }
     },
     {
       "src": {
-        "process": "Unimplemented",
+        "process": "VoiceDecoder",
         "port": "Out"
       },
       "tgt": {
@@ -94,48 +48,57 @@
       }
     },
     {
-      "data": "b56957fa6f8c4f94aeaace533390b685",
+      "src": {
+        "process": "Voice",
+        "port": "Next"
+      },
       "tgt": {
         "process": "Ai",
-        "port": "Token"
+        "port": "In"
       }
     },
     {
-      "data": "123456789",
+      "src": {
+        "process": "Voice",
+        "port": "Out"
+      },
       "tgt": {
-        "process": "Ai",
-        "port": "SessionId"
+        "process": "Reply",
+        "port": "In"
       }
     },
     {
-      "data": "今天",
+      "data": "9926043",
       "tgt": {
-        "process": "OpenOrder",
-        "port": "Deftime"
+        "process": "Voice",
+        "port": "AppId"
       }
     },
     {
-      "data": "开单",
+      "data": "dE3SNoLcH5KuhhwVc8hhL5fL",
       "tgt": {
-        "process": "OrderIntDispatcher",
-        "port": "Intent"
+        "process": "Voice",
+        "port": "ApiKey"
       }
     },
     {
-      "data": 0.35,
+      "data": "fwMleRZAsW9vmMf2GcmlVexXNooTVHGa",
       "tgt": {
-        "process": "OrderIntDispatcher",
-        "port": "Score"
+        "process": "Voice",
+        "port": "SecKey"
+      }
+    },
+    {
+      "data": "请输入你的话",
+      "tgt": {
+        "process": "Line",
+        "port": "Prompt"
       }
     }
   ],
   "inports": {
-    "Text": {
-      "process": "Ai",
-      "port": "In"
-    },
-    "Ctx": {
-      "process": "Merge",
+    "In": {
+      "process": "Line",
       "port": "Ctx"
     }
   },

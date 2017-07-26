@@ -1,6 +1,8 @@
 package builtin
 
 import (
+	"log"
+
 	flow "github.com/wanliu/goflow"
 )
 
@@ -14,5 +16,6 @@ type Final struct {
 }
 
 func (s *Final) OnIn(data ReplyData) {
-	data.Ctx.Post(data.Reply)
+	log.Printf(":::::::::::::::Reply %v", data.Reply)
+	// data.Ctx.Post(data.Reply)
 }

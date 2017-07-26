@@ -1,79 +1,92 @@
-INPORT=Ai.In:Text
-INPORT=Merge.Ctx:Ctx
+# INPORT=VoiceDecoder.In:FPath
+# INPORT=Ai.In:Text
+# INPORT=Merge.Ctx:Ctx
 
-Ai(ApiAi) Out -> Result Merge()
-Merge(QuerySave) Out -> Ctx CM(ContextManager)
-CM() Process -> Ctx OrderIntDispatcher(IntentCheck)
+# VoiceDecoder(VoiceDecoder) Next -> Path Voice(BaiduVoice)
+# VoiceDecoder() Out -> In Reply(Final)
 
-# CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
-# PraiseIntDispatcher() Out -> Ctx Praise(Praise)
-# Praise() Out -> In Reply(Final)
+# Voice() Next -> In Ai(ApiAi)
+# Voice() Out -> In Reply()
 
-# PraiseIntDispatcher() Next -> Ctx CriIntDispatcher(IntentCheck)
-# CriIntDispatcher() Out -> Ctx Critical(Critical)
-# Critical() Out -> In Reply()
+# Ai() Out -> Result Merge()
+# Merge(QuerySave) Out -> Ctx CM(ContextManager)
+# CM() Process -> Ctx OrderIntDispatcher(IntentCheck)
 
-# CriIntDispatcher() Next -> Ctx AbuseIntDispatcher(IntentCheck)
-# AbuseIntDispatcher() Out -> Ctx Abuse(Abuse)
-# Abuse() Out -> In Reply()
+# # CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
+# # PraiseIntDispatcher() Out -> Ctx Praise(Praise)
+# # Praise() Out -> In Reply(Final)
 
-# AbuseIntDispatcher() Next -> Ctx GreetIntDispatcher(IntentCheck)
-# GreetIntDispatcher() Out -> Ctx Greet(Greet)
-# Greet() Out -> In Reply()
+# # PraiseIntDispatcher() Next -> Ctx CriIntDispatcher(IntentCheck)
+# # CriIntDispatcher() Out -> Ctx Critical(Critical)
+# # Critical() Out -> In Reply()
 
-# GreetIntDispatcher() Next -> Ctx RobotIntDispatcher(IntentCheck)
-# RobotIntDispatcher() Out -> Ctx Robot(Robot)
-# Robot() Out -> In Reply()
+# # CriIntDispatcher() Next -> Ctx AbuseIntDispatcher(IntentCheck)
+# # AbuseIntDispatcher() Out -> Ctx Abuse(Abuse)
+# # Abuse() Out -> In Reply()
 
-# RobotIntDispatcher() Next -> Ctx StockIntDispatcher(IntentCheck)
-# StockIntDispatcher() Out -> Ctx StockQuery(StockQuery)
-# StockQuery() Out -> In Reply()
+# # AbuseIntDispatcher() Next -> Ctx GreetIntDispatcher(IntentCheck)
+# # GreetIntDispatcher() Out -> Ctx Greet(Greet)
+# # Greet() Out -> In Reply()
 
-# StockIntDispatcher() Next -> Ctx PriceIntDispatcher(IntentCheck)
-# PriceIntDispatcher() Out -> Ctx PriceQuery(PriceQuery)
-# PriceQuery() Out -> In Reply()
+# # GreetIntDispatcher() Next -> Ctx RobotIntDispatcher(IntentCheck)
+# # RobotIntDispatcher() Out -> Ctx Robot(Robot)
+# # Robot() Out -> In Reply()
 
-# PriceIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
+# # RobotIntDispatcher() Next -> Ctx StockIntDispatcher(IntentCheck)
+# # StockIntDispatcher() Out -> Ctx StockQuery(StockQuery)
+# # StockQuery() Out -> In Reply()
 
-OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
-OpenOrder() Out -> In Reply(Final)
+# # StockIntDispatcher() Next -> Ctx PriceIntDispatcher(IntentCheck)
+# # PriceIntDispatcher() Out -> Ctx PriceQuery(PriceQuery)
+# # PriceQuery() Out -> In Reply()
 
-OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
-Unimplemented() Out -> In Reply()
+# # PriceIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
 
-'b56957fa6f8c4f94aeaace533390b685' -> Token Ai()
-'123456789' -> SessionId Ai()
+# OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
+# OpenOrder() Out -> In Reply()
 
-# '表扬' -> Intent PraiseIntDispatcher()
-# 0.40 -> Score PraiseIntDispatcher()
+# OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
+# Unimplemented() Out -> In Reply()
 
-# '批评' -> Intent CriIntDispatcher()
-# 0.40 -> Score CriIntDispatcher()
+# 'b56957fa6f8c4f94aeaace533390b685' -> Token Ai()
+# '123456789' -> SessionId Ai()
 
-# '辱骂' -> Intent AbuseIntDispatcher()
-# 0.40 -> Score AbuseIntDispatcher()
+# # APP_ID = '9926043'
+# # API_KEY = 'dE3SNoLcH5KuhhwVc8hhL5fL'
+# # SECRET_KEY = 'fwMleRZAsW9vmMf2GcmlVexXNooTVHGa'
+# '9926043' -> AppId Voice()
+# 'dE3SNoLcH5KuhhwVc8hhL5fL' -> ApiKey Voice()
+# 'fwMleRZAsW9vmMf2GcmlVexXNooTVHGa' -> SecKey Voice()
 
-# '招呼' -> Intent GreetIntDispatcher()
-# 0.40 -> Score GreetIntDispatcher()
+# # '表扬' -> Intent PraiseIntDispatcher()
+# # 0.40 -> Score PraiseIntDispatcher()
 
-# '关于机器人' -> Intent RobotIntDispatcher()
-# 0.40 -> Score RobotIntDispatcher()
+# # '批评' -> Intent CriIntDispatcher()
+# # 0.40 -> Score CriIntDispatcher()
 
-# '问货' -> Intent StockIntDispatcher()
-# 0.40 -> Score StockIntDispatcher()
+# # '辱骂' -> Intent AbuseIntDispatcher()
+# # 0.40 -> Score AbuseIntDispatcher()
 
-# '问价' -> Intent PriceIntDispatcher()
-# 0.40 -> Score PriceIntDispatcher()
+# # '招呼' -> Intent GreetIntDispatcher()
+# # 0.40 -> Score GreetIntDispatcher()
 
-'今天' -> Deftime OpenOrder()
+# # '关于机器人' -> Intent RobotIntDispatcher()
+# # 0.40 -> Score RobotIntDispatcher()
 
-'开单' -> Intent OrderIntDispatcher()
-0.35 -> Score OrderIntDispatcher()
-# # 'products' -> Type TryProducts()
+# # '问货' -> Intent StockIntDispatcher()
+# # 0.40 -> Score StockIntDispatcher()
+
+# # '问价' -> Intent PriceIntDispatcher()
+# # 0.40 -> Score PriceIntDispatcher()
+
+# '今天' -> Deftime OpenOrder()
+
+# '开单' -> Intent OrderIntDispatcher()
+# 0.35 -> Score OrderIntDispatcher()
 
 
 
-# # FOR TEST
+# FOR TEST
 # INPORT=Line.Ctx:In
  
 # Line(MyInput) Out -> In Luis(LuisAnalyze)
@@ -89,3 +102,17 @@ Unimplemented() Out -> In Reply()
 # '请输入你的话' -> Prompt Line()
 # '开单' -> Intent IntentDispatcher()
 # 0.70 -> Score IntentDispatcher()
+
+INPORT=Line.Ctx:In
+
+Line(MyInput) Out -> In VoiceDecoder(VoiceDecoder)
+VoiceDecoder() Next -> Path Voice(BaiduVoice)
+VoiceDecoder() Out -> In Reply(Final)
+
+Voice() Next -> In Ai(ApiAi)
+Voice() Out -> In Reply()
+
+'9926043' -> AppId Voice()
+'dE3SNoLcH5KuhhwVc8hhL5fL' -> ApiKey Voice()
+'fwMleRZAsW9vmMf2GcmlVexXNooTVHGa' -> SecKey Voice()
+'请输入你的话' -> Prompt Line()
