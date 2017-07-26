@@ -1,6 +1,8 @@
 {
   "processes": {
-    "VoiceDecoder": {},
+    "VoiceDecoder": {
+      "component": "VoiceDecoder"
+    },
     "Voice": {
       "component": "BaiduVoice"
     },
@@ -9,6 +11,12 @@
     },
     "Ai": {
       "component": "ApiAi"
+    },
+    "Merge": {
+      "component": "QuerySave"
+    },
+    "CM": {
+      "component": "ContextManager"
     }
   },
   "connections": [
@@ -53,6 +61,26 @@
       }
     },
     {
+      "src": {
+        "process": "Merge",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "CM",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Ai",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Merge",
+        "port": "Result"
+      }
+    },
+    {
       "data": "9926043",
       "tgt": {
         "process": "Voice",
@@ -75,9 +103,17 @@
     }
   ],
   "inports": {
-    "FPath": {
+    "Voice": {
       "process": "VoiceDecoder",
       "port": "In"
+    },
+    "Text": {
+      "process": "Ai",
+      "port": "In"
+    },
+    "Ctx": {
+      "process": "Merge",
+      "port": "Ctx"
     }
   },
   "caseSensitive": true

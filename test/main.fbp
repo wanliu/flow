@@ -1,4 +1,4 @@
-# INPORT=VoiceDecoder.In:FPath
+# INPORT=VoiceDecoder.In:Voice
 # INPORT=Ai.In:Text
 # INPORT=Merge.Ctx:Ctx
 
@@ -104,14 +104,19 @@
 # 0.70 -> Score IntentDispatcher()
 
 # INPORT=Line.Ctx:In
-INPORT=VoiceDecoder.In:FPath
+INPORT=VoiceDecoder.In:Voice
+INPORT=Ai.In:Text
+INPORT=Merge.Ctx:Ctx
 
 # Line(MyInput) Out -> In VoiceDecoder(VoiceDecoder)
-VoiceDecoder() Next -> Path Voice(BaiduVoice)
+VoiceDecoder(VoiceDecoder) Next -> Path Voice(BaiduVoice)
 VoiceDecoder() Out -> In Reply(Final)
 
 Voice() Next -> In Ai(ApiAi)
 Voice() Out -> In Reply()
+
+Merge(QuerySave) Out -> Ctx CM(ContextManager)
+Ai(ApiAi) Out -> Result Merge()
 
 '9926043' -> AppId Voice()
 'dE3SNoLcH5KuhhwVc8hhL5fL' -> ApiKey Voice()
