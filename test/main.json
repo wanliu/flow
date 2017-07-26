@@ -1,6 +1,14 @@
 {
   "processes": {
-    "VoiceDecoder": {},
+    "Line": {
+      "component": "MyInput"
+    },
+    "Mp3Reader": {
+      "component": "Mp3Reader"
+    },
+    "VoiceDecoder": {
+      "component": "VoiceDecoder"
+    },
     "Voice": {
       "component": "BaiduVoice"
     },
@@ -12,6 +20,26 @@
     }
   },
   "connections": [
+    {
+      "src": {
+        "process": "Line",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Mp3Reader",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Mp3Reader",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "VoiceDecoder",
+        "port": "In"
+      }
+    },
     {
       "src": {
         "process": "VoiceDecoder",
@@ -72,12 +100,19 @@
         "process": "Voice",
         "port": "SecKey"
       }
+    },
+    {
+      "data": "请输入你的话",
+      "tgt": {
+        "process": "Line",
+        "port": "Prompt"
+      }
     }
   ],
   "inports": {
-    "FPath": {
-      "process": "VoiceDecoder",
-      "port": "In"
+    "In": {
+      "process": "Line",
+      "port": "Ctx"
     }
   },
   "caseSensitive": true

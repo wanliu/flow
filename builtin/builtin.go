@@ -37,6 +37,7 @@ func ComponentList() map[string]func() interface{} {
 	_components["ApiAi"] = NewApiAi
 	_components["VoiceDecoder"] = NewVoiceDecoder
 	_components["BaiduVoice"] = NewBaiduVoice
+	_components["Mp3Reader"] = NewMp3Reader
 
 	return _components
 }
@@ -223,6 +224,13 @@ func ComponentInfos() map[string]Component {
 		Description: "BaiduVoice Component",
 		Icon:        "",
 		Constructor: NewBaiduVoice,
+	}
+
+	result["Mp3Reader"] = Component{
+		Name:        "Mp3Reader",
+		Description: "Mp3Reader Component",
+		Icon:        "",
+		Constructor: NewMp3Reader,
 	}
 
 	return result
