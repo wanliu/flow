@@ -9,6 +9,7 @@ package builtin
 import (
 	"encoding/base64"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -48,20 +49,32 @@ func (c VoiceDecoder) OnIn(src string) {
 
 	rand.Seed(time.Now().UnixNano())
 	randId := strconv.Itoa(rand.Intn(10000000))
-	filename := "./.tmp/" + strconv.Itoa(int(time.Now().Unix())) + randId + ".mp3"
+
+	tempDir := filepath.Abs("./.tmp/")
+	if _, err := os.Stat(tempDir); os.IsNotExist(err) {
+		log.Printf("[AUDIO]创建临时文件夹 %v", tempDir)
+		os.Mkdir(tempDir, 0644)
+	}
+
+	filename := tempDir + strconv.Itoa(int(time.Now().Unix())) + randId + ".mp3"
 	filename, _ = filepath.Abs(filename)
+
+	log.Printf("[AUDIO]输出mp3文件到 %v", filename)
 	ioutil.WriteFile(filename, dst, 0644)
 
 	pathPre := strings.Replace(filename, ".mp3", "", -1)
 	conPath := pathPre + "_copy.amr"
+
+	log.Printf("[AUDIO]输出amr文件到 %v", filename)
 	comm := exec.Command("ffmpeg", "-i", filename, "-ab", AudioBitRate, "-ac", NumberOfAudioChannels, "-ar", AudioSamplingRateAMR, conPath)
 	if err := comm.Run(); err != nil {
 		if _, err := os.Stat(conPath); os.IsNotExist(err) {
+			log.Printf("[AUDIO ERROR]输出amr文件失败")
+
 			replyData := ReplyData{"解码音频文件失败", nil}
 			c.Out <- replyData
 			return
 		}
-
 	}
 
 	c.Next <- conPath
