@@ -17,6 +17,12 @@
     },
     "Ai": {
       "component": "ApiAi"
+    },
+    "Merge": {
+      "component": "QuerySave"
+    },
+    "CM": {
+      "component": "ContextManager"
     }
   },
   "connections": [
@@ -78,6 +84,26 @@
       "tgt": {
         "process": "Reply",
         "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Merge",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "CM",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Ai",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Merge",
+        "port": "Result"
       }
     },
     {
