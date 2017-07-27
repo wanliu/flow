@@ -119,9 +119,9 @@ VoiceDecoder(VoiceDecoder) Next -> Path Voice(BaiduVoice)
 VoiceDecoder() Out -> In Reply(Final)
 
 Voice() Next -> In Ai(ApiAi)
-Voice() Out -> In Reply()
-
-Merge(QuerySave) Out -> Ctx CM(ContextManager)
+Voice() Out -> Text Merge(VoiceSave)
+Merge() Out -> Ctx PrintVoice(PrintVoice)
+PrintVoice() Out -> In Reply()
 Ai(ApiAi) Out -> Result Merge()
 
 '9926043' -> AppId Voice()

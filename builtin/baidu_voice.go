@@ -22,7 +22,7 @@ type BaiduVoice struct {
 	Path   <-chan string
 
 	Next chan<- string
-	Out  chan<- ReplyData
+	Out  chan<- string
 }
 
 func NewBaiduVoice() interface{} {
@@ -61,13 +61,13 @@ func (c *BaiduVoice) OnPath(path string) {
 
 	strs, err := client.SpeechToText(ap)
 	if err != nil {
-		replyData := ReplyData{err.Error(), nil}
-		c.Out <- replyData
+		// replyData := ReplyData{err.Error(), nil}
+		c.Out <- err.Error()
 		return
 	}
 
-	replyData := ReplyData{strings.Join(strs, ", "), nil}
-	c.Out <- replyData
+	// replyData := ReplyData{strings.Join(strs, ", "), nil}
+	c.Out <- strings.Join(strs, ", ")
 }
 
 type BaiduRes struct {
