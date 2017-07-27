@@ -3,3 +3,5 @@ test.fbp
 test.json
 component.so
 runtime.json
+tmp
+.tmp

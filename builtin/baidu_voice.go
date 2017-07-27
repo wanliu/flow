@@ -1,11 +1,11 @@
 package builtin
 
 import (
-	"encoding/json"
-	"log"
-	"os/exec"
-	"path/filepath"
+	"encoding/base64"
+	"io/ioutil"
+	"strings"
 
+	voice "github.com/chenqinghe/baidu-ai-go-sdk/voice"
 	flow "github.com/wanliu/goflow"
 )
 
@@ -42,21 +42,31 @@ func (c *BaiduVoice) OnSecKey(key string) {
 }
 
 func (c *BaiduVoice) OnPath(path string) {
-	pyPath, _ := filepath.Abs("./lib/baidu_sdk.py")
-	comm := exec.Command("python", pyPath, c.Appid, c.Apikey, c.Secretkey, path)
-	output, err := comm.CombinedOutput()
+	client := voice.NewVoiceClient(c.Apikey, c.Secretkey)
 
+	data, err := ioutil.ReadFile(path)
+	bData := base64.StdEncoding.EncodeToString(data)
+	leng := len(data)
+
+	var ap voice.ASRParams = voice.ASRParams{
+		Format:  "amr",
+		Rate:    8000,
+		Channel: 1,
+		Token:   client.AccessToken,
+		Cuid:    "565985655244",
+		Lan:     "zh",
+		Speech:  bData,
+		Len:     leng,
+	}
+
+	strs, err := client.SpeechToText(ap)
 	if err != nil {
 		replyData := ReplyData{err.Error(), nil}
 		c.Out <- replyData
 		return
 	}
 
-	var res BaiduRes
-	json.Unmarshal([]byte(output), &res)
-	log.Println(res)
-
-	replyData := ReplyData{string(res.Result[0]), nil}
+	replyData := ReplyData{strings.Join(strs, ", "), nil}
 	c.Out <- replyData
 }
 
