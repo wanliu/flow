@@ -13,10 +13,10 @@
       "component": "ApiAi"
     },
     "Merge": {
-      "component": "QuerySave"
+      "component": "VoiceSave"
     },
-    "CM": {
-      "component": "ContextManager"
+    "PrintVoice": {
+      "component": "PrintVoice"
     }
   },
   "connections": [
@@ -56,8 +56,8 @@
         "port": "Out"
       },
       "tgt": {
-        "process": "Reply",
-        "port": "In"
+        "process": "Merge",
+        "port": "Text"
       }
     },
     {
@@ -66,18 +66,18 @@
         "port": "Out"
       },
       "tgt": {
-        "process": "CM",
+        "process": "PrintVoice",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "Ai",
+        "process": "PrintVoice",
         "port": "Out"
       },
       "tgt": {
-        "process": "Merge",
-        "port": "Result"
+        "process": "Reply",
+        "port": "In"
       }
     },
     {

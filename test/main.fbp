@@ -108,15 +108,17 @@ INPORT=VoiceDecoder.In:Voice
 INPORT=Ai.In:Text
 INPORT=Merge.Ctx:Ctx
 
+
 # Line(MyInput) Out -> In VoiceDecoder(VoiceDecoder)
 VoiceDecoder(VoiceDecoder) Next -> Path Voice(BaiduVoice)
 VoiceDecoder() Out -> In Reply(Final)
 
 Voice() Next -> In Ai(ApiAi)
-Voice() Out -> In Reply()
+Voice() Out -> Text Merge(VoiceSave)
 
-Merge(QuerySave) Out -> Ctx CM(ContextManager)
-Ai(ApiAi) Out -> Result Merge()
+Merge() Out -> Ctx PrintVoice(PrintVoice)
+PrintVoice() Out -> In Reply()
+# Ai(ApiAi) Out -> Result Merge()
 
 '9926043' -> AppId Voice()
 'dE3SNoLcH5KuhhwVc8hhL5fL' -> ApiKey Voice()

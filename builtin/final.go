@@ -17,5 +17,5 @@ type Final struct {
 
 func (s *Final) OnIn(data ReplyData) {
 	log.Printf(":::::::::::::::Reply %v", data.Reply)
-	// data.Ctx.Post(data.Reply)
+	data.Ctx.Post(data.Reply)
 }
