@@ -50,10 +50,11 @@ func (c VoiceDecoder) OnIn(src string) {
 	rand.Seed(time.Now().UnixNano())
 	randId := strconv.Itoa(rand.Intn(10000000))
 
-	tempDir := filepath.Abs("./.tmp/")
+	tempDir, _ := filepath.Abs("./.tmp/")
 	if _, err := os.Stat(tempDir); os.IsNotExist(err) {
 		log.Printf("[AUDIO]创建临时文件夹 %v", tempDir)
-		os.Mkdir(tempDir, 0644)
+		os.Mkdir(tempDir, 0777)
+		tempDir = tempDir + "/"
 	}
 
 	filename := tempDir + strconv.Itoa(int(time.Now().Unix())) + randId + ".mp3"
@@ -65,7 +66,7 @@ func (c VoiceDecoder) OnIn(src string) {
 	pathPre := strings.Replace(filename, ".mp3", "", -1)
 	conPath := pathPre + "_copy.amr"
 
-	log.Printf("[AUDIO]输出amr文件到 %v", filename)
+	log.Printf("[AUDIO]输出amr文件到 %v", conPath)
 	comm := exec.Command("ffmpeg", "-i", filename, "-ab", AudioBitRate, "-ac", NumberOfAudioChannels, "-ar", AudioSamplingRateAMR, conPath)
 	if err := comm.Run(); err != nil {
 		if _, err := os.Stat(conPath); os.IsNotExist(err) {
