@@ -54,8 +54,8 @@ func (c VoiceDecoder) OnIn(src string) {
 	if _, err := os.Stat(tempDir); os.IsNotExist(err) {
 		log.Printf("[AUDIO]创建临时文件夹 %v", tempDir)
 		os.Mkdir(tempDir, 0777)
-		tempDir = tempDir + "/"
 	}
+	tempDir = tempDir + "/"
 
 	filename := tempDir + strconv.Itoa(int(time.Now().Unix())) + randId + ".mp3"
 	filename, _ = filepath.Abs(filename)
