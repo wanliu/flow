@@ -15,14 +15,10 @@ import (
 type GoogleVoice struct {
 	flow.Component
 
-	Appid     string
-	Apikey    string
-	Secretkey string
+	Apikeyfile string
 
-	AppId  <-chan string
-	ApiKey <-chan string
-	SecKey <-chan string
-	Path   <-chan string
+	ApiKeyFile <-chan string
+	Path       <-chan string
 
 	Next chan<- string
 	Out  chan<- string
@@ -32,22 +28,14 @@ func NewGoogleVoice() interface{} {
 	return new(GoogleVoice)
 }
 
-func (c *GoogleVoice) OnAppId(id string) {
-	c.Appid = id
-}
-
-func (c *GoogleVoice) OnApiKey(key string) {
-	c.Apikey = key
-}
-
-func (c *GoogleVoice) OnSecKey(key string) {
-	c.Secretkey = key
+func (c *GoogleVoice) OnApiKeyFile(filepath string) {
+	c.Apikeyfile = filepath
 }
 
 func (c *GoogleVoice) OnPath(path string) {
 
 	ctx := context.Background()
-	cl, err := speech.NewClient(ctx, option.WithServiceAccountFile("api-key.json"))
+	cl, err := speech.NewClient(ctx, option.WithServiceAccountFile(c.Apikeyfile))
 	if err != nil {
 		// TODO: Handle error.
 	}
@@ -108,7 +96,7 @@ func (c *GoogleVoice) OnPath(path string) {
 	c.Out <- "nothing"
 }
 
-type BaiduRes struct {
+type GoogleRes struct {
 	Err_no    int
 	Corpus_no string
 	Err_msg   string
