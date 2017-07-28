@@ -4,7 +4,7 @@
       "component": "VoiceDecoder"
     },
     "Voice": {
-      "component": "BaiduVoice"
+      "component": "GoogleVoice"
     },
     "Reply": {
       "component": "Final"
@@ -81,24 +81,10 @@
       }
     },
     {
-      "data": "9926043",
+      "data": "api-key.json",
       "tgt": {
         "process": "Voice",
-        "port": "AppId"
-      }
-    },
-    {
-      "data": "dE3SNoLcH5KuhhwVc8hhL5fL",
-      "tgt": {
-        "process": "Voice",
-        "port": "ApiKey"
-      }
-    },
-    {
-      "data": "fwMleRZAsW9vmMf2GcmlVexXNooTVHGa",
-      "tgt": {
-        "process": "Voice",
-        "port": "SecKey"
+        "port": "ApiKeyFile"
       }
     }
   ],

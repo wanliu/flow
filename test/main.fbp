@@ -110,7 +110,7 @@ INPORT=Merge.Ctx:Ctx
 
 
 # Line(MyInput) Out -> In VoiceDecoder(VoiceDecoder)
-VoiceDecoder(VoiceDecoder) Next -> Path Voice(BaiduVoice)
+VoiceDecoder(VoiceDecoder) Next -> Path Voice(GoogleVoice)
 VoiceDecoder() Out -> In Reply(Final)
 
 Voice() Next -> In Ai(ApiAi)
@@ -120,7 +120,7 @@ Merge() Out -> Ctx PrintVoice(PrintVoice)
 PrintVoice() Out -> In Reply()
 # Ai(ApiAi) Out -> Result Merge()
 
-'9926043' -> AppId Voice()
-'dE3SNoLcH5KuhhwVc8hhL5fL' -> ApiKey Voice()
-'fwMleRZAsW9vmMf2GcmlVexXNooTVHGa' -> SecKey Voice()
+'api-key.json' -> ApiKeyFile Voice()
+# 'dE3SNoLcH5KuhhwVc8hhL5fL' -> ApiKey Voice()
+# 'fwMleRZAsW9vmMf2GcmlVexXNooTVHGa' -> SecKey Voice()
 # '请输入你的话' -> Prompt Line()
