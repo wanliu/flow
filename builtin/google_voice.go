@@ -52,7 +52,7 @@ func (c *GoogleVoice) OnPath(path string) {
 		Content: data,
 	}
 
-	req := &speechpb.RecognizeRequest{
+	req := &speechpb.LongRunningRecognizeRequest{
 		Config: &speechpb.RecognitionConfig{
 			Encoding:        speechpb.RecognitionConfig_AMR,
 			SampleRateHertz: 8000,
@@ -63,7 +63,19 @@ func (c *GoogleVoice) OnPath(path string) {
 		},
 	}
 
-	resp, err := cl.Recognize(ctx, req)
+	// resp, err := cl.Recognize(ctx, req)
+	// if err != nil {
+	// 	c.Out <- err.Error()
+	// 	return
+	// }
+
+	op, err := cl.LongRunningRecognize(ctx, req)
+	if err != nil {
+		c.Out <- err.Error()
+		return
+	}
+
+	resp, err := op.Wait(ctx)
 	if err != nil {
 		c.Out <- err.Error()
 		return
