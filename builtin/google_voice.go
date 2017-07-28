@@ -4,6 +4,7 @@ import (
 	"context"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	speech "cloud.google.com/go/speech/apiv1"
 	"google.golang.org/api/option"
@@ -67,6 +68,15 @@ func (c *GoogleVoice) OnPath(path string) {
 		c.Out <- err.Error()
 		return
 	}
+
+	var strs []string
+	for i := range resp.Results {
+		for j := range resp.Results[i].Alternatives {
+			strs = append(strs, resp.Results[i].Alternatives[j].Transcript)
+		}
+
+	}
+	// resp.Results
 	// _ = resp
 	log.Printf("resp %#v", resp)
 
@@ -93,7 +103,7 @@ func (c *GoogleVoice) OnPath(path string) {
 	// }
 
 	// replyData := ReplyData{strings.Join(strs, ", "), nil}
-	c.Out <- "nothing"
+	c.Out <- strings.Join(strs, ", ")
 }
 
 type GoogleRes struct {
