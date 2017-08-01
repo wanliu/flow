@@ -15,8 +15,17 @@
     "OpenOrder": {
       "component": "Order"
     },
+    "NewOrder": {
+      "component": "NewOrder"
+    },
+    "PatchOrder": {
+      "component": "PatchOrder"
+    },
     "Reply": {
       "component": "Final"
+    },
+    "NewOrderNotice": {
+      "component": "NewOrderNotice"
     },
     "Unimplemented": {
       "component": "Unimplemented"
@@ -66,6 +75,66 @@
     {
       "src": {
         "process": "OpenOrder",
+        "port": "New"
+      },
+      "tgt": {
+        "process": "NewOrder",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OpenOrder",
+        "port": "Patch"
+      },
+      "tgt": {
+        "process": "PatchOrder",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OpenOrder",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "NewOrder",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "NewOrder",
+        "port": "Notice"
+      },
+      "tgt": {
+        "process": "NewOrderNotice",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "PatchOrder",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "NewOrderNotice",
         "port": "Out"
       },
       "tgt": {
@@ -110,7 +179,7 @@
     {
       "data": "今天",
       "tgt": {
-        "process": "OpenOrder",
+        "process": "NewOrder",
         "port": "Deftime"
       }
     },

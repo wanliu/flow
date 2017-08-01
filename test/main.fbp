@@ -36,13 +36,18 @@ CM() Process -> Ctx OrderIntDispatcher(IntentCheck)
 # PriceIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
 
 OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
+OpenOrder() New -> In NewOrder(NewOrder)
+OpenOrder() Patch -> In PatchOrder(PatchOrder)
 OpenOrder() Out -> In Reply(Final)
+
+NewOrder() Out -> In Reply()
+NewOrder() Notice -> In NewOrderNotice(NewOrderNotice)
+PatchOrder() Out -> In Reply()
+NewOrderNotice() Out -> In Reply()
 
 OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
 Unimplemented() Out -> In Reply()
 
-'b56957fa6f8c4f94aeaace533390b685' -> Token Ai()
-'123456789' -> SessionId Ai()
 
 # '表扬' -> Intent PraiseIntDispatcher()
 # 0.40 -> Score PraiseIntDispatcher()
@@ -65,7 +70,10 @@ Unimplemented() Out -> In Reply()
 # '问价' -> Intent PriceIntDispatcher()
 # 0.40 -> Score PriceIntDispatcher()
 
-'今天' -> Deftime OpenOrder()
+'b56957fa6f8c4f94aeaace533390b685' -> Token Ai()
+'123456789' -> SessionId Ai()
+
+'今天' -> Deftime NewOrder()
 
 '开单' -> Intent OrderIntDispatcher()
 0.35 -> Score OrderIntDispatcher()
