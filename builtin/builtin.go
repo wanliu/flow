@@ -27,6 +27,7 @@ func ComponentList() map[string]func() interface{} {
 	_components["Final"] = NewFinal
 	_components["Order"] = GetOrder
 	_components["NewOrder"] = NewNewOrder
+	_components["PatchOrder"] = NewPatchOrder
 	_components["Praise"] = NewPraise
 	_components["Unimplemented"] = NewUnimplemented
 	_components["Critical"] = NewCritical
