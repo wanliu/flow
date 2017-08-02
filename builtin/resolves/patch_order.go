@@ -13,7 +13,8 @@ import (
 
 type PatchOrderResolve struct {
 	OrderResolve
-	Origin *OrderResolve
+	Origin          *OrderResolve
+	OriginUpdatedAt time.Time
 }
 
 func NewPatchOrderResolve(ctx Context) *PatchOrderResolve {
@@ -63,7 +64,12 @@ func (r *PatchOrderResolve) Patch(orderResolve *OrderResolve) {
 		}
 	}
 
-	r.UpdatedAt = time.Now()
+	if r.Address != "" && r.Origin.Address == "" {
+		r.Origin.Address = r.Address
+	}
+
+	r.OriginUpdatedAt = r.Origin.UpdatedAt
+	r.Origin.UpdatedAt = time.Now()
 }
 
 // 新增 2 种产品, 《伊利畅轻450原味》 已 10 件,
@@ -81,7 +87,7 @@ func (r PatchOrderResolve) Answer() string {
 }
 
 func (r PatchOrderResolve) PatchInShortMinute() bool {
-	return r.Origin.UpdatedAt.Add(time.Duration(2)*time.Minute).UnixNano() > time.Now().UnixNano()
+	return r.OriginUpdatedAt.Add(time.Duration(2)*time.Minute).UnixNano() > time.Now().UnixNano()
 }
 
 func (r PatchOrderResolve) ShortAnswer() string {

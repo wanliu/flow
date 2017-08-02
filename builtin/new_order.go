@@ -38,6 +38,7 @@ func (c *NewOrder) OnCtx(ctx Context) {
 		output = "没有相关的产品"
 	} else {
 		output = orderResolve.Answer()
+		c.Notice <- ctx
 	}
 
 	replyData := ReplyData{output, ctx}
