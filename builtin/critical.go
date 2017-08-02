@@ -2,7 +2,6 @@ package builtin
 
 import (
 	. "github.com/wanliu/flow/context"
-	"log"
 )
 
 type Critical struct {
@@ -20,8 +19,6 @@ func NewCritical() interface{} {
 func (order *Critical) OnCtx(ctx Context) {
 	// entities := ctx.Value("Result").(ResultParams).Entities
 	output := "对不起，辜负了您的期望，请给我们时间，我们会改进的"
-
-	log.Printf("OUTPUT: %v", output)
 
 	replyData := ReplyData{output, ctx}
 	order.Out <- replyData

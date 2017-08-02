@@ -3,7 +3,6 @@ package builtin
 import (
 	. "github.com/wanliu/flow/builtin/luis"
 	. "github.com/wanliu/flow/context"
-	"log"
 )
 
 type Greet struct {
@@ -41,8 +40,6 @@ func (order *Greet) OnCtx(ctx Context) {
 	if output == "" {
 		output = "你好，很高兴为您服务"
 	}
-
-	log.Printf("OUTPUT: %v", output)
 
 	replyData := ReplyData{output, ctx}
 	order.Out <- replyData

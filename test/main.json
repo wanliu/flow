@@ -24,8 +24,8 @@
     "Reply": {
       "component": "Final"
     },
-    "NewOrderNotice": {
-      "component": "NewOrderNotice"
+    "OperationNotice": {
+      "component": "OperationNotice"
     },
     "Unimplemented": {
       "component": "Unimplemented"
@@ -79,7 +79,7 @@
       },
       "tgt": {
         "process": "NewOrder",
-        "port": "In"
+        "port": "Ctx"
       }
     },
     {
@@ -89,7 +89,7 @@
       },
       "tgt": {
         "process": "PatchOrder",
-        "port": "In"
+        "port": "Ctx"
       }
     },
     {
@@ -118,8 +118,8 @@
         "port": "Notice"
       },
       "tgt": {
-        "process": "NewOrderNotice",
-        "port": "In"
+        "process": "OperationNotice",
+        "port": "Ctx"
       }
     },
     {
@@ -134,7 +134,7 @@
     },
     {
       "src": {
-        "process": "NewOrderNotice",
+        "process": "OperationNotice",
         "port": "Out"
       },
       "tgt": {

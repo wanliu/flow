@@ -1,8 +1,6 @@
 package builtin
 
 import (
-	"log"
-
 	"github.com/hysios/apiai-go"
 	. "github.com/wanliu/flow/context"
 )
@@ -26,8 +24,6 @@ func (order *Unimplemented) OnCtx(ctx Context) {
 	if r := aiResult.Fulfillment.Speech; r != "" {
 		output = r
 	}
-
-	log.Printf("OUTPUT: %v", output)
 
 	replyData := ReplyData{output, ctx}
 	order.Out <- replyData

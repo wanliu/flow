@@ -1,8 +1,6 @@
 package builtin
 
 import (
-	"log"
-
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
 )
@@ -13,6 +11,7 @@ type NewOrder struct {
 	Ctx     <-chan Context
 	Deftime <-chan string
 	Out     chan<- ReplyData
+	Notice  chan<- Context
 }
 
 func NewNewOrder() interface{} {
@@ -25,11 +24,13 @@ func (c *NewOrder) OnDeftime(t string) {
 }
 
 func (c *NewOrder) OnCtx(ctx Context) {
-	orderResolve := NewNewOrderResolve(ctx)
+	orderResolve := NewOrderResolve(ctx)
 
 	if c.DefTime != "" {
 		orderResolve.SetDefTime(c.DefTime)
 	}
+
+	ctx.SetValue("Order", *orderResolve)
 
 	output := ""
 
@@ -38,8 +39,6 @@ func (c *NewOrder) OnCtx(ctx Context) {
 	} else {
 		output = orderResolve.Answer()
 	}
-
-	log.Printf("OUTPUT: %v", output)
 
 	replyData := ReplyData{output, ctx}
 	c.Out <- replyData

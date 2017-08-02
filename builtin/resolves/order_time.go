@@ -10,7 +10,7 @@ import (
 
 type OrderTimeResolve struct {
 	// Time   time.Time
-	Parent *OpenOrderResolve
+	Parent *OrderResolve
 }
 
 func (ar OrderTimeResolve) Hint() string {

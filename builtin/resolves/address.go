@@ -8,7 +8,7 @@ import (
 
 type AddressResolve struct {
 	// Address string
-	Parent *OpenOrderResolve
+	Parent *OrderResolve
 	// Confirm *Confirm
 	Confirm string
 }

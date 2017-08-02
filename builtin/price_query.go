@@ -35,8 +35,6 @@ func (query *PriceQuery) OnCtx(ctx Context) {
 		output = priceQuery.Next().Hint()
 	}
 
-	log.Printf("OUTPUT: %v", output)
-
 	replyData := ReplyData{output, ctx}
 	query.Out <- replyData
 

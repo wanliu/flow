@@ -3,7 +3,7 @@ package builtin
 import (
 	// "log"
 
-	// . "github.com/wanliu/flow/builtin/resolves"
+	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
 )
 
@@ -18,24 +18,21 @@ func NewPatchOrder() interface{} {
 	return new(PatchOrder)
 }
 
-// 默认送货时间
-func (order *PatchOrder) OnDeftime(t string) {
-	order.DefTime = t
-}
-
 func (order *PatchOrder) OnCtx(ctx Context) {
-	// orderResolve := NewPatchOrderResolve(ctx)
+	patchResolve := NewPatchOrderResolve(ctx)
 
-	// output := ""
+	output := ""
 
-	// if orderResolve.EmptyProducts() {
-	// 	output = "没有相关的产品"
-	// } else {
-	// 	output = orderResolve.Answer()
-	// }
+	if patchResolve.EmptyProducts() {
+		output = "没有相关的产品"
+	} else {
+		curResolve := ctx.Value("Order").(OrderResolve)
+		patchResolve.Patch(&curResolve)
+		ctx.SetValue("Order", curResolve)
 
-	// log.Printf("OUTPUT: %v", output)
+		output = patchResolve.Answer()
+	}
 
-	// replyData := ReplyData{output, ctx}
-	// order.Out <- replyData
+	replyData := ReplyData{output, ctx}
+	order.Out <- replyData
 }

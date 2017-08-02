@@ -36,14 +36,14 @@ CM() Process -> Ctx OrderIntDispatcher(IntentCheck)
 # PriceIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
 
 OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
-OpenOrder() New -> In NewOrder(NewOrder)
-OpenOrder() Patch -> In PatchOrder(PatchOrder)
+OpenOrder() New -> Ctx NewOrder(NewOrder)
+OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
 OpenOrder() Out -> In Reply(Final)
 
 NewOrder() Out -> In Reply()
-NewOrder() Notice -> In NewOrderNotice(NewOrderNotice)
+NewOrder() Notice -> Ctx OperationNotice(OperationNotice)
 PatchOrder() Out -> In Reply()
-NewOrderNotice() Out -> In Reply()
+OperationNotice() Out -> In Reply()
 
 OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
 Unimplemented() Out -> In Reply()

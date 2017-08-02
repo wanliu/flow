@@ -3,7 +3,6 @@ package builtin
 import (
 	. "github.com/wanliu/flow/builtin/luis"
 	. "github.com/wanliu/flow/context"
-	"log"
 )
 
 type Robot struct {
@@ -98,8 +97,6 @@ func (order *Robot) OnCtx(ctx Context) {
 	if output == "" {
 		output = "我是服务大家的机器人小花"
 	}
-
-	log.Printf("OUTPUT: %v", output)
 
 	replyData := ReplyData{output, ctx}
 	order.Out <- replyData

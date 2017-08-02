@@ -10,8 +10,9 @@ import (
 type Order struct {
 	TryGetEntities
 	Ctx   <-chan Context
-	New   chan<- ReplyData
-	Patch chan<- ReplyData
+	New   chan<- Context
+	Patch chan<- Context
+	Out   chan<- ReplyData
 }
 
 func GetOrder() interface{} {
@@ -20,8 +21,9 @@ func GetOrder() interface{} {
 
 func (c *Order) OnCtx(ctx Context) {
 	currentOrder := ctx.Value("Order")
+
 	if nil != currentOrder {
-		cOrder = currentOrder.(OrderResolve)
+		cOrder := currentOrder.(OrderResolve)
 
 		if cOrder.Modifable() {
 			c.Patch <- ctx

@@ -35,8 +35,6 @@ func (query *StockQuery) OnCtx(ctx Context) {
 		output = stockQuery.Next().Hint()
 	}
 
-	log.Printf("OUTPUT: %v", output)
-
 	replyData := ReplyData{output, ctx}
 	query.Out <- replyData
 

@@ -25,6 +25,7 @@ type OrderResolve struct {
 
 func NewOrderResolve(ctx Context) *OrderResolve {
 	resolve := new(OrderResolve)
+	resolve.UpdatedAt = time.Now()
 
 	aiResult := ctx.Value("Result").(apiai.Result)
 
@@ -113,6 +114,10 @@ func (r OrderResolve) EmptyProducts() bool {
 }
 
 func (r OrderResolve) Answer() string {
+	return r.AnswerHead() + r.AnswerBody()
+}
+
+func (r OrderResolve) AnswerHead() string {
 	desc := "订单已经生成, 共" + CnNum(len(r.Products.Products)) + "种产品"
 
 	if len(r.Gifts.Products) > 0 {
@@ -120,6 +125,12 @@ func (r OrderResolve) Answer() string {
 	} else {
 		desc = desc + "\n"
 	}
+
+	return desc
+}
+
+func (r OrderResolve) AnswerBody() string {
+	desc := ""
 
 	for _, p := range r.Products.Products {
 		desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + "件\n"
