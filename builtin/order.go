@@ -3,6 +3,7 @@ package builtin
 import (
 	// "log"
 
+	. "github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
 )
@@ -24,12 +25,16 @@ func GetOrder() interface{} {
 }
 
 func (c *Order) OnCtx(ctx Context) {
-	currentOrder := ctx.Value("Order")
+	currentOrder := ctx.Value(CtxKeyOrder)
+
+	if c.expMins != 0 {
+		ctx.SetValue(CtxKeyExpiredMinutes, int(c.expMins))
+	}
 
 	if nil != currentOrder {
 		cOrder := currentOrder.(OrderResolve)
 
-		exMin := 5
+		exMin := SesssionExpiredMinutes
 
 		if c.expMins != 0 {
 			exMin = int(c.expMins)

@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	. "github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
 )
@@ -30,7 +31,7 @@ func (c *NewOrder) OnCtx(ctx Context) {
 		orderResolve.SetDefTime(c.DefTime)
 	}
 
-	ctx.SetValue("Order", *orderResolve)
+	ctx.SetValue(CtxKeyOrder, *orderResolve)
 
 	output := ""
 

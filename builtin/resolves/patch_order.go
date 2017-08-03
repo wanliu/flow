@@ -8,6 +8,7 @@ import (
 
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
+	. "github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/context"
 )
 
@@ -54,6 +55,7 @@ func (r *PatchOrderResolve) Patch(orderResolve *OrderResolve) {
 			for _, gIn := range orderResolve.Gifts.Products {
 				if g.Product == gIn.Product {
 					gIn.Quantity = gIn.Quantity + g.Quantity
+					match = true
 					break
 				}
 			}
@@ -79,15 +81,17 @@ func (r PatchOrderResolve) Answer() string {
 		return "ERROR"
 	}
 
-	if r.PatchInShortMinute() {
+	shtMns := PatchShortMinutes
+
+	if r.PatchInShortMinute(shtMns) {
 		return r.ShortAnswer()
 	} else {
 		return r.LongAnswer()
 	}
 }
 
-func (r PatchOrderResolve) PatchInShortMinute() bool {
-	return r.OriginUpdatedAt.Add(time.Duration(2)*time.Minute).UnixNano() > time.Now().UnixNano()
+func (r PatchOrderResolve) PatchInShortMinute(mins int) bool {
+	return r.OriginUpdatedAt.Add(time.Duration(mins)*time.Minute).UnixNano() > time.Now().UnixNano()
 }
 
 func (r PatchOrderResolve) ShortAnswer() string {
