@@ -70,12 +70,12 @@ Unimplemented() Out -> In Reply()
 # '问价' -> Intent PriceIntDispatcher()
 # 0.40 -> Score PriceIntDispatcher()
 
-'b56957fa6f8c4f94aeaace533390b685' -> Token Ai()
+'4ae1a59715104c32a6bacabd88cfc070' -> Token Ai()
 '123456789' -> SessionId Ai()
 
 '今天' -> Deftime NewOrder()
 
-'开单' -> Intent OrderIntDispatcher()
+'business.order.create' -> Intent OrderIntDispatcher()
 0.35 -> Score OrderIntDispatcher()
 # # 'products' -> Type TryProducts()
 
