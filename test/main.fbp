@@ -73,6 +73,8 @@ Unimplemented() Out -> In Reply()
 '4ae1a59715104c32a6bacabd88cfc070' -> Token Ai()
 '123456789' -> SessionId Ai()
 
+5 -> ExpireMinutes OpenOrder()
+
 '今天' -> Deftime NewOrder()
 
 'business.order.create' -> Intent OrderIntDispatcher()

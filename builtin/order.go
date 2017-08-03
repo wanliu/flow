@@ -9,10 +9,14 @@ import (
 
 type Order struct {
 	TryGetEntities
-	Ctx   <-chan Context
-	New   chan<- Context
-	Patch chan<- Context
-	Out   chan<- ReplyData
+
+	expMins float64
+
+	Ctx           <-chan Context
+	ExpireMinutes <-chan float64
+	New           chan<- Context
+	Patch         chan<- Context
+	Out           chan<- ReplyData
 }
 
 func GetOrder() interface{} {
@@ -25,7 +29,13 @@ func (c *Order) OnCtx(ctx Context) {
 	if nil != currentOrder {
 		cOrder := currentOrder.(OrderResolve)
 
-		if cOrder.Modifable() {
+		exMin := 5
+
+		if c.expMins != 0 {
+			exMin = int(c.expMins)
+		}
+
+		if cOrder.Modifable(exMin) {
 			c.Patch <- ctx
 		} else {
 			c.New <- ctx
@@ -33,4 +43,8 @@ func (c *Order) OnCtx(ctx Context) {
 	} else {
 		c.New <- ctx
 	}
+}
+
+func (c *Order) OnExpireMinutes(minutes float64) {
+	c.expMins = minutes
 }

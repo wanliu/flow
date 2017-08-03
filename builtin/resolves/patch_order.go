@@ -112,12 +112,10 @@ func (r PatchOrderResolve) ShortAnswer() string {
 
 	gs := []string{}
 	if len(r.Gifts.Products) > 0 {
-		desc = desc + "-------赠品-------\n"
-
 		for _, g := range r.Gifts.Products {
 			for _, gIn := range r.Origin.Gifts.Products {
 				if g.Product == gIn.Product {
-					gs = append(gs, g.Product+"已"+strconv.Itoa(g.Quantity)+"件")
+					gs = append(gs, "赠品 "+gIn.Product+" 已"+strconv.Itoa(gIn.Quantity)+"件")
 					break
 				}
 			}
@@ -130,6 +128,7 @@ func (r PatchOrderResolve) ShortAnswer() string {
 
 func (r PatchOrderResolve) LongAnswer() string {
 	desc := r.ShortAnswer()
+	desc = desc + "\n-----------订单详情-------------\n"
 
 	desc = desc + r.Origin.AnswerBody()
 

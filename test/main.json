@@ -177,6 +177,13 @@
       }
     },
     {
+      "data": 5,
+      "tgt": {
+        "process": "OpenOrder",
+        "port": "ExpireMinutes"
+      }
+    },
+    {
       "data": "今天",
       "tgt": {
         "process": "NewOrder",

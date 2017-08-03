@@ -39,9 +39,17 @@ func (r *OrderResolve) Solve(aiResult apiai.Result) string {
 	return r.Answer()
 }
 
-func (r OrderResolve) Modifable() bool {
-	return true
-	// return UpdatedAt.Add(time.Duration(30)*time.Minute) >= time.Now() || r.Unsubmited()
+func (r OrderResolve) Modifable(expireMin int) bool {
+	return !r.Expired(expireMin) || r.Submited()
+}
+
+func (r OrderResolve) Expired(expireMin int) bool {
+	return r.UpdatedAt.Add(time.Duration(expireMin)*time.Minute).UnixNano() < time.Now().UnixNano()
+}
+
+// TODO
+func (r OrderResolve) Submited() bool {
+	return false
 }
 
 // 从ｌｕｉｓ数据构造结构数据
@@ -137,7 +145,7 @@ func (r OrderResolve) AnswerBody() string {
 	}
 
 	if len(r.Gifts.Products) > 0 {
-		desc = desc + "-------赠品-------\n"
+		desc = desc + "申请的赠品:\n"
 
 		for _, g := range r.Gifts.Products {
 			desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + "件\n"
@@ -166,7 +174,7 @@ func CnNum(num int) string {
 	case 1:
 		return "一"
 	case 2:
-		return "二"
+		return "两"
 	case 3:
 		return "三"
 	case 4:
