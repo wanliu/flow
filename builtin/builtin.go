@@ -38,6 +38,7 @@ func ComponentList() map[string]func() interface{} {
 	_components["Robot"] = NewRobot
 	_components["ApiAi"] = NewApiAi
 	_components["OperationNotice"] = NewOperationNotice
+	_components["OrderPrinter"] = NewOrderPrinter
 
 	return _components
 }
@@ -231,6 +232,13 @@ func ComponentInfos() map[string]Component {
 		Description: "OperationNotice Component",
 		Icon:        "",
 		Constructor: NewOperationNotice,
+	}
+
+	result["OrderPrinter"] = Component{
+		Name:        "OrderPrinter",
+		Description: "OrderPrinter Component",
+		Icon:        "",
+		Constructor: NewOrderPrinter,
 	}
 
 	return result

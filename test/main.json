@@ -9,6 +9,15 @@
     "CM": {
       "component": "ContextManager"
     },
+    "OrderPrinterDispatcher": {
+      "component": "IntentCheck"
+    },
+    "OrderPrinter": {
+      "component": "OrderPrinter"
+    },
+    "Reply": {
+      "component": "Final"
+    },
     "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
@@ -20,9 +29,6 @@
     },
     "PatchOrder": {
       "component": "PatchOrder"
-    },
-    "Reply": {
-      "component": "Final"
     },
     "OperationNotice": {
       "component": "OperationNotice"
@@ -56,6 +62,36 @@
       "src": {
         "process": "CM",
         "port": "Process"
+      },
+      "tgt": {
+        "process": "OrderPrinterDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderPrinterDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderPrinter",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderPrinter",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderPrinterDispatcher",
+        "port": "Next"
       },
       "tgt": {
         "process": "OrderIntDispatcher",
@@ -188,6 +224,20 @@
       "tgt": {
         "process": "NewOrder",
         "port": "Deftime"
+      }
+    },
+    {
+      "data": "business.order.print",
+      "tgt": {
+        "process": "OrderPrinterDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.35,
+      "tgt": {
+        "process": "OrderPrinterDispatcher",
+        "port": "Score"
       }
     },
     {

@@ -3,7 +3,37 @@ INPORT=Merge.Ctx:Ctx
 
 Ai(ApiAi) Out -> Result Merge()
 Merge(QuerySave) Out -> Ctx CM(ContextManager)
-CM() Process -> Ctx OrderIntDispatcher(IntentCheck)
+CM() Process -> Ctx OrderPrinterDispatcher(IntentCheck)
+OrderPrinterDispatcher() Out -> Ctx OrderPrinter(OrderPrinter)
+OrderPrinter() Out -> In Reply(Final)
+OrderPrinterDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
+
+OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
+OpenOrder() New -> Ctx NewOrder(NewOrder)
+OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
+OpenOrder() Out -> In Reply()
+
+NewOrder() Out -> In Reply()
+NewOrder() Notice -> Ctx OperationNotice(OperationNotice)
+PatchOrder() Out -> In Reply()
+OperationNotice() Out -> In Reply()
+
+OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
+Unimplemented() Out -> In Reply()
+
+'4ae1a59715104c32a6bacabd88cfc070' -> Token Ai()
+'123456789' -> SessionId Ai()
+
+5 -> ExpireMinutes OpenOrder()
+
+'今天' -> Deftime NewOrder()
+
+'business.order.print' -> Intent OrderPrinterDispatcher()
+0.35 -> Score OrderPrinterDispatcher()
+
+'business.order.create' -> Intent OrderIntDispatcher()
+0.35 -> Score OrderIntDispatcher()
+# # 'products' -> Type TryProducts()
 
 # CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
 # PraiseIntDispatcher() Out -> Ctx Praise(Praise)
@@ -35,19 +65,6 @@ CM() Process -> Ctx OrderIntDispatcher(IntentCheck)
 
 # PriceIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
 
-OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
-OpenOrder() New -> Ctx NewOrder(NewOrder)
-OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
-OpenOrder() Out -> In Reply(Final)
-
-NewOrder() Out -> In Reply()
-NewOrder() Notice -> Ctx OperationNotice(OperationNotice)
-PatchOrder() Out -> In Reply()
-OperationNotice() Out -> In Reply()
-
-OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
-Unimplemented() Out -> In Reply()
-
 
 # '表扬' -> Intent PraiseIntDispatcher()
 # 0.40 -> Score PraiseIntDispatcher()
@@ -69,17 +86,6 @@ Unimplemented() Out -> In Reply()
 
 # '问价' -> Intent PriceIntDispatcher()
 # 0.40 -> Score PriceIntDispatcher()
-
-'4ae1a59715104c32a6bacabd88cfc070' -> Token Ai()
-'123456789' -> SessionId Ai()
-
-5 -> ExpireMinutes OpenOrder()
-
-'今天' -> Deftime NewOrder()
-
-'business.order.create' -> Intent OrderIntDispatcher()
-0.35 -> Score OrderIntDispatcher()
-# # 'products' -> Type TryProducts()
 
 
 
