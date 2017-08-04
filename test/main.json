@@ -227,14 +227,14 @@
       }
     },
     {
-      "data": "business.order.print",
+      "data": "business.order.current.display",
       "tgt": {
         "process": "OrderPrinterDispatcher",
         "port": "Intent"
       }
     },
     {
-      "data": 0.35,
+      "data": 0.7,
       "tgt": {
         "process": "OrderPrinterDispatcher",
         "port": "Score"
@@ -248,7 +248,7 @@
       }
     },
     {
-      "data": 0.35,
+      "data": 0.7,
       "tgt": {
         "process": "OrderIntDispatcher",
         "port": "Score"

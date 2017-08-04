@@ -28,11 +28,11 @@ Unimplemented() Out -> In Reply()
 
 '今天' -> Deftime NewOrder()
 
-'business.order.print' -> Intent OrderPrinterDispatcher()
-0.35 -> Score OrderPrinterDispatcher()
+'business.order.current.display' -> Intent OrderPrinterDispatcher()
+0.7 -> Score OrderPrinterDispatcher()
 
 'business.order.create' -> Intent OrderIntDispatcher()
-0.35 -> Score OrderIntDispatcher()
+0.7 -> Score OrderIntDispatcher()
 # # 'products' -> Type TryProducts()
 
 # CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
