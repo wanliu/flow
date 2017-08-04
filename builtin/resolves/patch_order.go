@@ -32,39 +32,8 @@ func NewPatchOrderResolve(ctx Context) *PatchOrderResolve {
 func (r *PatchOrderResolve) Patch(orderResolve *OrderResolve) {
 	r.Origin = orderResolve
 
-	for _, p := range r.Products.Products {
-		match := false
-
-		for _, pIn := range orderResolve.Products.Products {
-			if p.Product == pIn.Product {
-				pIn.Quantity = pIn.Quantity + p.Quantity
-				match = true
-				break
-			}
-		}
-
-		if !match {
-			orderResolve.Products.Products = append(orderResolve.Products.Products, p)
-		}
-	}
-
-	if len(r.Gifts.Products) > 0 {
-		for _, g := range r.Gifts.Products {
-			match := false
-
-			for _, gIn := range orderResolve.Gifts.Products {
-				if g.Product == gIn.Product {
-					gIn.Quantity = gIn.Quantity + g.Quantity
-					match = true
-					break
-				}
-			}
-
-			if !match {
-				orderResolve.Gifts.Products = append(orderResolve.Gifts.Products, g)
-			}
-		}
-	}
+	orderResolve.Products.Patch(r.Products)
+	orderResolve.Gifts.Patch(r.Gifts)
 
 	if r.Address != "" && r.Origin.Address == "" {
 		r.Origin.Address = r.Address
@@ -83,14 +52,14 @@ func (r PatchOrderResolve) Answer() string {
 
 	shtMns := PatchShortMinutes
 
-	if r.PatchInShortMinute(shtMns) {
+	if r.WithinShortMinute(shtMns) {
 		return r.ShortAnswer()
 	} else {
 		return r.LongAnswer()
 	}
 }
 
-func (r PatchOrderResolve) PatchInShortMinute(mins int) bool {
+func (r PatchOrderResolve) WithinShortMinute(mins int) bool {
 	return r.OriginUpdatedAt.Add(time.Duration(mins)*time.Minute).UnixNano() > time.Now().UnixNano()
 }
 
