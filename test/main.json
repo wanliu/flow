@@ -18,6 +18,12 @@
     "Reply": {
       "component": "Final"
     },
+    "OrderCancelDispatcher": {
+      "component": "IntentCheck"
+    },
+    "OrderCancel": {
+      "component": "OrderCancel"
+    },
     "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
@@ -91,6 +97,36 @@
     {
       "src": {
         "process": "OrderPrinterDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderCancelDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderCancelDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderCancel",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderCancel",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderCancelDispatcher",
         "port": "Next"
       },
       "tgt": {
@@ -237,6 +273,20 @@
       "data": 0.7,
       "tgt": {
         "process": "OrderPrinterDispatcher",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.order.create.cancel",
+      "tgt": {
+        "process": "OrderCancelDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OrderCancelDispatcher",
         "port": "Score"
       }
     },

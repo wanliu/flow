@@ -43,6 +43,16 @@ func (r OrderResolve) Modifable(expireMin int) bool {
 	return !r.Expired(expireMin) || r.Submited()
 }
 
+// TODO
+func (r OrderResolve) Cancelable() bool {
+	return true
+}
+
+// TODO
+func (r *OrderResolve) Cancel() bool {
+	return true
+}
+
 func (r OrderResolve) Expired(expireMin int) bool {
 	return r.UpdatedAt.Add(time.Duration(expireMin)*time.Minute).UnixNano() < time.Now().UnixNano()
 }

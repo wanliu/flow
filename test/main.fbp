@@ -3,11 +3,16 @@ INPORT=Merge.Ctx:Ctx
 
 Ai(ApiAi) Out -> Result Merge()
 Merge(QuerySave) Out -> Ctx CM(ContextManager)
+
 CM() Process -> Ctx OrderPrinterDispatcher(IntentCheck)
 OrderPrinterDispatcher() Out -> Ctx OrderPrinter(OrderPrinter)
 OrderPrinter() Out -> In Reply(Final)
-OrderPrinterDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
 
+OrderPrinterDispatcher() Next -> Ctx OrderCancelDispatcher(IntentCheck)
+OrderCancelDispatcher() Out -> Ctx OrderCancel(OrderCancel)
+OrderCancel() Out -> In Reply()
+
+OrderCancelDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
 OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
 OpenOrder() New -> Ctx NewOrder(NewOrder)
 OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
@@ -30,6 +35,9 @@ Unimplemented() Out -> In Reply()
 
 'business.order.current.display' -> Intent OrderPrinterDispatcher()
 0.7 -> Score OrderPrinterDispatcher()
+
+'business.order.create.cancel' -> Intent OrderCancelDispatcher()
+0.7 -> Score OrderCancelDispatcher()
 
 'business.order.create' -> Intent OrderIntDispatcher()
 0.7 -> Score OrderIntDispatcher()
