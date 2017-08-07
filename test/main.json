@@ -327,17 +327,24 @@
       }
     },
     {
-      "data": "4ae1a59715104c32a6bacabd88cfc070",
-      "tgt": {
-        "process": "Ai",
-        "port": "Token"
-      }
-    },
-    {
       "data": "123456789",
       "tgt": {
         "process": "Ai",
         "port": "SessionId"
+      }
+    },
+    {
+      "data": "http://127.0.0.1:8123",
+      "tgt": {
+        "process": "Ai",
+        "port": "ProxyUrl"
+      }
+    },
+    {
+      "data": "4ae1a59715104c32a6bacabd88cfc070",
+      "tgt": {
+        "process": "Ai",
+        "port": "Token"
       }
     },
     {

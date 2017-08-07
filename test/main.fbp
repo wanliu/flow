@@ -39,8 +39,9 @@ Voice(Voice) Out -> In Reply()
 
 'dfadsafdsafdsafdsafdsa' -> Token Voice()
 
-'4ae1a59715104c32a6bacabd88cfc070' -> Token Ai()
 '123456789' -> SessionId Ai()
+'http://127.0.0.1:8123' -> ProxyUrl Ai()
+'4ae1a59715104c32a6bacabd88cfc070' -> Token Ai()
 
 5 -> ExpireMinutes OpenOrder()
 
