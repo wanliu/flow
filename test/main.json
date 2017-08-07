@@ -41,6 +41,9 @@
     },
     "Unimplemented": {
       "component": "Unimplemented"
+    },
+    "Voice": {
+      "component": "Voice"
     }
   },
   "connections": [
@@ -235,6 +238,23 @@
       }
     },
     {
+      "src": {
+        "process": "Voice",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "data": "dfadsafdsafdsafdsafdsa",
+      "tgt": {
+        "process": "Voice",
+        "port": "Token"
+      }
+    },
+    {
       "data": "4ae1a59715104c32a6bacabd88cfc070",
       "tgt": {
         "process": "Ai",
@@ -313,6 +333,10 @@
     "Ctx": {
       "process": "Merge",
       "port": "Ctx"
+    },
+    "Voice": {
+      "process": "Voice",
+      "port": "In"
     }
   },
   "caseSensitive": true

@@ -1,5 +1,6 @@
 INPORT=Ai.In:Text
 INPORT=Merge.Ctx:Ctx
+INPORT=Voice.In:Voice
 
 Ai(ApiAi) Out -> Result Merge()
 Merge(QuerySave) Out -> Ctx CM(ContextManager)
@@ -25,6 +26,10 @@ OperationNotice() Out -> In Reply()
 
 OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
 Unimplemented() Out -> In Reply()
+
+Voice(Voice) Out -> In Reply()
+
+'dfadsafdsafdsafdsafdsa' -> Token Voice()
 
 '4ae1a59715104c32a6bacabd88cfc070' -> Token Ai()
 '123456789' -> SessionId Ai()
