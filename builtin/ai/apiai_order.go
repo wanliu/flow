@@ -58,7 +58,22 @@ func (aa ApiAiOrder) GiftQuantities() []Item {
 
 func (aa ApiAiOrder) Address() string {
 	if a, exist := aa.AiResult.Params["street-address"]; exist {
-		return a.(string) + aa.Customer()
+
+		rt := reflect.TypeOf(a)
+		vals := reflect.ValueOf(a)
+
+		switch rt.Kind() {
+		case reflect.Slice:
+			if vals.Len() > 0 {
+				return vals.Index(0).Interface().(string) + aa.Customer()
+			}
+		case reflect.Array:
+			if vals.Len() > 0 {
+				return vals.Index(0).Interface().(string) + aa.Customer()
+			}
+		case reflect.String:
+			return vals.Interface().(string) + aa.Customer()
+		}
 	}
 
 	return aa.Customer()
@@ -66,7 +81,22 @@ func (aa ApiAiOrder) Address() string {
 
 func (aa ApiAiOrder) Customer() string {
 	if c, exist := aa.AiResult.Params["customer"]; exist {
-		return c.(string)
+
+		rt := reflect.TypeOf(c)
+		vals := reflect.ValueOf(c)
+
+		switch rt.Kind() {
+		case reflect.Slice:
+			if vals.Len() > 0 {
+				return vals.Index(0).Interface().(string) + aa.Customer()
+			}
+		case reflect.Array:
+			if vals.Len() > 0 {
+				return vals.Index(0).Interface().(string) + aa.Customer()
+			}
+		case reflect.String:
+			return vals.Interface().(string)
+		}
 	}
 
 	return ""
