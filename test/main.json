@@ -24,6 +24,18 @@
     "OrderCancel": {
       "component": "OrderCancel"
     },
+    "AdressIntDispatcher": {
+      "component": "IntentCheck"
+    },
+    "OrderAddress": {
+      "component": "OrderAddress"
+    },
+    "CustomerIntDispatcher": {
+      "component": "IntentCheck"
+    },
+    "OrderCustomer": {
+      "component": "OrderCustomer"
+    },
     "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
@@ -130,6 +142,66 @@
     {
       "src": {
         "process": "OrderCancelDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "AdressIntDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "AdressIntDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderAddress",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderAddress",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "AdressIntDispatcher",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "CustomerIntDispatcher",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerIntDispatcher",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderCustomer",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderCustomer",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerIntDispatcher",
         "port": "Next"
       },
       "tgt": {
@@ -280,6 +352,34 @@
       "tgt": {
         "process": "NewOrder",
         "port": "Deftime"
+      }
+    },
+    {
+      "data": "business.order.create.address",
+      "tgt": {
+        "process": "AdressIntDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "AdressIntDispatcher",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.order.create.customer",
+      "tgt": {
+        "process": "CustomerIntDispatcher",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "CustomerIntDispatcher",
+        "port": "Score"
       }
     },
     {

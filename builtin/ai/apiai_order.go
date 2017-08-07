@@ -65,18 +65,18 @@ func (aa ApiAiOrder) Address() string {
 		switch rt.Kind() {
 		case reflect.Slice:
 			if vals.Len() > 0 {
-				return vals.Index(0).Interface().(string) + aa.Customer()
+				return vals.Index(0).Interface().(string)
 			}
 		case reflect.Array:
 			if vals.Len() > 0 {
-				return vals.Index(0).Interface().(string) + aa.Customer()
+				return vals.Index(0).Interface().(string)
 			}
 		case reflect.String:
-			return vals.Interface().(string) + aa.Customer()
+			return vals.Interface().(string)
 		}
 	}
 
-	return aa.Customer()
+	return ""
 }
 
 func (aa ApiAiOrder) Customer() string {
@@ -88,11 +88,11 @@ func (aa ApiAiOrder) Customer() string {
 		switch rt.Kind() {
 		case reflect.Slice:
 			if vals.Len() > 0 {
-				return vals.Index(0).Interface().(string) + aa.Customer()
+				return vals.Index(0).Interface().(string)
 			}
 		case reflect.Array:
 			if vals.Len() > 0 {
-				return vals.Index(0).Interface().(string) + aa.Customer()
+				return vals.Index(0).Interface().(string)
 			}
 		case reflect.String:
 			return vals.Interface().(string)

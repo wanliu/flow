@@ -16,11 +16,13 @@ type OrderResolve struct {
 	Products  ItemsResolve
 	Gifts     ItemsResolve
 	Address   string
+	Customer  string
 	Time      time.Time
 	DefTime   string
 	Current   Resolve
 	Note      string
 	UpdatedAt time.Time
+	Editing   bool
 }
 
 func NewOrderResolve(ctx Context) *OrderResolve {
@@ -51,6 +53,10 @@ func (r OrderResolve) Cancelable() bool {
 // TODO
 func (r *OrderResolve) Cancel() bool {
 	return true
+}
+
+func (r OrderResolve) Fulfiled() bool {
+	return len(r.Products.Products) > 0 && (r.Address != "" || r.Customer != "")
 }
 
 func (r OrderResolve) Expired(expireMin int) bool {
@@ -103,6 +109,10 @@ func (r *OrderResolve) ExtractAddress() {
 	r.Address = r.AiParams.Address()
 }
 
+func (r *OrderResolve) ExtractCustomer() {
+	r.Customer = r.AiParams.Customer()
+}
+
 func (r *OrderResolve) ExtractTime() {
 	r.Time = r.AiParams.Time()
 }
@@ -135,8 +145,24 @@ func (r OrderResolve) Answer() string {
 	return r.AnswerHead() + r.AnswerBody()
 }
 
+func (r OrderResolve) AddressInfo() string {
+	if r.Address != "" && r.Customer != "" {
+		return "地址:" + r.Address + r.Customer + "\n"
+	} else if r.Address != "" {
+		return "地址:" + r.Address + "\n"
+	} else if r.Customer != "" {
+		return "客户:" + r.Customer + "\n"
+	} else {
+		return ""
+	}
+}
+
 func (r OrderResolve) AnswerHead() string {
-	desc := "订单已经生成, 共" + CnNum(len(r.Products.Products)) + "种产品"
+	desc := "订单正在处理, 已经添加" + CnNum(len(r.Products.Products)) + "种产品"
+
+	if r.Fulfiled() {
+		desc = "订单已经生成, 共" + CnNum(len(r.Products.Products)) + "种产品"
+	}
 
 	if len(r.Gifts.Products) > 0 {
 		desc = desc + ", " + CnNum(len(r.Gifts.Products)) + "种赠品" + "\n"
@@ -168,13 +194,13 @@ func (r OrderResolve) AnswerBody() string {
 		desc = desc + "备注：" + r.Note + "\n"
 	}
 
-	if r.Address != "" {
-		desc = desc + "地址:" + r.Address + "\n"
+	if r.Fulfiled() {
+		desc = desc + r.AddressInfo()
+		desc = desc + "订单已经生成，订单号为：" + "1056895214" + "\n"
+		desc = desc + "订单入口: http://wanliu.biz/orders/"
 	} else {
-		desc = desc + "告诉我地址或客户是谁，我就安排送货了\n"
+		desc = desc + "告诉我地址或客户是谁，就可以生成订单了\n"
 	}
-
-	desc = desc + "订单入口: http://wanliu.biz/orders/"
 
 	return desc
 }

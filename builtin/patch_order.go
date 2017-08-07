@@ -3,6 +3,7 @@ package builtin
 import (
 	// "log"
 
+	. "github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
 )
@@ -26,9 +27,15 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 	if patchResolve.EmptyProducts() {
 		output = "没有相关的产品"
 	} else {
-		curResolve := ctx.Value("Order").(OrderResolve)
+		curResolve := ctx.Value(CtxKeyOrder).(OrderResolve)
 		patchResolve.Patch(&curResolve)
-		ctx.SetValue("Order", curResolve)
+
+		if curResolve.Fulfiled() {
+			ctx.SetValue(CtxKeyOrder, nil)
+			ctx.SetValue(CtxKeyLastOrder, curResolve)
+		} else {
+			ctx.SetValue(CtxKeyOrder, curResolve)
+		}
 
 		output = patchResolve.Answer()
 	}

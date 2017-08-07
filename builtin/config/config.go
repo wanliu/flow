@@ -6,4 +6,5 @@ const (
 
 	CtxKeyOrder          = "Order"
 	CtxKeyExpiredMinutes = "ExpMins"
+	CtxKeyLastOrder      = "LastOrder"
 )

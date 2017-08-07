@@ -39,6 +39,10 @@ func (r *PatchOrderResolve) Patch(orderResolve *OrderResolve) {
 		r.Origin.Address = r.Address
 	}
 
+	if r.Customer != "" && r.Origin.Customer == "" {
+		r.Origin.Customer = r.Customer
+	}
+
 	r.OriginUpdatedAt = r.Origin.UpdatedAt
 	r.Origin.UpdatedAt = time.Now()
 }
@@ -52,7 +56,9 @@ func (r PatchOrderResolve) Answer() string {
 
 	shtMns := PatchShortMinutes
 
-	if r.WithinShortMinute(shtMns) {
+	if r.Origin.Fulfiled() {
+		return r.LongAnswer()
+	} else if r.WithinShortMinute(shtMns) {
 		return r.ShortAnswer()
 	} else {
 		return r.LongAnswer()
