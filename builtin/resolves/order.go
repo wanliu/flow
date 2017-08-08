@@ -74,6 +74,7 @@ func (r *OrderResolve) ExtractFromParams() {
 	r.ExtractItems()
 	r.ExtractGiftItems()
 	r.ExtractAddress()
+	r.ExtractCustomer()
 	r.ExtractTime()
 	r.ExtractNote()
 }
