@@ -2,6 +2,7 @@ package resolves
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/hysios/apiai-go"
@@ -79,12 +80,13 @@ func (r *OrderResolve) ExtractFromParams() {
 
 func (r *OrderResolve) ExtractItems() {
 	for _, i := range r.AiParams.Items() {
+		name := strings.Replace(i.Product, "%", "%%", -1)
 		item := &ItemResolve{
 			Resolved: true,
-			Name:     i.Product,
+			Name:     name,
 			Price:    i.Price,
 			Quantity: i.Quantity,
-			Product:  i.Product,
+			Product:  name,
 		}
 
 		r.Products.Products = append(r.Products.Products, item)
@@ -93,12 +95,13 @@ func (r *OrderResolve) ExtractItems() {
 
 func (r *OrderResolve) ExtractGiftItems() {
 	for _, i := range r.AiParams.GiftItems() {
+		name := strings.Replace(i.Product, "%", "%%", -1)
 		item := &ItemResolve{
 			Resolved: true,
-			Name:     i.Product,
+			Name:     name,
 			Price:    i.Price,
 			Quantity: i.Quantity,
-			Product:  i.Product,
+			Product:  name,
 		}
 
 		r.Gifts.Products = append(r.Gifts.Products, item)
