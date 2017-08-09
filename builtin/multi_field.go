@@ -41,6 +41,7 @@ func (mf *MultiField) Run() {
 	mf.once.Do(func() {
 		mf.cond = sync.NewCond(&sync.Mutex{})
 		mf.cond.L.Lock()
+		defer mf.cond.L.Unlock()
 		for !mf.ms.Valid() {
 			mf.cond.Wait()
 		}
@@ -48,7 +49,7 @@ func (mf *MultiField) Run() {
 		if mf.Process != nil {
 			mf.Process()
 		}
-		mf.cond.L.Unlock()
+		// mf.cond.L.Unlock()
 		mf.Reset()
 	})
 

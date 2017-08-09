@@ -34,7 +34,6 @@ func (ic *IntentCheck) OnScore(score float64) {
 
 func (ic *IntentCheck) OnCtx(ctx Context) {
 	if res, ok := ctx.Value("Result").(apiai.Result); ok {
-		log.Printf("ai: %v", res)
 		if res.Metadata.IntentName == ic._intent && res.Score >= ic._score {
 			ic.Out <- ctx
 		} else {

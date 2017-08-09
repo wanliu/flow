@@ -1,9 +1,11 @@
 package builtin
 
 import (
-	"github.com/hysios/apiai-go"
+	"log"
 
 	. "github.com/wanliu/flow/builtin/ai"
+	config "github.com/wanliu/flow/builtin/config"
+	. "github.com/wanliu/flow/context"
 	flow "github.com/wanliu/goflow"
 )
 
@@ -13,6 +15,9 @@ func NewApiAi() interface{} {
 
 type ApiAi struct {
 	flow.Component
+
+	MultiField
+
 	token     string
 	sessionId string
 	proxyUrl  string
@@ -22,25 +27,51 @@ type ApiAi struct {
 	Token     <-chan string
 	SessionId <-chan string
 	ProxyUrl  <-chan string
-	Out       chan<- apiai.Result
+	Out       chan<- Context
+	Ctx       <-chan Context
 }
 
-func (l *ApiAi) OnIn(input string) {
-	result, _ := ApiAiQuery(input, l.token, l.sessionId, l.proxyUrl)
+func (c *ApiAi) Init() {
+	c.Fields = []string{config.ValueKeyCtx, config.ValueKeyText}
 
-	// if err != nil {
-	l.Out <- result
-	// }
+	c.Process = func() error {
+		txt, tok := c.Value(config.ValueKeyText).(string)
+		ctx, cok := c.Value(config.ValueKeyCtx).(Context)
+
+		if tok && cok {
+			go func() {
+				res, _ := ApiAiQuery(txt, c.token, c.sessionId, c.proxyUrl)
+
+				ctx.SetValue(config.CtxkeyResult, res)
+				intent := res.Metadata.IntentName
+				score := res.Score
+				query := res.ResolvedQuery
+
+				log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%", query, intent, score*100)
+				c.Out <- ctx
+			}()
+		}
+
+		return nil
+	}
 }
 
-func (l *ApiAi) OnToken(token string) {
-	l.token = token
+func (c *ApiAi) OnIn(input string) {
+	c.SetValue(config.ValueKeyText, input)
 }
 
-func (l *ApiAi) OnSessionId(sessionId string) {
-	l.sessionId = sessionId
+func (c *ApiAi) OnToken(token string) {
+	c.token = token
 }
 
-func (l *ApiAi) OnProxyUrl(proxy string) {
-	l.proxyUrl = proxy
+func (c *ApiAi) OnSessionId(sessionId string) {
+	c.sessionId = sessionId
+}
+
+func (c *ApiAi) OnProxyUrl(proxy string) {
+	c.proxyUrl = proxy
+}
+
+func (c *ApiAi) OnCtx(ctx Context) {
+	c.SetValue(config.ValueKeyCtx, ctx)
 }

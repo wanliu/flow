@@ -3,9 +3,6 @@
     "Ai": {
       "component": "ApiAi"
     },
-    "Merge": {
-      "component": "QuerySave"
-    },
     "CM": {
       "component": "ContextManager"
     },
@@ -62,16 +59,6 @@
     {
       "src": {
         "process": "Ai",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Merge",
-        "port": "Result"
-      }
-    },
-    {
-      "src": {
-        "process": "Merge",
         "port": "Out"
       },
       "tgt": {
@@ -334,7 +321,7 @@
       }
     },
     {
-      "data": "http://127.0.0.1:8123",
+      "data": "http://192.168.0.151:1087",
       "tgt": {
         "process": "Ai",
         "port": "ProxyUrl"
@@ -438,7 +425,7 @@
       "port": "In"
     },
     "Ctx": {
-      "process": "Merge",
+      "process": "Ai",
       "port": "Ctx"
     },
     "Voice": {
