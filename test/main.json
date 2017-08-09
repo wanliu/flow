@@ -27,12 +27,6 @@
     "OrderAddress": {
       "component": "OrderAddress"
     },
-    "CustomerIntDispatcher": {
-      "component": "IntentCheck"
-    },
-    "OrderCustomer": {
-      "component": "OrderCustomer"
-    },
     "OrderIntDispatcher": {
       "component": "IntentCheck"
     },
@@ -159,36 +153,6 @@
     {
       "src": {
         "process": "AdressIntDispatcher",
-        "port": "Next"
-      },
-      "tgt": {
-        "process": "CustomerIntDispatcher",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "CustomerIntDispatcher",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "OrderCustomer",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "OrderCustomer",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "CustomerIntDispatcher",
         "port": "Next"
       },
       "tgt": {
@@ -359,20 +323,6 @@
       "data": 0.7,
       "tgt": {
         "process": "AdressIntDispatcher",
-        "port": "Score"
-      }
-    },
-    {
-      "data": "business.order.create.customer",
-      "tgt": {
-        "process": "CustomerIntDispatcher",
-        "port": "Intent"
-      }
-    },
-    {
-      "data": 0.7,
-      "tgt": {
-        "process": "CustomerIntDispatcher",
         "port": "Score"
       }
     },

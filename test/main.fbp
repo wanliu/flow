@@ -16,11 +16,7 @@ OrderCancelDispatcher() Next -> Ctx AdressIntDispatcher(IntentCheck)
 AdressIntDispatcher() Out -> Ctx OrderAddress(OrderAddress)
 OrderAddress() Out -> In Reply()
 
-AdressIntDispatcher() Next -> Ctx CustomerIntDispatcher(IntentCheck)
-CustomerIntDispatcher() Out -> Ctx OrderCustomer(OrderCustomer)
-OrderCustomer() Out -> In Reply()
-
-CustomerIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
+AdressIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
 OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
 OpenOrder() New -> Ctx NewOrder(NewOrder)
 OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
@@ -48,9 +44,6 @@ Voice(Voice) Out -> In Reply()
 
 'business.order.create.address' -> Intent AdressIntDispatcher()
 0.7 -> Score AdressIntDispatcher()
-
-'business.order.create.customer' -> Intent CustomerIntDispatcher()
-0.7 -> Score CustomerIntDispatcher()
 
 'business.order.current.display' -> Intent OrderPrinterDispatcher()
 0.7 -> Score OrderPrinterDispatcher()

@@ -32,16 +32,24 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 
 		params := ai.ApiAiOrder{AiResult: aiResult}
 		address := params.Address()
+		customer := params.Customer()
 
 		cOrder := currentOrder.(OrderResolve)
-		cOrder.Address = address
+
+		if address != "" {
+			cOrder.Address = address
+		}
+
+		if customer != "" {
+			cOrder.Customer = customer
+		}
 
 		if cOrder.Fulfiled() {
 			ctx.SetValue(CtxKeyOrder, nil)
 			ctx.SetValue(CtxKeyLastOrder, cOrder)
 		}
 
-		reply := "收到地址信息：" + address + "\n" + cOrder.Answer()
+		reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer()
 		c.Out <- ReplyData{reply, ctx}
 	} else {
 		c.Out <- ReplyData{"地址输入无效，当前没有正在进行中的订单", ctx}
