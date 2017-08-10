@@ -1,6 +1,8 @@
 package context
 
 import (
+	"sync"
+
 	"fmt"
 	"time"
 )
@@ -10,6 +12,7 @@ type CtxOptFunc func(opt *ContextOption) error
 type TaskHandle func(ctx Context, raw interface{}) error
 
 type ctxt struct {
+	sync.RWMutex
 	Stack *Stack
 	Reply Replyer
 
@@ -139,19 +142,25 @@ func (ctx *ctxt) Pop() Context {
 }
 
 func (ctx *ctxt) Value(name interface{}) interface{} {
+	ctx.RLock()
+	defer ctx.RUnlock()
 	return ctx.values[name]
 }
 
 func (ctx *ctxt) SetValue(name, value interface{}) {
+	ctx.Lock()
+	defer ctx.Unlock()
 	ctx.values[name] = value
 }
 
 func (ctx *ctxt) GlobalValue(name interface{}) interface{} {
-	return ctx.Stack.Root.values[name]
+	return ctx.Stack.Root.Value(name)
+	// return ctx.Stack.Root.values[name]
 }
 
 func (ctx *ctxt) SetGlobalValue(name, value interface{}) {
-	ctx.Stack.Root.values[name] = value
+	ctx.Stack.Root.SetValue(name, value)
+	// ctx.Stack.Root.values[name] = value
 }
 
 func (ctx *ctxt) Wait(task TaskHandle) {
@@ -250,7 +259,8 @@ func (ctx *ctxt) Reset() {
 	if ctx.Stack.Root.IsRunning() {
 		go ctx.Stack.Root.Cancel()
 	}
-
+	ctx.Lock()
+	defer ctx.Unlock()
 	root := ctx.Stack.Root
 	root.values = make(map[interface{}]interface{})
 	root.retry = make(chan bool)
