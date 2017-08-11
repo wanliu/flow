@@ -82,7 +82,7 @@ func (c *ApiAi) SendQuery() {
 		txt := c.TxtQueue.Dequeue().(string)
 		ctx := c.CtxQueue.Dequeue().(Context)
 
-		res, _ := ApiAiQuery(txt, c.token, c.sessionId, c.proxyUrl)
+		res, err := ApiAiQuery(txt, c.token, c.sessionId, c.proxyUrl)
 
 		ctx.SetValue(config.CtxkeyResult, res)
 
@@ -90,7 +90,12 @@ func (c *ApiAi) SendQuery() {
 		score := res.Score
 		query := res.ResolvedQuery
 
-		log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%", query, intent, score*100)
+		if err != nil {
+			log.Printf("意图解析失败:" + err.Error())
+		} else {
+			log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%", query, intent, score*100)
+		}
+
 		c.Out <- ctx
 	}
 
