@@ -53,6 +53,11 @@ Voice(Voice) Out -> In Reply()
 
 'business.order.create' -> Intent OrderIntDispatcher()
 0.7 -> Score OrderIntDispatcher()
+
+# 延迟回复时间
+5 -> DelayMin Reply()
+10 -> DelayMax Reply()
+
 # # 'products' -> Type TryProducts()
 
 # CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
