@@ -22,7 +22,7 @@ type ApiAi struct {
 
 	MultiField
 
-	sync.RWMutex
+	sync.Mutex
 
 	token     string
 	sessionId string
@@ -76,7 +76,7 @@ func (c *ApiAi) OnCtx(ctx Context) {
 }
 
 func (c *ApiAi) SendQuery() {
-	c.RLock()
+	c.Lock()
 
 	for c.CtxQueue.Head() != nil && c.TxtQueue.Head() != nil {
 		txt := c.TxtQueue.Dequeue().(string)
@@ -99,5 +99,5 @@ func (c *ApiAi) SendQuery() {
 		c.Out <- ctx
 	}
 
-	c.RUnlock()
+	c.Unlock()
 }
