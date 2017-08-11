@@ -43,12 +43,10 @@ func (s *Final) OnIn(data ReplyData) {
 }
 
 func (s *Final) OnDelayMin(min float64) {
-	log.Printf("-------------Min: %v", min)
 	s.delayMin = int(min)
 }
 
 func (s *Final) OnDelayMax(max float64) {
-	log.Printf("-------------Max: %v", max)
 	s.delayMax = int(max)
 }
 
@@ -56,7 +54,7 @@ func (s Final) DelayRange() int {
 	rand.Seed(time.Now().UnixNano())
 
 	if s.delayMin == 0 {
-		return 3 + rand.Intn(3)
+		return 5 + rand.Intn(3)
 	} else {
 		if s.delayMax > s.delayMin {
 			return s.delayMin + rand.Intn(s.delayMax-s.delayMin)

@@ -367,20 +367,6 @@
         "process": "OrderIntDispatcher",
         "port": "Score"
       }
-    },
-    {
-      "data": 5,
-      "tgt": {
-        "process": "Reply",
-        "port": "DelayMin"
-      }
-    },
-    {
-      "data": 10,
-      "tgt": {
-        "process": "Reply",
-        "port": "DelayMax"
-      }
     }
   ],
   "inports": {
