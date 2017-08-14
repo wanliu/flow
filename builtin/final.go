@@ -54,7 +54,7 @@ func (s Final) DelayRange() int {
 	rand.Seed(time.Now().UnixNano())
 
 	if s.delayMin == 0 {
-		return 5 + rand.Intn(3)
+		return 3 + rand.Intn(2)
 	} else {
 		if s.delayMax > s.delayMin {
 			return s.delayMin + rand.Intn(s.delayMax-s.delayMin)
