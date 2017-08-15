@@ -12,6 +12,10 @@ type Item struct {
 }
 
 type AiOrder interface {
+	Score() float64
+
+	Query() string
+
 	Items() []Item
 	Products() []Item
 	Quantities() []Item

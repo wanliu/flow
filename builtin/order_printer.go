@@ -1,9 +1,10 @@
 package builtin
 
 import (
-	. "github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
+
+	config "github.com/wanliu/flow/builtin/config"
 	flow "github.com/wanliu/goflow"
 )
 
@@ -19,14 +20,14 @@ type OrderPrinter struct {
 }
 
 func (s *OrderPrinter) OnCtx(ctx Context) {
-	currentOrder := ctx.Value(CtxKeyOrder)
+	currentOrder := ctx.Value(config.CtxKeyOrder)
 
 	if nil == currentOrder {
 		s.Out <- ReplyData{"当前没有正在进行中的订单", ctx}
 	} else {
 		curOrder := currentOrder.(OrderResolve)
 
-		if curOrder.Expired(SesssionExpiredMinutes) {
+		if curOrder.Expired(config.SesssionExpiredMinutes) {
 			s.Out <- ReplyData{"当前没有正在进行中的订单", ctx}
 		} else {
 			orderDetail := "-----------订单详情-------------\n"

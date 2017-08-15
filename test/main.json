@@ -6,28 +6,37 @@
     "CM": {
       "component": "ContextManager"
     },
-    "OrderPrinterDispatcher": {
+    "ConfirmInt": {
+      "component": "IntentCheck"
+    },
+    "AddressConfirm": {
+      "component": "Confirm"
+    },
+    "Reply": {
+      "component": "Final"
+    },
+    "CancelInt": {
+      "component": "IntentCheck"
+    },
+    "OrderPrinterInt": {
       "component": "IntentCheck"
     },
     "OrderPrinter": {
       "component": "OrderPrinter"
     },
-    "Reply": {
-      "component": "Final"
-    },
-    "OrderCancelDispatcher": {
+    "OrderCancelInt": {
       "component": "IntentCheck"
     },
     "OrderCancel": {
       "component": "OrderCancel"
     },
-    "AdressIntDispatcher": {
+    "AdressInt": {
       "component": "IntentCheck"
     },
     "OrderAddress": {
       "component": "OrderAddress"
     },
-    "OrderIntDispatcher": {
+    "OrderInt": {
       "component": "IntentCheck"
     },
     "OpenOrder": {
@@ -66,13 +75,73 @@
         "port": "Process"
       },
       "tgt": {
-        "process": "OrderPrinterDispatcher",
+        "process": "ConfirmInt",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "OrderPrinterDispatcher",
+        "process": "ConfirmInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "AddressConfirm",
+        "port": "Confirm"
+      }
+    },
+    {
+      "src": {
+        "process": "AddressConfirm",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "ConfirmInt",
+        "port": "FlowOut"
+      },
+      "tgt": {
+        "process": "AddressConfirm",
+        "port": "Expire"
+      }
+    },
+    {
+      "src": {
+        "process": "ConfirmInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "CancelInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CancelInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "AddressConfirm",
+        "port": "Cancel"
+      }
+    },
+    {
+      "src": {
+        "process": "CancelInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderPrinterInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderPrinterInt",
         "port": "Out"
       },
       "tgt": {
@@ -92,17 +161,17 @@
     },
     {
       "src": {
-        "process": "OrderPrinterDispatcher",
+        "process": "OrderPrinterInt",
         "port": "Next"
       },
       "tgt": {
-        "process": "OrderCancelDispatcher",
+        "process": "OrderCancelInt",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "OrderCancelDispatcher",
+        "process": "OrderCancelInt",
         "port": "Out"
       },
       "tgt": {
@@ -122,17 +191,17 @@
     },
     {
       "src": {
-        "process": "OrderCancelDispatcher",
+        "process": "OrderCancelInt",
         "port": "Next"
       },
       "tgt": {
-        "process": "AdressIntDispatcher",
+        "process": "AdressInt",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "AdressIntDispatcher",
+        "process": "AdressInt",
         "port": "Out"
       },
       "tgt": {
@@ -152,17 +221,17 @@
     },
     {
       "src": {
-        "process": "AdressIntDispatcher",
+        "process": "AdressInt",
         "port": "Next"
       },
       "tgt": {
-        "process": "OrderIntDispatcher",
+        "process": "OrderInt",
         "port": "Ctx"
       }
     },
     {
       "src": {
-        "process": "OrderIntDispatcher",
+        "process": "OrderInt",
         "port": "Out"
       },
       "tgt": {
@@ -242,7 +311,7 @@
     },
     {
       "src": {
-        "process": "OrderIntDispatcher",
+        "process": "OrderInt",
         "port": "Next"
       },
       "tgt": {
@@ -313,58 +382,103 @@
       }
     },
     {
+      "data": "buiness.order.address.confirm",
+      "tgt": {
+        "process": "ConfirmInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "src": {
+        "process": "true",
+        "port": "OUT"
+      },
+      "tgt": {
+        "process": "ConfirmInt",
+        "port": "Flow"
+      }
+    },
+    {
+      "data": 0.5,
+      "tgt": {
+        "process": "ConfirmInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "buiness.order.address.cancel",
+      "tgt": {
+        "process": "CancelInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.5,
+      "tgt": {
+        "process": "CancelInt",
+        "port": "Score"
+      }
+    },
+    {
       "data": "business.order.create.address",
       "tgt": {
-        "process": "AdressIntDispatcher",
+        "process": "AdressInt",
         "port": "Intent"
+      }
+    },
+    {
+      "data": 0.1,
+      "tgt": {
+        "process": "AdressInt",
+        "port": "Score"
       }
     },
     {
       "data": 0.7,
       "tgt": {
-        "process": "AdressIntDispatcher",
-        "port": "Score"
+        "process": "OrderAddress",
+        "port": "ConfirmScore"
       }
     },
     {
       "data": "business.order.current.display",
       "tgt": {
-        "process": "OrderPrinterDispatcher",
+        "process": "OrderPrinterInt",
         "port": "Intent"
       }
     },
     {
       "data": 0.7,
       "tgt": {
-        "process": "OrderPrinterDispatcher",
+        "process": "OrderPrinterInt",
         "port": "Score"
       }
     },
     {
       "data": "business.order.create.cancel",
       "tgt": {
-        "process": "OrderCancelDispatcher",
+        "process": "OrderCancelInt",
         "port": "Intent"
       }
     },
     {
       "data": 0.7,
       "tgt": {
-        "process": "OrderCancelDispatcher",
+        "process": "OrderCancelInt",
         "port": "Score"
       }
     },
     {
       "data": "business.order.create",
       "tgt": {
-        "process": "OrderIntDispatcher",
+        "process": "OrderInt",
         "port": "Intent"
       }
     },
     {
       "data": 0.7,
       "tgt": {
-        "process": "OrderIntDispatcher",
+        "process": "OrderInt",
         "port": "Score"
       }
     }

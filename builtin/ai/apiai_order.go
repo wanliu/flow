@@ -14,6 +14,14 @@ type ApiAiOrder struct {
 	AiResult apiai.Result
 }
 
+func (aa ApiAiOrder) Score() float64 {
+	return aa.AiResult.Score
+}
+
+func (aa ApiAiOrder) Query() string {
+	return aa.AiResult.ResolvedQuery
+}
+
 func (aa ApiAiOrder) Items() []Item {
 	products := aa.Products()
 	quantities := aa.Quantities()

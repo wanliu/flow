@@ -24,6 +24,7 @@ type OrderResolve struct {
 	Note      string
 	UpdatedAt time.Time
 	Editing   bool
+	Canceled  bool
 }
 
 func NewOrderResolve(ctx Context) *OrderResolve {
@@ -53,6 +54,7 @@ func (r OrderResolve) Cancelable() bool {
 
 // TODO
 func (r *OrderResolve) Cancel() bool {
+	r.Canceled = true
 	return true
 }
 

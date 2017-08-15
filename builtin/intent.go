@@ -14,10 +14,17 @@ type IntentCheck struct {
 	// Query  <-chan ResultParams
 	_intent string
 	_score  float64
-	Intent  <-chan string
-	Score   <-chan float64
-	Out     chan<- Context
-	Next    chan<- Context
+	// _flow   bool
+
+	Intent <-chan string
+	Score  <-chan float64
+	// Flow   <-chan bool
+
+	Out  chan<- Context
+	Next chan<- Context
+
+	// 即使意图和得分不满足，也向这个端口发送ｃｔｘ，列如使确认信息失效这种情况
+	FlowOut chan<- Context
 }
 
 func NewIntentCheck() interface{} {
@@ -32,12 +39,23 @@ func (ic *IntentCheck) OnScore(score float64) {
 	ic._score = score
 }
 
+func (ic *IntentCheck) OnFlow(flow bool) {
+	// ic._flow = flow
+}
+
 func (ic *IntentCheck) OnCtx(ctx Context) {
 	if res, ok := ctx.Value("Result").(apiai.Result); ok {
 		if res.Metadata.IntentName == ic._intent && res.Score >= ic._score {
 			ic.Out <- ctx
 		} else {
 			ic.Next <- ctx
+
+			// log.Printf("...detect flow: %v", ic._flow)
+			// if ic._flow {
+			// log.Printf("...sending flow")
+
+			ic.FlowOut <- ctx
+			// }
 		}
 	} else {
 		log.Printf("无效的 Context Value Result")

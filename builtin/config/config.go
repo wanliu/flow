@@ -12,4 +12,5 @@ const (
 	CtxKeyExpiredMinutes = "ExpMins"
 	CtxKeyLastOrder      = "LastOrder"
 	CtxkeyResult         = "Result"
+	CtxKeyConfirm        = "Confirm"
 )

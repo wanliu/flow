@@ -4,20 +4,28 @@ INPORT=Voice.In:Voice
 
 Ai(ApiAi) Out -> Ctx CM(ContextManager)
 
-CM() Process -> Ctx OrderPrinterDispatcher(IntentCheck)
-OrderPrinterDispatcher() Out -> Ctx OrderPrinter(OrderPrinter)
-OrderPrinter() Out -> In Reply(Final)
+CM() Process -> Ctx ConfirmInt(IntentCheck)
+ConfirmInt() Out -> Confirm AddressConfirm(Confirm)
+AddressConfirm() Out -> In Reply(Final)
+ConfirmInt() FlowOut -> Expire AddressConfirm()
 
-OrderPrinterDispatcher() Next -> Ctx OrderCancelDispatcher(IntentCheck)
-OrderCancelDispatcher() Out -> Ctx OrderCancel(OrderCancel)
+ConfirmInt() Next -> Ctx CancelInt(IntentCheck)
+CancelInt() Out -> Cancel AddressConfirm()
+
+CancelInt() Next -> Ctx OrderPrinterInt(IntentCheck)
+OrderPrinterInt() Out -> Ctx OrderPrinter(OrderPrinter)
+OrderPrinter() Out -> In Reply()
+
+OrderPrinterInt() Next -> Ctx OrderCancelInt(IntentCheck)
+OrderCancelInt() Out -> Ctx OrderCancel(OrderCancel)
 OrderCancel() Out -> In Reply()
 
-OrderCancelDispatcher() Next -> Ctx AdressIntDispatcher(IntentCheck)
-AdressIntDispatcher() Out -> Ctx OrderAddress(OrderAddress)
+OrderCancelInt() Next -> Ctx AdressInt(IntentCheck)
+AdressInt() Out -> Ctx OrderAddress(OrderAddress)
 OrderAddress() Out -> In Reply()
 
-AdressIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
-OrderIntDispatcher() Out -> Ctx OpenOrder(Order)
+AdressInt() Next -> Ctx OrderInt(IntentCheck)
+OrderInt() Out -> Ctx OpenOrder(Order)
 OpenOrder() New -> Ctx NewOrder(NewOrder)
 OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
 OpenOrder() Out -> In Reply()
@@ -27,7 +35,7 @@ NewOrder() Notice -> Ctx OperationNotice(OperationNotice)
 PatchOrder() Out -> In Reply()
 OperationNotice() Out -> In Reply()
 
-OrderIntDispatcher() Next -> Ctx Unimplemented(Unimplemented)
+OrderInt() Next -> Ctx Unimplemented(Unimplemented)
 Unimplemented() Out -> In Reply()
 
 Voice(Voice) Out -> In Reply()
@@ -42,17 +50,26 @@ Voice(Voice) Out -> In Reply()
 
 '今天' -> Deftime NewOrder()
 
-'business.order.create.address' -> Intent AdressIntDispatcher()
-0.7 -> Score AdressIntDispatcher()
+'buiness.order.address.confirm' -> Intent ConfirmInt()
+true -> Flow ConfirmInt()
+0.5 -> Score ConfirmInt()
 
-'business.order.current.display' -> Intent OrderPrinterDispatcher()
-0.7 -> Score OrderPrinterDispatcher()
+'buiness.order.address.cancel' -> Intent CancelInt()
+0.5 -> Score CancelInt()
 
-'business.order.create.cancel' -> Intent OrderCancelDispatcher()
-0.7 -> Score OrderCancelDispatcher()
+'business.order.create.address' -> Intent AdressInt()
+0.1 -> Score AdressInt()
 
-'business.order.create' -> Intent OrderIntDispatcher()
-0.7 -> Score OrderIntDispatcher()
+0.7 -> ConfirmScore OrderAddress()
+
+'business.order.current.display' -> Intent OrderPrinterInt()
+0.7 -> Score OrderPrinterInt()
+
+'business.order.create.cancel' -> Intent OrderCancelInt()
+0.7 -> Score OrderCancelInt()
+
+'business.order.create' -> Intent OrderInt()
+0.7 -> Score OrderInt()
 
 # 延迟回复时间
 # 5 -> DelayMin Reply()
@@ -60,57 +77,57 @@ Voice(Voice) Out -> In Reply()
 
 # # 'products' -> Type TryProducts()
 
-# CM() Process -> Ctx PraiseIntDispatcher(IntentCheck)
-# PraiseIntDispatcher() Out -> Ctx Praise(Praise)
+# CM() Process -> Ctx PraiseInt(IntentCheck)
+# PraiseInt() Out -> Ctx Praise(Praise)
 # Praise() Out -> In Reply(Final)
 
-# PraiseIntDispatcher() Next -> Ctx CriIntDispatcher(IntentCheck)
-# CriIntDispatcher() Out -> Ctx Critical(Critical)
+# PraiseInt() Next -> Ctx CriInt(IntentCheck)
+# CriInt() Out -> Ctx Critical(Critical)
 # Critical() Out -> In Reply()
 
-# CriIntDispatcher() Next -> Ctx AbuseIntDispatcher(IntentCheck)
-# AbuseIntDispatcher() Out -> Ctx Abuse(Abuse)
+# CriInt() Next -> Ctx AbuseInt(IntentCheck)
+# AbuseInt() Out -> Ctx Abuse(Abuse)
 # Abuse() Out -> In Reply()
 
-# AbuseIntDispatcher() Next -> Ctx GreetIntDispatcher(IntentCheck)
-# GreetIntDispatcher() Out -> Ctx Greet(Greet)
+# AbuseInt() Next -> Ctx GreetInt(IntentCheck)
+# GreetInt() Out -> Ctx Greet(Greet)
 # Greet() Out -> In Reply()
 
-# GreetIntDispatcher() Next -> Ctx RobotIntDispatcher(IntentCheck)
-# RobotIntDispatcher() Out -> Ctx Robot(Robot)
+# GreetInt() Next -> Ctx RobotInt(IntentCheck)
+# RobotInt() Out -> Ctx Robot(Robot)
 # Robot() Out -> In Reply()
 
-# RobotIntDispatcher() Next -> Ctx StockIntDispatcher(IntentCheck)
-# StockIntDispatcher() Out -> Ctx StockQuery(StockQuery)
+# RobotInt() Next -> Ctx StockInt(IntentCheck)
+# StockInt() Out -> Ctx StockQuery(StockQuery)
 # StockQuery() Out -> In Reply()
 
-# StockIntDispatcher() Next -> Ctx PriceIntDispatcher(IntentCheck)
-# PriceIntDispatcher() Out -> Ctx PriceQuery(PriceQuery)
+# StockInt() Next -> Ctx PriceInt(IntentCheck)
+# PriceInt() Out -> Ctx PriceQuery(PriceQuery)
 # PriceQuery() Out -> In Reply()
 
-# PriceIntDispatcher() Next -> Ctx OrderIntDispatcher(IntentCheck)
+# PriceInt() Next -> Ctx OrderInt(IntentCheck)
 
 
-# '表扬' -> Intent PraiseIntDispatcher()
-# 0.40 -> Score PraiseIntDispatcher()
+# '表扬' -> Intent PraiseInt()
+# 0.40 -> Score PraiseInt()
 
-# '批评' -> Intent CriIntDispatcher()
-# 0.40 -> Score CriIntDispatcher()
+# '批评' -> Intent CriInt()
+# 0.40 -> Score CriInt()
 
-# '辱骂' -> Intent AbuseIntDispatcher()
-# 0.40 -> Score AbuseIntDispatcher()
+# '辱骂' -> Intent AbuseInt()
+# 0.40 -> Score AbuseInt()
 
-# '招呼' -> Intent GreetIntDispatcher()
-# 0.40 -> Score GreetIntDispatcher()
+# '招呼' -> Intent GreetInt()
+# 0.40 -> Score GreetInt()
 
-# '关于机器人' -> Intent RobotIntDispatcher()
-# 0.40 -> Score RobotIntDispatcher()
+# '关于机器人' -> Intent RobotInt()
+# 0.40 -> Score RobotInt()
 
-# '问货' -> Intent StockIntDispatcher()
-# 0.40 -> Score StockIntDispatcher()
+# '问货' -> Intent StockInt()
+# 0.40 -> Score StockInt()
 
-# '问价' -> Intent PriceIntDispatcher()
-# 0.40 -> Score PriceIntDispatcher()
+# '问价' -> Intent PriceInt()
+# 0.40 -> Score PriceInt()
 
 
 
@@ -121,12 +138,12 @@ Voice(Voice) Out -> In Reply()
 # Line() Next -> Ctx Merge(QuerySave)
 # Luis() Out -> Result Merge()
 # Merge() Out -> Ctx CM(ContextManager)
-# CM() Process -> Ctx IntentDispatcher(IntentCheck)
-# IntentDispatcher() Out -> Ctx OpenOrder(Order)
+# CM() Process -> Ctx IntentInt(IntentCheck)
+# IntentInt() Out -> Ctx OpenOrder(Order)
 # OpenOrder() Out -> In reply(Final)
 
 # '8b65b31f-05b0-4da0-ab98-afa62c0e80ae' -> AppId Luis()
 # '9c6711ad95c846a792248515cb6d1a23' -> Key Luis()
 # '请输入你的话' -> Prompt Line()
-# '开单' -> Intent IntentDispatcher()
-# 0.70 -> Score IntentDispatcher()
+# '开单' -> Intent IntentInt()
+# 0.70 -> Score IntentInt()
