@@ -31,9 +31,9 @@ OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
 OpenOrder() Out -> In Reply()
 
 NewOrder() Out -> In Reply()
-# NewOrder() Notice -> Ctx OperationNotice(OperationNotice)
+NewOrder() Timeout -> Ctx OrderTimeout(OrderTimeout)
+OrderTimeout() Out -> In Reply()
 PatchOrder() Out -> In Reply()
-# OperationNotice() Out -> In Reply()
 
 OrderInt() Next -> Ctx Unimplemented(Unimplemented)
 Unimplemented() Out -> In Reply()
@@ -70,6 +70,8 @@ true -> Flow CancelInt()
 
 'business.order.create' -> Intent OrderInt()
 0.7 -> Score OrderInt()
+
+5.0 -> Mins OrderTimeout()
 
 # 延迟回复时间
 # 5 -> DelayMin Reply()

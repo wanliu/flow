@@ -48,6 +48,9 @@
     "PatchOrder": {
       "component": "PatchOrder"
     },
+    "OrderTimeout": {
+      "component": "OrderTimeout"
+    },
     "Unimplemented": {
       "component": "Unimplemented"
     },
@@ -278,6 +281,26 @@
     },
     {
       "src": {
+        "process": "NewOrder",
+        "port": "Timeout"
+      },
+      "tgt": {
+        "process": "OrderTimeout",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderTimeout",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
         "process": "PatchOrder",
         "port": "Out"
       },
@@ -457,6 +480,13 @@
       "tgt": {
         "process": "OrderInt",
         "port": "Score"
+      }
+    },
+    {
+      "data": 5,
+      "tgt": {
+        "process": "OrderTimeout",
+        "port": "Mins"
       }
     }
   ],

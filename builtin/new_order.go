@@ -13,6 +13,7 @@ type NewOrder struct {
 	Deftime <-chan string
 	Out     chan<- ReplyData
 	Notice  chan<- Context
+	Timeout chan<- Context
 }
 
 func NewNewOrder() interface{} {
@@ -44,6 +45,7 @@ func (c *NewOrder) OnCtx(ctx Context) {
 
 		output = orderResolve.Answer()
 		// c.Notice <- ctx
+		c.Timeout <- ctx
 	}
 
 	replyData := ReplyData{output, ctx}
