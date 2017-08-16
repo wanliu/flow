@@ -148,7 +148,11 @@ func (r OrderResolve) EmptyProducts() bool {
 }
 
 func (r OrderResolve) Answer() string {
-	return r.AnswerHead() + r.AnswerBody()
+	if r.Fulfiled() {
+		return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter()
+	} else {
+		return r.AnswerHead() + r.AnswerFooter()
+	}
 }
 
 func (r OrderResolve) AddressInfo() string {
@@ -200,12 +204,18 @@ func (r OrderResolve) AnswerBody() string {
 		desc = desc + "备注：" + r.Note + "\n"
 	}
 
+	return desc
+}
+
+func (r OrderResolve) AnswerFooter() string {
+	desc := ""
+
 	if r.Fulfiled() {
 		desc = desc + r.AddressInfo()
 		desc = desc + "订单已经生成，订单号为：" + "1056895214" + "\n"
 		desc = desc + "订单入口: http://wanliu.biz/orders/"
 	} else {
-		desc = desc + "告诉我地址或客户是谁，就可以生成订单了\n"
+		desc = desc + "请告诉我告诉我地址或客户，就可以生成订单了\n"
 	}
 
 	return desc
