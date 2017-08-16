@@ -102,16 +102,6 @@
     {
       "src": {
         "process": "ConfirmInt",
-        "port": "FlowOut"
-      },
-      "tgt": {
-        "process": "AddressConfirm",
-        "port": "Expire"
-      }
-    },
-    {
-      "src": {
-        "process": "ConfirmInt",
         "port": "Next"
       },
       "tgt": {
@@ -127,6 +117,16 @@
       "tgt": {
         "process": "AddressConfirm",
         "port": "Cancel"
+      }
+    },
+    {
+      "src": {
+        "process": "CancelInt",
+        "port": "FlowOut"
+      },
+      "tgt": {
+        "process": "AddressConfirm",
+        "port": "Expire"
       }
     },
     {
@@ -389,16 +389,6 @@
       }
     },
     {
-      "src": {
-        "process": "true",
-        "port": "OUT"
-      },
-      "tgt": {
-        "process": "ConfirmInt",
-        "port": "Flow"
-      }
-    },
-    {
       "data": 0.5,
       "tgt": {
         "process": "ConfirmInt",
@@ -410,6 +400,16 @@
       "tgt": {
         "process": "CancelInt",
         "port": "Intent"
+      }
+    },
+    {
+      "src": {
+        "process": "true",
+        "port": "OUT"
+      },
+      "tgt": {
+        "process": "CancelInt",
+        "port": "Flow"
       }
     },
     {
