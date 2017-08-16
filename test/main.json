@@ -48,9 +48,6 @@
     "PatchOrder": {
       "component": "PatchOrder"
     },
-    "OperationNotice": {
-      "component": "OperationNotice"
-    },
     "Unimplemented": {
       "component": "Unimplemented"
     },
@@ -281,27 +278,7 @@
     },
     {
       "src": {
-        "process": "NewOrder",
-        "port": "Notice"
-      },
-      "tgt": {
-        "process": "OperationNotice",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
         "process": "PatchOrder",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
-        "process": "OperationNotice",
         "port": "Out"
       },
       "tgt": {

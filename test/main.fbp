@@ -31,9 +31,9 @@ OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
 OpenOrder() Out -> In Reply()
 
 NewOrder() Out -> In Reply()
-NewOrder() Notice -> Ctx OperationNotice(OperationNotice)
+# NewOrder() Notice -> Ctx OperationNotice(OperationNotice)
 PatchOrder() Out -> In Reply()
-OperationNotice() Out -> In Reply()
+# OperationNotice() Out -> In Reply()
 
 OrderInt() Next -> Ctx Unimplemented(Unimplemented)
 Unimplemented() Out -> In Reply()

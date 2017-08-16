@@ -43,7 +43,7 @@ func (c *NewOrder) OnCtx(ctx Context) {
 		}
 
 		output = orderResolve.Answer()
-		c.Notice <- ctx
+		// c.Notice <- ctx
 	}
 
 	replyData := ReplyData{output, ctx}

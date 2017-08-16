@@ -215,7 +215,7 @@ func (r OrderResolve) AnswerFooter() string {
 		desc = desc + "订单已经生成，订单号为：" + "1056895214" + "\n"
 		desc = desc + "订单入口: http://wanliu.biz/orders/"
 	} else {
-		desc = desc + "请告诉我告诉我地址或客户，就可以生成订单了\n"
+		desc = desc + "还缺少收货地址或客户信息\n"
 	}
 
 	return desc
