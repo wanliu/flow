@@ -77,7 +77,7 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 			ctx.SetValue(config.CtxKeyConfirm, addressConfirm)
 
 			reply := "收到您的回复:" + query + "\n"
-			reply = "是否将 “" + address + "” 做为收货地址?"
+			reply = reply + "是否将 “" + address + "” 做为收货地址?"
 			c.Out <- ReplyData{reply, ctx}
 		}
 	} else {
