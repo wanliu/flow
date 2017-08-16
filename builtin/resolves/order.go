@@ -29,7 +29,7 @@ type OrderResolve struct {
 
 func NewOrderResolve(ctx Context) *OrderResolve {
 	resolve := new(OrderResolve)
-	resolve.UpdatedAt = time.Now()
+	resolve.Touch()
 
 	aiResult := ctx.Value("Result").(apiai.Result)
 
@@ -41,6 +41,10 @@ func NewOrderResolve(ctx Context) *OrderResolve {
 
 func (r *OrderResolve) Solve(aiResult apiai.Result) string {
 	return r.Answer()
+}
+
+func (r *OrderResolve) Touch() {
+	r.UpdatedAt = time.Now()
 }
 
 func (r OrderResolve) Modifable(expireMin int) bool {

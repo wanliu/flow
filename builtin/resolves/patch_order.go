@@ -44,7 +44,7 @@ func (r *PatchOrderResolve) Patch(orderResolve *OrderResolve) {
 	}
 
 	r.OriginUpdatedAt = r.Origin.UpdatedAt
-	r.Origin.UpdatedAt = time.Now()
+	// r.Origin.Touch()
 }
 
 // 新增 2 种产品, 《伊利畅轻450原味》 已 10 件,

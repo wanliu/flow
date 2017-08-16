@@ -6,6 +6,12 @@
     "CM": {
       "component": "ContextManager"
     },
+    "OrderTouch": {
+      "component": "OrderTouch"
+    },
+    "OrderTimeout": {
+      "component": "OrderTimeout"
+    },
     "ConfirmInt": {
       "component": "IntentCheck"
     },
@@ -48,9 +54,6 @@
     "PatchOrder": {
       "component": "PatchOrder"
     },
-    "OrderTimeout": {
-      "component": "OrderTimeout"
-    },
     "Unimplemented": {
       "component": "Unimplemented"
     },
@@ -73,6 +76,26 @@
       "src": {
         "process": "CM",
         "port": "Process"
+      },
+      "tgt": {
+        "process": "OrderTouch",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderTouch",
+        "port": "Timeout"
+      },
+      "tgt": {
+        "process": "OrderTimeout",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderTouch",
+        "port": "Next"
       },
       "tgt": {
         "process": "ConfirmInt",
@@ -480,13 +503,6 @@
       "tgt": {
         "process": "OrderInt",
         "port": "Score"
-      }
-    },
-    {
-      "data": 5,
-      "tgt": {
-        "process": "OrderTimeout",
-        "port": "Mins"
       }
     }
   ],

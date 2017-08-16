@@ -4,7 +4,10 @@ INPORT=Voice.In:Voice
 
 Ai(ApiAi) Out -> Ctx CM(ContextManager)
 
-CM() Process -> Ctx ConfirmInt(IntentCheck)
+CM() Process -> Ctx OrderTouch(OrderTouch)
+OrderTouch() Timeout -> Ctx OrderTimeout(OrderTimeout)
+
+OrderTouch() Next -> Ctx ConfirmInt(IntentCheck)
 ConfirmInt() Out -> Confirm AddressConfirm(Confirm)
 AddressConfirm() Out -> In Reply(Final)
 
@@ -31,7 +34,7 @@ OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
 OpenOrder() Out -> In Reply()
 
 NewOrder() Out -> In Reply()
-NewOrder() Timeout -> Ctx OrderTimeout(OrderTimeout)
+NewOrder() Timeout -> Ctx OrderTimeout()
 OrderTimeout() Out -> In Reply()
 PatchOrder() Out -> In Reply()
 
@@ -70,8 +73,6 @@ true -> Flow CancelInt()
 
 'business.order.create' -> Intent OrderInt()
 0.7 -> Score OrderInt()
-
-5.0 -> Mins OrderTimeout()
 
 # 延迟回复时间
 # 5 -> DelayMin Reply()

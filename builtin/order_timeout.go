@@ -10,26 +10,30 @@ import (
 )
 
 type OrderTimeout struct {
+	TryGetEntities
+
 	mins int
 
-	Ctx  <-chan Context
-	Mins <-chan float64
-	Out  chan<- ReplyData
+	Ctx <-chan Context
+	// Mins <-chan float64
+	Out chan<- ReplyData
 }
 
 func NewOrderTimeout() interface{} {
 	return new(OrderTimeout)
 }
 
-func (c *OrderTimeout) OnMins(t float64) {
-	c.mins = int(t)
-}
+// func (c *OrderTimeout) OnMins(t float64) {
+// 	c.mins = int(t)
+// }
 
 func (c *OrderTimeout) OnCtx(ctx Context) {
 	go func() {
 		expiredMins := config.SesssionExpiredMinutes
-		if c.mins != 0 {
-			expiredMins = c.mins
+		settedMins := ctx.Value(config.CtxKeyExpiredMinutes)
+
+		if settedMins != 0 {
+			expiredMins = settedMins.(int)
 		}
 
 		time.Sleep(time.Duration(expiredMins) * time.Minute)
