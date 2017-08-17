@@ -68,6 +68,8 @@ func (c *Confirm) OnConfirm(ctx Context) {
 			if cOrder.Fulfiled() {
 				ctx.SetValue(config.CtxKeyOrder, nil)
 				ctx.SetValue(config.CtxKeyLastOrder, cOrder)
+			} else {
+				ctx.SetValue(config.CtxKeyOrder, cOrder)
 			}
 
 			reply := "已经确认\"" + cConfirm.Value + "\"为收货地址" + "\n" + cOrder.Answer()
