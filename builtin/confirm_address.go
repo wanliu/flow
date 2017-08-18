@@ -19,7 +19,7 @@ import (
 
 type AddressConfirm struct {
 	Order *OrderResolve
-	Value string
+	Value []string
 }
 
 type Confirm struct {
@@ -63,17 +63,23 @@ func (c *Confirm) OnConfirm(ctx Context) {
 		cConfirm := confirm.(AddressConfirm)
 
 		if cOrder.Address == "" {
-			cOrder.Address = cConfirm.Value
+			if len(cConfirm.Value) > 0 {
+				cOrder.Address = cConfirm.Value[0]
 
-			if cOrder.Fulfiled() {
-				ctx.SetValue(config.CtxKeyOrder, nil)
-				ctx.SetValue(config.CtxKeyLastOrder, cOrder)
+				if cOrder.Fulfiled() {
+					ctx.SetValue(config.CtxKeyOrder, nil)
+					ctx.SetValue(config.CtxKeyLastOrder, cOrder)
+				} else {
+					ctx.SetValue(config.CtxKeyOrder, cOrder)
+				}
+
+				reply := "已经确认\"" + cConfirm.Value[0] + "\"为收货地址" + "\n" + cOrder.Answer()
+				c.Out <- ReplyData{reply, ctx}
 			} else {
-				ctx.SetValue(config.CtxKeyOrder, cOrder)
+				ctx.SetValue(config.CtxKeyConfirm, nil)
+				reply := ReplyData{"确认操作已经过期", ctx}
+				c.Out <- reply
 			}
-
-			reply := "已经确认\"" + cConfirm.Value + "\"为收货地址" + "\n" + cOrder.Answer()
-			c.Out <- ReplyData{reply, ctx}
 		} else {
 			reply := ReplyData{"确认操作已经过期", ctx}
 			c.Out <- reply
@@ -89,14 +95,23 @@ func (c *Confirm) OnCancel(ctx Context) {
 	confirm := ctx.Value(config.CtxKeyConfirm)
 
 	if currentOrder != nil && confirm != nil {
+		cConfirm := confirm.(AddressConfirm)
 		cOrder := currentOrder.(OrderResolve)
 
-		ctx.SetValue(config.CtxKeyConfirm, nil)
+		reply := ""
 
-		reply := "取消操作完成"
+		if len(cConfirm.Value) > 1 {
+			newValues := cConfirm.Value[1:]
+			cConfirm.Value = newValues
+			ctx.SetValue(config.CtxKeyConfirm, cConfirm)
 
-		if cOrder.Address == "" {
-			reply = reply + "，当前订单收货地址尚未确认，请输入收货地址"
+			reply = reply + "是否将 “" + newValues[0] + "” 做为收货地址?"
+		} else {
+			ctx.SetValue(config.CtxKeyConfirm, nil)
+
+			if cOrder.Address == "" {
+				reply = reply + "取消操作完成，当前订单收货地址尚未确认，请输入收货地址"
+			}
 		}
 
 		c.Out <- ReplyData{reply, ctx}
