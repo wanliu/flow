@@ -7,7 +7,10 @@ import (
 
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
+
 	. "github.com/wanliu/flow/context"
+
+	client "github.com/wanliu/flow/builtin/graphql_client"
 )
 
 // 处理开单的逻辑结构, 不需要是组件
@@ -153,10 +156,71 @@ func (r OrderResolve) EmptyProducts() bool {
 
 func (r OrderResolve) Answer() string {
 	if r.Fulfiled() {
-		return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter()
+		return r.PostOrderAndAnswer()
 	} else {
-		return r.AnswerHead() + r.AnswerFooter()
+		return r.AnswerHead() + r.AnswerFooter("")
 	}
+}
+
+func (r *OrderResolve) PostOrderAndAnswer() string {
+	mutationStr := `mutation createOrderMutation($input: OrderInput!) {
+        createOrder(input: $input) {
+            __typename
+            order {
+                address
+                id
+                no
+                deliveryTime
+                items {
+                    product {
+                        name
+                        picUrl
+                        price
+                    }
+                    price
+                    quantity
+                }
+                gifts {
+                    product {
+                        name
+                        picUrl
+                        price
+                    }
+                    quantity
+                }
+                saler {
+                    id
+                    name
+                }
+            }
+        }
+    }`
+
+	variables := `{"input": {"address":"` + r.Address + `","deliveryTime":"` + r.Time.Format("Mon Jan 2 15:04:05 MST 2006") + `","clientMutationId":0` + `,"items":[`
+
+	itemStrs := []string{}
+	for _, item := range r.Products.Products {
+		iStr := `{"quantity":` + strconv.Itoa(item.Quantity) + `,"productName":"` + item.Product + `"}`
+		itemStrs = append(itemStrs, iStr)
+	}
+	variables = variables + strings.Join(itemStrs, ",") + `]`
+
+	if len(r.Gifts.Products) > 0 {
+		variables = variables + `,"gifts":[`
+		giftStrs := []string{}
+		for _, gift := range r.Gifts.Products {
+			iStr := `{"quantity":` + strconv.Itoa(gift.Quantity) + `,"productName":"` + gift.Product + `"}`
+			giftStrs = append(giftStrs, iStr)
+		}
+		variables = variables + strings.Join(giftStrs, ",") + `]}}}`
+	} else {
+		variables = variables + "}}"
+	}
+
+	requstStr := client.QueryToRequest(mutationStr, variables)
+	res, _ := client.MakeGraphqlRequest(requstStr)
+
+	return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(res.OrderNo())
 }
 
 func (r OrderResolve) AddressInfo() string {
@@ -211,13 +275,13 @@ func (r OrderResolve) AnswerBody() string {
 	return desc
 }
 
-func (r OrderResolve) AnswerFooter() string {
+func (r OrderResolve) AnswerFooter(no string) string {
 	desc := ""
 
 	if r.Fulfiled() {
 		desc = desc + r.AddressInfo()
-		desc = desc + "订单已经生成，订单号为：" + "1056895214" + "\n"
-		desc = desc + "订单入口: http://wanliu.biz/orders/"
+		desc = desc + "订单已经生成，订单号为：" + no + "\n"
+		desc = desc + "订单入口: http://wanliu.biz/orders/" + no
 	} else {
 		desc = desc + "还缺少收货地址或客户信息\n"
 	}
