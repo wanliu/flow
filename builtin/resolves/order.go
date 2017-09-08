@@ -168,6 +168,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
             __typename
             order {
                 address
+                note
                 id
                 no
                 deliveryTime
@@ -196,7 +197,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
         }
     }`
 
-	variables := `{"input": {"address":"` + r.Address + `","deliveryTime":"` + r.Time.Format("Mon Jan 2 15:04:05 MST 2006") + `","clientMutationId":0` + `,"items":[`
+	variables := `{"input": {"address":"` + r.Address + `","deliveryTime":"` + r.Time.Format(time.RFC3339) + `","clientMutationId":0` + `,"items":[`
 
 	itemStrs := []string{}
 	for _, item := range r.Products.Products {
@@ -212,15 +213,19 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 			iStr := `{"quantity":` + strconv.Itoa(gift.Quantity) + `,"productName":"` + gift.Product + `"}`
 			giftStrs = append(giftStrs, iStr)
 		}
-		variables = variables + strings.Join(giftStrs, ",") + `]}}}`
-	} else {
-		variables = variables + "}}"
+		variables = variables + strings.Join(giftStrs, ",") + `]}`
 	}
+
+	if r.Note != "" {
+		variables = variables + `,"note":"` + r.Note + `"`
+	}
+
+	variables = variables + "}}"
 
 	requstStr := client.QueryToRequest(mutationStr, variables)
 	res, _ := client.MakeGraphqlRequest(requstStr)
 
-	return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(res.OrderNo())
+	return r.AnswerHead() + res.AnswerBody() + r.AnswerFooter(res.OrderNo())
 }
 
 func (r OrderResolve) AddressInfo() string {

@@ -1,6 +1,7 @@
 package graphqlClient
 
 import (
+	"strconv"
 	"time"
 )
 
@@ -47,9 +48,32 @@ type createOrder struct {
 	Order    order  `json:"order"`
 }
 
+type Product struct {
+	PicUrl string `json:"picUrl"`
+	Name   string `json:"name"`
+}
+
+type OrderItem struct {
+	ProductId   uint    `json:"productId"`
+	OriginPrice float64 `json:"originPrice"`
+	Price       float64 `json:"price"`
+	Quantity    int     `json:"quantity"`
+	Product     Product `json:"product"`
+	ProductName string  `json:"productName"`
+}
+
+type GiftItem struct {
+	ProductId   uint    `json:"productId"`
+	OriginPrice float64 `json:"originPrice"`
+	Quantity    int     `json:"quantity"`
+	Product     Product `json:"product"`
+	ProductName string  `json:"productName"`
+}
+
 type order struct {
 	Status uint   `json:"status";`
 	No     string `json:"no"`
+	Note   string `json:"note"`
 
 	CustomerId uint `json:"customerId"`
 	// Customer   People
@@ -62,8 +86,8 @@ type order struct {
 	Address      string    `json:"address"`
 	DeliveryTime time.Time `json:"deliveryTime"`
 
-	// OrderItems []OrderItem `json:"items"`
-	// GiftItems  []GiftItem  `json:"gifts"`
+	OrderItems []OrderItem `json:"items"`
+	GiftItems  []GiftItem  `json:"gifts"`
 }
 
 type err struct {
@@ -77,4 +101,57 @@ func (res CreateOrderResponse) OrderNo() string {
 	// } else {
 	// 	return ""
 	// }
+}
+
+func (res CreateOrderResponse) Items() []OrderItem {
+	items := res.Data.CreateOrder.Order.OrderItems
+	result := make([]OrderItem, 0, len(items))
+
+	for _, item := range items {
+		item.ProductName = item.Product.Name
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (res CreateOrderResponse) Gifts() []GiftItem {
+	gifts := res.Data.CreateOrder.Order.GiftItems
+	result := make([]GiftItem, 0, len(gifts))
+
+	for _, gift := range gifts {
+		gift.ProductName = gift.Product.Name
+		result = append(result, gift)
+	}
+
+	return result
+}
+
+func (res CreateOrderResponse) Note() string {
+	return res.Data.CreateOrder.Order.Note
+}
+
+func (res CreateOrderResponse) AnswerBody() string {
+	desc := ""
+
+	for _, item := range res.Items() {
+		desc = desc + item.ProductName + " " + strconv.Itoa(item.Quantity) + "件\n"
+	}
+
+	gifts := res.Gifts()
+	if len(gifts) > 0 {
+		desc = desc + "申请的赠品:\n"
+
+		for _, g := range gifts {
+			desc = desc + g.ProductName + " " + strconv.Itoa(g.Quantity) + "件\n"
+		}
+	}
+
+	desc = desc + "时间:" + res.Data.CreateOrder.Order.DeliveryTime.Format("2006年01月02日") + "\n"
+
+	if res.Note() != "" {
+		desc = desc + "备注：" + res.Note() + "\n"
+	}
+
+	return desc
 }

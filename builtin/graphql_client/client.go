@@ -23,6 +23,7 @@ func QueryToRequest(queryString, variablesString string) string {
 }
 
 func MakeGraphqlRequest(requestString string) (*CreateOrderResponse, error) {
+	fmt.Printf("===> requestString: %v", requestString)
 	// http://stackoverflow.com/questions/24455147/how-do-i-send-a-json-string-in-a-post-request-in-go
 	fmt.Println("URL:", URL)
 
@@ -42,11 +43,13 @@ func MakeGraphqlRequest(requestString string) (*CreateOrderResponse, error) {
 	switch resp.StatusCode {
 	case http.StatusOK:
 		body, _ := ioutil.ReadAll(resp.Body)
+		fmt.Printf("====> res body: %v", string(body))
 		err = json.Unmarshal(body, &cr)
 		if err != nil {
 			return nil, err
 		}
-
+		fmt.Printf("------> res: %cr\n", cr.Data.CreateOrder.Order.OrderItems)
+		fmt.Printf("------> res: %cr", cr.Data.CreateOrder.Order.GiftItems)
 		return cr, nil
 	default:
 		return nil, fmt.Errorf("apiai: wops something happens because status code is %v", resp.StatusCode)
