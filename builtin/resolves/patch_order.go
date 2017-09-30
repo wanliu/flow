@@ -26,6 +26,11 @@ func NewPatchOrderResolve(ctx Context) *PatchOrderResolve {
 	resolve.AiParams = ai.ApiAiOrder{AiResult: aiResult}
 	resolve.ExtractFromParams()
 
+	if viewer := ctx.Value("Viewer"); viewer != nil {
+		user := viewer.(database.User)
+		resolve.User = &user
+	}
+
 	return resolve
 }
 

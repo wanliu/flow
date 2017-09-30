@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hysios/apiai-go"
+	"github.com/wanliu/brain_data.database"
 	"github.com/wanliu/flow/builtin/ai"
 
 	. "github.com/wanliu/flow/context"
@@ -28,6 +29,8 @@ type OrderResolve struct {
 	UpdatedAt time.Time
 	Editing   bool
 	Canceled  bool
+
+	User *database.User
 }
 
 func NewOrderResolve(ctx Context) *OrderResolve {
@@ -38,6 +41,11 @@ func NewOrderResolve(ctx Context) *OrderResolve {
 
 	resolve.AiParams = ai.ApiAiOrder{AiResult: aiResult}
 	resolve.ExtractFromParams()
+
+	if viewer := ctx.Value("Viewer"); viewer != nil {
+		user := viewer.(database.User)
+		resolve.User = &user
+	}
 
 	return resolve
 }
