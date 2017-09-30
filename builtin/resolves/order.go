@@ -43,8 +43,8 @@ func NewOrderResolve(ctx Context) *OrderResolve {
 	resolve.ExtractFromParams()
 
 	if viewer := ctx.Value("Viewer"); viewer != nil {
-		user := viewer.(database.User)
-		resolve.User = &user
+		user := viewer.(*database.User)
+		resolve.User = user
 	}
 
 	return resolve
