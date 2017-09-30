@@ -65,14 +65,14 @@ func (s Final) DelayRange() int {
 }
 
 func (s *Final) SendReply() {
-	secs := s.DelayRange()
+	// secs := s.DelayRange()
 
 	s.RLock()
 	for s.ReplyQueue.Head() != nil {
 		data := s.ReplyQueue.Dequeue().(ReplyData)
 
-		log.Printf("[Delay]Delay reply for " + strconv.Itoa(secs) + " seconds.")
-		time.Sleep(time.Second * time.Duration(secs))
+		// log.Printf("[Delay]Delay reply for " + strconv.Itoa(secs) + " seconds.")
+		// time.Sleep(time.Second * time.Duration(secs))
 
 		data.Ctx.Post(data.Reply)
 	}
