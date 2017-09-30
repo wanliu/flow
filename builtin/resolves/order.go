@@ -230,10 +230,10 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 
 	variables = variables + "}}"
 
-	_ := client.QueryToRequest(mutationStr, variables)
+	requstSt := client.QueryToRequest(mutationStr, variables)
 	r.User.CreateSaledOrder()
 	// res, _ := client.MakeGraphqlRequest(requstStr)
-	return ""
+	return requstSt
 	// return r.AnswerHead() + res.AnswerBody() + r.AnswerFooter(res.OrderNo())
 }
 
