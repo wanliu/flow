@@ -173,7 +173,6 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	gifts := make([]database.GiftItem, 0, 0)
 
 	for _, pr := range r.Products.Products {
-		 NewOrderItem(productId, proName string, quantity uint, price float64)
 		item, err := database.NewOrderItem("", pr.Product, uint(pr.Quantity), pr.Price)
 		if err != nil {
 			return err.Error()
