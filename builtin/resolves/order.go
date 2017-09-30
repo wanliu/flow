@@ -190,6 +190,10 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		gifts = append(gifts, *gift)
 	}
 
+	if r.User == nil {
+		return "无法创建订单，请与工作人员联系！"
+	}
+
 	order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, items, gifts)
 
 	if err != nil {
