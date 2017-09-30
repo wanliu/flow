@@ -166,75 +166,31 @@ func (r OrderResolve) Answer() string {
 	if r.Fulfiled() {
 		return r.PostOrderAndAnswer()
 	} else {
-		return r.AnswerHead() + r.AnswerFooter("")
+		return r.AnswerHead() + r.AnswerFooter("", "")
 	}
 }
 
 func (r *OrderResolve) PostOrderAndAnswer() string {
-	mutationStr := `mutation createOrderMutation($input: OrderInput!) {
-        createOrder(input: $input) {
-            __typename
-            order {
-                address
-                note
-                id
-                no
-                deliveryTime
-                items {
-                    product {
-                        name
-                        picUrl
-                        price
-                    }
-                    price
-                    quantity
-                }
-                gifts {
-                    product {
-                        name
-                        picUrl
-                        price
-                    }
-                    quantity
-                }
-                saler {
-                    id
-                    name
-                }
-            }
-        }
-    }`
+	items := make([]database.OrderItem, 0, 0)
+	gifts := make([]database.GiftItem, 0, 0)
 
-	variables := `{"input": {"address":"` + r.Address + `","deliveryTime":"` + r.Time.Format(time.RFC3339) + `","clientMutationId":0` + `,"items":[`
-
-	itemStrs := []string{}
-	for _, item := range r.Products.Products {
-		iStr := `{"quantity":` + strconv.Itoa(item.Quantity) + `,"productName":"` + item.Product + `"}`
-		itemStrs = append(itemStrs, iStr)
-	}
-	variables = variables + strings.Join(itemStrs, ",") + `]`
-
-	if len(r.Gifts.Products) > 0 {
-		variables = variables + `,"gifts":[`
-		giftStrs := []string{}
-		for _, gift := range r.Gifts.Products {
-			iStr := `{"quantity":` + strconv.Itoa(gift.Quantity) + `,"productName":"` + gift.Product + `"}`
-			giftStrs = append(giftStrs, iStr)
-		}
-		variables = variables + strings.Join(giftStrs, ",") + `]}`
+	for _, pr := range r.Products.Products {
+		item = database.NewOrderItem("", pr.Product, pr.Product, pr.Price)
+		items = append(items, item)
 	}
 
-	if r.Note != "" {
-		variables = variables + `,"note":"` + r.Note + `"`
+	for _, pr := range r.Gifts.Products {
+		gift = database.NewGiftItem("", pr.Product, pr.Quantity)
+		gifts = append(items, gift)
 	}
 
-	variables = variables + "}}"
+	order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, items, gifts)
 
-	requstSt := client.QueryToRequest(mutationStr, variables)
-	r.User.CreateSaledOrder()
-	// res, _ := client.MakeGraphqlRequest(requstStr)
-	return requstSt
-	// return r.AnswerHead() + res.AnswerBody() + r.AnswerFooter(res.OrderNo())
+	if err != nil {
+		return err.Error()
+	} else {
+		return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.ID)
+	}
 }
 
 func (r OrderResolve) AddressInfo() string {
@@ -289,13 +245,13 @@ func (r OrderResolve) AnswerBody() string {
 	return desc
 }
 
-func (r OrderResolve) AnswerFooter(no string) string {
+func (r OrderResolve) AnswerFooter(no, id interface{}) string {
 	desc := ""
 
 	if r.Fulfiled() {
 		desc = desc + r.AddressInfo()
-		desc = desc + "订单已经生成，订单号为：" + no + "\n"
-		desc = desc + "订单入口: http://wanliu.biz/orders/" + no
+		desc = desc + "订单已经生成，订单号为：" + fmt.Sprint(no) + "\n"
+		desc = desc + "订单入口: http://wanliu.biz/orders/" + fmt.Sprint(id)
 	} else {
 		desc = desc + "还缺少收货地址或客户信息\n"
 	}
