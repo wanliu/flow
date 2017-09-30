@@ -257,7 +257,7 @@ func (r OrderResolve) AnswerFooter(no, id interface{}) string {
 	if r.Fulfiled() {
 		desc = desc + r.AddressInfo()
 		desc = desc + "订单已经生成，订单号为：" + fmt.Sprint(no) + "\n"
-		desc = desc + "订单入口: http://wanliu.biz/orders/" + fmt.Sprint(id)
+		desc = desc + "订单入口: http://jiejie.wanliu.biz/order/QueryDetail/" + fmt.Sprint(id)
 	} else {
 		desc = desc + "还缺少收货地址或客户信息\n"
 	}
