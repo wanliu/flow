@@ -191,16 +191,25 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	}
 
 	if r.User == nil {
-		return "无法创建订单，请与工作人员联系！"
-	}
+		// return "无法创建订单，请与工作人员联系！"
+		user := database.User{}
+		order, err := user.CreateSaledOrder(r.Address, r.Note, r.Time, 0, items, gifts)
 
-	order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, items, gifts)
-
-	if err != nil {
-		return err.Error()
+		if err != nil {
+			return err.Error()
+		} else {
+			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.ID, order.GlobelId())
+		}
 	} else {
-		return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.ID, order.GlobelId())
+		order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, items, gifts)
+
+		if err != nil {
+			return err.Error()
+		} else {
+			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.ID, order.GlobelId())
+		}
 	}
+
 }
 
 func (r OrderResolve) AddressInfo() string {
