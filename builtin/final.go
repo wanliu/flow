@@ -2,9 +2,9 @@ package builtin
 
 import (
 	"github.com/oleiade/lane"
-	"log"
+	// "log"
 	"math/rand"
-	"strconv"
+	// "strconv"
 	"sync"
 	"time"
 
