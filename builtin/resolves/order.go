@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/hysios/apiai-go"
-	"github.com/wanliu/brain_data.database"
+	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/ai"
 
 	. "github.com/wanliu/flow/context"
