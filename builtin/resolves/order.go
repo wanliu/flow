@@ -231,9 +231,10 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	variables = variables + "}}"
 
 	requstStr := client.QueryToRequest(mutationStr, variables)
-	res, _ := client.MakeGraphqlRequest(requstStr)
-
-	return r.AnswerHead() + res.AnswerBody() + r.AnswerFooter(res.OrderNo())
+	order, err := r.User.CreateSaledOrder()
+	// res, _ := client.MakeGraphqlRequest(requstStr)
+	return ""
+	// return r.AnswerHead() + res.AnswerBody() + r.AnswerFooter(res.OrderNo())
 }
 
 func (r OrderResolve) AddressInfo() string {
