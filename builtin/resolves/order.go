@@ -10,8 +10,6 @@ import (
 	"github.com/wanliu/flow/builtin/ai"
 
 	. "github.com/wanliu/flow/context"
-
-	client "github.com/wanliu/flow/builtin/graphql_client"
 )
 
 // 处理开单的逻辑结构, 不需要是组件
@@ -175,13 +173,20 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	gifts := make([]database.GiftItem, 0, 0)
 
 	for _, pr := range r.Products.Products {
-		item = database.NewOrderItem("", pr.Product, pr.Product, pr.Price)
+		item, err := database.NewOrderItem("", pr.Product, pr.Product, pr.Price)
+		if err != nil {
+			return err.Error()
+		}
 		items = append(items, item)
 	}
 
 	for _, pr := range r.Gifts.Products {
-		gift = database.NewGiftItem("", pr.Product, pr.Quantity)
-		gifts = append(items, gift)
+		gift, err := database.NewGiftItem("", pr.Product, pr.Quantity)
+		if err != nil {
+			return err.Error()
+		}
+
+		gifts = append(gifts, gift)
 	}
 
 	order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, items, gifts)
