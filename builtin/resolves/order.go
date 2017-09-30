@@ -173,20 +173,21 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	gifts := make([]database.GiftItem, 0, 0)
 
 	for _, pr := range r.Products.Products {
-		item, err := database.NewOrderItem("", pr.Product, pr.Product, pr.Price)
+		 NewOrderItem(productId, proName string, quantity uint, price float64)
+		item, err := database.NewOrderItem("", pr.Product, uint(pr.Quantity), pr.Price)
 		if err != nil {
 			return err.Error()
 		}
-		items = append(items, item)
+		items = append(items, *item)
 	}
 
 	for _, pr := range r.Gifts.Products {
-		gift, err := database.NewGiftItem("", pr.Product, pr.Quantity)
+		gift, err := database.NewGiftItem("", pr.Product, uint(pr.Quantity))
 		if err != nil {
 			return err.Error()
 		}
 
-		gifts = append(gifts, gift)
+		gifts = append(gifts, *gift)
 	}
 
 	order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, items, gifts)
@@ -194,7 +195,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	if err != nil {
 		return err.Error()
 	} else {
-		return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.ID)
+		return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.ID, order.GlobelId())
 	}
 }
 
