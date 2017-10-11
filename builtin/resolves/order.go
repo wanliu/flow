@@ -198,7 +198,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		if err != nil {
 			return err.Error()
 		} else {
-			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.ID, order.GlobelId())
+			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}
 	} else {
 		order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
@@ -206,7 +206,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		if err != nil {
 			return err.Error()
 		} else {
-			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.ID, order.GlobelId())
+			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}
 	}
 
