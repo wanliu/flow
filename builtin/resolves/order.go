@@ -29,6 +29,8 @@ type OrderResolve struct {
 	Editing   bool
 	Canceled  bool
 
+	Id uint
+
 	User *database.User
 }
 
@@ -161,7 +163,7 @@ func (r OrderResolve) EmptyProducts() bool {
 	return len(r.Products.Products) == 0
 }
 
-func (r OrderResolve) Answer() string {
+func (r *OrderResolve) Answer() string {
 	if r.Fulfiled() {
 		return r.PostOrderAndAnswer()
 	} else {
@@ -198,6 +200,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		if err != nil {
 			return err.Error()
 		} else {
+			r.Id = order.ID
 			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}
 	} else {
@@ -206,6 +209,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		if err != nil {
 			return err.Error()
 		} else {
+			r.Id = order.ID
 			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}
 	}

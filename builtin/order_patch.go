@@ -1,8 +1,6 @@
 package builtin
 
 import (
-	// "log"
-
 	. "github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
@@ -30,6 +28,8 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 		curResolve := ctx.Value(CtxKeyOrder).(OrderResolve)
 		patchResolve.Patch(&curResolve)
 
+		output = curResolve.Answer()
+
 		if curResolve.Fulfiled() {
 			ctx.SetValue(CtxKeyOrder, nil)
 			ctx.SetValue(CtxKeyLastOrder, curResolve)
@@ -37,7 +37,6 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 			ctx.SetValue(CtxKeyOrder, curResolve)
 		}
 
-		output = patchResolve.Answer()
 	}
 
 	replyData := ReplyData{output, ctx}

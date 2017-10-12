@@ -55,13 +55,13 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 				cOrder.Customer = customer
 			}
 
+			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer()
+			c.Out <- ReplyData{reply, ctx}
+
 			if cOrder.Fulfiled() {
 				ctx.SetValue(config.CtxKeyOrder, nil)
 				ctx.SetValue(config.CtxKeyLastOrder, cOrder)
 			}
-
-			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer()
-			c.Out <- ReplyData{reply, ctx}
 		} else {
 			var values []string
 

@@ -36,13 +36,13 @@ func (c *OrderCustomer) OnCtx(ctx Context) {
 		cOrder := currentOrder.(OrderResolve)
 		cOrder.Customer = customer
 
+		reply := "收到客户信息：" + customer + "\n" + cOrder.Answer()
+		c.Out <- ReplyData{reply, ctx}
+
 		if cOrder.Fulfiled() {
 			ctx.SetValue(CtxKeyOrder, nil)
 			ctx.SetValue(CtxKeyLastOrder, cOrder)
 		}
-
-		reply := "收到客户信息：" + customer + "\n" + cOrder.Answer()
-		c.Out <- ReplyData{reply, ctx}
 	} else {
 		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx}
 	}
