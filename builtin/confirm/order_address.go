@@ -99,6 +99,8 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 			if len(ac.Values) > 0 {
 				order.Address = ac.Values[0]
 
+				reply := fmt.Sprintf("已经确认\"%v\"为收货地址\n%v", ac.Values[0], order.Answer())
+
 				if order.Fulfiled() {
 					ctx.SetValue(config.CtxKeyOrder, nil)
 					ctx.SetValue(config.CtxKeyLastOrder, order)
@@ -106,7 +108,7 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 					ctx.SetValue(config.CtxKeyOrder, order)
 				}
 
-				return fmt.Sprintf("已经确认\"%v\"为收货地址\n%v", ac.Values[0], order.Answer())
+				return reply
 
 			} else {
 				// ctx.SetValue(config.CtxKeyConfirm, nil)
