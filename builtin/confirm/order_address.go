@@ -82,7 +82,7 @@ func (ac *AddressConfirm) Cancel(ctx context.Context) string {
 	return ""
 }
 
-func (ac *AddressConfirm) Comfirm(ctx context.Context) string {
+func (ac *AddressConfirm) Confirm(ctx context.Context) string {
 	oIn := ctx.Value(config.CtxKeyOrder)
 	// confirm := ctx.Value(config.CtxKeyConfirm)
 
