@@ -52,7 +52,7 @@ func (c *Confirm) OnCancel(ctx Context) {
 	cIn := ctx.Value(config.CtxKeyConfirm)
 
 	if cIn != nil {
-		cfm := &cIn.(confirm.Data)
+		cfm := cIn.(*confirm.Data)
 		reply := cfm.Cancel(ctx)
 		c.Out <- ReplyData{reply, ctx}
 	} else {
