@@ -3,6 +3,7 @@ package builtin
 import (
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
+	"github.com/wanliu/flow/builtin/confirm"
 
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
@@ -74,12 +75,12 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 				values = []string{address, query}
 			}
 
-			addressConfirm := AddressConfirm{Order: &cOrder, Value: values}
+			addressConfirm := confirm.AddressConfirm{Values: values}
 
 			ctx.SetValue(config.CtxKeyConfirm, addressConfirm)
 
 			reply := "收到您的回复:" + query + "\n"
-			reply = reply + "是否将 “" + values[0] + "” 做为收货地址?"
+			reply = reply + addressConfirm.Notice(ctx)
 			c.Out <- ReplyData{reply, ctx}
 		}
 	} else {
