@@ -13,15 +13,15 @@ type AddressConfirm struct {
 	// order  *resolves.OrderResolve
 }
 
-func (ac *AddressConfirm) SetUp(ctx context.Context) {
-	ctx.SetValue(config.CtxKeyConfirm, *ac)
+func (ac AddressConfirm) SetUp(ctx context.Context) {
+	ctx.SetValue(config.CtxKeyConfirm, ac)
 }
 
-func (ac *AddressConfirm) ClearUp(ctx context.Context) {
+func (ac AddressConfirm) ClearUp(ctx context.Context) {
 	ctx.SetValue(config.CtxKeyConfirm, nil)
 }
 
-func (ac *AddressConfirm) Notice(ctx context.Context) string {
+func (ac AddressConfirm) Notice(ctx context.Context) string {
 	oIn := ctx.Value(config.CtxKeyOrder)
 	// confirm := ctx.Value(config.CtxKeyConfirm)
 
@@ -49,7 +49,7 @@ func (ac *AddressConfirm) Notice(ctx context.Context) string {
 	return ""
 }
 
-func (ac *AddressConfirm) Cancel(ctx context.Context) string {
+func (ac AddressConfirm) Cancel(ctx context.Context) string {
 	oIn := ctx.Value(config.CtxKeyOrder)
 	// confirm := ctx.Value(config.CtxKeyConfirm)
 
@@ -82,7 +82,7 @@ func (ac *AddressConfirm) Cancel(ctx context.Context) string {
 	return ""
 }
 
-func (ac *AddressConfirm) Confirm(ctx context.Context) string {
+func (ac AddressConfirm) Confirm(ctx context.Context) string {
 	oIn := ctx.Value(config.CtxKeyOrder)
 	// confirm := ctx.Value(config.CtxKeyConfirm)
 
