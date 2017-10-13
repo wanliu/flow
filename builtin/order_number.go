@@ -30,7 +30,7 @@ func (c *OrderNumber) OnCtx(ctx context.Context) {
 		orderNo := numInt.(string)
 
 		resolveInt := ctx.Value(config.CtxKeyOrderNum)
-		if resolveInt == nil {
+		if resolveInt != nil {
 			resolve := resolveInt.(resolves.OrderNumberResolve)
 			reply := resolve.Resolve(orderNo, ctx)
 			c.Out <- ReplyData{reply, ctx}
