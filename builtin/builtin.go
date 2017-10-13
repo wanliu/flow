@@ -47,6 +47,7 @@ func ComponentList() map[string]func() interface{} {
 	_components["OrderTimeout"] = NewOrderTimeout
 	_components["OrderTouch"] = NewOrderTouch
 	_components["OrderDelete"] = NewOrderDelete
+	_components["OrderNumber"] = NewOrderNumber
 
 	return _components
 }
@@ -303,6 +304,13 @@ func ComponentInfos() map[string]Component {
 		Description: "OrderDelete Component",
 		Icon:        "",
 		Constructor: NewOrderDelete,
+	}
+
+	result["OrderNumber"] = Component{
+		Name:        "OrderNumber",
+		Description: "OrderNumber Component",
+		Icon:        "",
+		Constructor: NewOrderNumber,
 	}
 
 	return result

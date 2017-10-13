@@ -20,7 +20,7 @@ OrderDeleteInt() Out -> Ctx OrderDelete(OrderDelete)
 OrderDelete() Out -> In Reply()
 
 OrderDeleteInt() Next -> Ctx OrderNumberInt(IntentCheck)
-OrderNumberInt() Out -> Ctx OrderNumber(OrderDelete)
+OrderNumberInt() Out -> Ctx OrderNumber(OrderNumber)
 OrderNumber() Out -> In Reply()
 
 OrderNumberInt() Next -> Ctx OrderPrinterInt(IntentCheck)

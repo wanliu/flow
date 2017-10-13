@@ -34,7 +34,7 @@
       "component": "IntentCheck"
     },
     "OrderNumber": {
-      "component": "OrderDelete"
+      "component": "OrderNumber"
     },
     "OrderPrinterInt": {
       "component": "IntentCheck"
