@@ -39,14 +39,14 @@ func (od OrderDelete) Confirm(ctx context.Context) string {
 	}
 
 	if order.Deletable() {
-		return fmt.Sprintf("%v 号订单已经在处理过程中，因此无法删除", od.OrderNo)
-	} else {
 		err = order.Delete()
 		if err == nil {
 			return fmt.Sprintf("%v 号订单删除成功", od.OrderNo)
 		} else {
 			return fmt.Sprintf("%v 号订单删除失败，请访问 http://jiejie.wanliu.biz/orders/%v 进行操作", od.OrderNo, order.GlobelId())
 		}
+	} else {
+		return fmt.Sprintf("%v 号订单已经在处理过程中，因此无法删除", od.OrderNo)
 	}
 
 	return ""
