@@ -24,6 +24,18 @@
     "CancelInt": {
       "component": "IntentCheck"
     },
+    "OrderDeleteInt": {
+      "component": "IntentCheck"
+    },
+    "OrderDelete": {
+      "component": "OrderDelete"
+    },
+    "OrderNumberInt": {
+      "component": "IntentCheck"
+    },
+    "OrderNumber": {
+      "component": "OrderDelete"
+    },
     "OrderPrinterInt": {
       "component": "IntentCheck"
     },
@@ -155,6 +167,66 @@
     {
       "src": {
         "process": "CancelInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderDeleteInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderDeleteInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderDelete",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderDelete",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderDeleteInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderNumberInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderNumberInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderNumber",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderNumber",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderNumberInt",
         "port": "Next"
       },
       "tgt": {
@@ -439,6 +511,34 @@
       "data": 0.5,
       "tgt": {
         "process": "CancelInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.order.delete",
+      "tgt": {
+        "process": "OrderDeleteInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OrderDeleteInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.order.number",
+      "tgt": {
+        "process": "OrderNumberInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OrderNumberInt",
         "port": "Score"
       }
     },
