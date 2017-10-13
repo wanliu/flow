@@ -14,11 +14,6 @@ type Product struct {
 	Number int
 }
 
-type ReplyData struct {
-	Reply string
-	Ctx   Context
-}
-
 type TryGetProducts struct {
 	TryGetEntities
 	Ctx  <-chan Context

@@ -1,11 +1,12 @@
 package builtin
 
 import (
-	"fmt"
+	// "fmt"
 	"time"
 
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/config"
+	"github.com/wanliu/flow/builtin/confirm"
 	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
 
@@ -23,7 +24,7 @@ type OrderCancel struct {
 	Out chan<- ReplyData
 }
 
-func (s *OrderCancel) OnCtx(ctx context.Context) {
+func (c *OrderCancel) OnCtx(ctx context.Context) {
 	currentOrder := ctx.Value(config.CtxKeyOrder)
 
 	if nil == currentOrder {
@@ -34,40 +35,39 @@ func (s *OrderCancel) OnCtx(ctx context.Context) {
 
 			eTime := time.Now().Add(-config.PreModifSecs * time.Second)
 			if preOrder.UpdatedAt.After(eTime) || preOrder.UpdatedAt.Equal(eTime) {
-				// TODO delete the last order
+
 				if preOrder.Id != 0 {
 					order, err := database.GetOrder(preOrder.Id)
 					if err == nil {
 						orderNo := order.No
-						err = order.Delete()
-						if err == nil {
-							ctx.SetValue(config.CtxKeyLastOrder, nil)
+						deleteComfirm := confirm.OrderDelete{OrderNo: orderNo}
 
-							msg := fmt.Sprintf("成功删除订单号为：%v 的订单", orderNo)
-							s.Out <- ReplyData{msg, ctx}
-							return
-						}
+						deleteComfirm.SetUp(ctx)
+
+						notice := deleteComfirm.Notice(ctx)
+						c.Out <- ReplyData{notice, ctx}
+						return
 					}
-
-					s.Out <- ReplyData{fmt.Sprintf("订单取消失败: %v", err.Error()), ctx}
-					return
 				}
 			}
 		}
 
-		s.Out <- ReplyData{"没有可以取消的订单", ctx}
+		deleteResolve := resolves.OrderDeleteResolve{}
+		deleteResolve.SetUp(ctx)
+
+		c.Out <- ReplyData{deleteResolve.Hint(), ctx}
 	} else {
 		curOrder := currentOrder.(resolves.OrderResolve)
 
 		if curOrder.Cancelable() {
 			if curOrder.Cancel() {
 				ctx.SetValue(config.CtxKeyOrder, nil)
-				s.Out <- ReplyData{"当前订单取消成功", ctx}
+				c.Out <- ReplyData{"当前订单取消成功", ctx}
 			} else {
-				s.Out <- ReplyData{"很抱歉，订单取消失败！请联系客服处理", ctx}
+				c.Out <- ReplyData{"很抱歉，订单取消失败！请联系客服处理", ctx}
 			}
 		} else {
-			s.Out <- ReplyData{"没有可以取消的订单", ctx}
+			c.Out <- ReplyData{"没有可以取消的订单", ctx}
 		}
 	}
 }

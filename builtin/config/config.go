@@ -14,4 +14,5 @@ const (
 	CtxKeyLastOrder      = "LastOrder"
 	CtxkeyResult         = "Result"
 	CtxKeyConfirm        = "Confirm"
+	CtxKeyOrderDel       = "OrderDel"
 )

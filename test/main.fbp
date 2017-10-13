@@ -15,7 +15,15 @@ ConfirmInt() Next -> Ctx CancelInt(IntentCheck)
 CancelInt() Out -> Cancel Confirm()
 CancelInt() FlowOut -> Expire Confirm()
 
-CancelInt() Next -> Ctx OrderPrinterInt(IntentCheck)
+CancelInt() Next -> Ctx OrderDeleteInt(IntentCheck)
+OrderDeleteInt() Out -> Ctx OrderDelete(OrderDelete)
+OrderDelete() Out -> In Reply()
+
+OrderDeleteInt() Next -> Ctx OrderNumberInt(IntentCheck)
+OrderNumberInt() Out -> Ctx OrderNumber(OrderDelete)
+OrderNumber() Out -> In Reply()
+
+OrderNumberInt() Next -> Ctx OrderPrinterInt(IntentCheck)
 OrderPrinterInt() Out -> Ctx OrderPrinter(OrderPrinter)
 OrderPrinter() Out -> In Reply()
 
@@ -59,6 +67,12 @@ Voice(Voice) Out -> In Reply()
 'buiness.cancel' -> Intent CancelInt()
 true -> Flow CancelInt()
 0.5 -> Score CancelInt()
+
+'business.order.delete' -> Intent OrderDeleteInt()
+0.7 -> Score OrderDeleteInt()
+
+'business.order.number' -> Intent OrderNumberInt()
+0.7 -> Score OrderNumberInt()
 
 'business.order.create.address' -> Intent AdressInt()
 0.1 -> Score AdressInt()

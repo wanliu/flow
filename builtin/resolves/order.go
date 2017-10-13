@@ -16,14 +16,14 @@ import (
 // 处理开单的逻辑结构, 不需要是组件
 // 作为context的一个部分，或者存在一个Value中
 type OrderResolve struct {
-	AiParams  ai.AiOrder
-	Products  ItemsResolve
-	Gifts     ItemsResolve
-	Address   string
-	Customer  string
-	Time      time.Time
-	DefTime   string
-	Current   Resolve
+	AiParams ai.AiOrder
+	Products ItemsResolve
+	Gifts    ItemsResolve
+	Address  string
+	Customer string
+	Time     time.Time
+	DefTime  string
+	// Current   Resolve
 	Note      string
 	UpdatedAt time.Time
 	Editing   bool
