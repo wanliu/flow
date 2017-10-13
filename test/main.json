@@ -15,7 +15,7 @@
     "ConfirmInt": {
       "component": "IntentCheck"
     },
-    "AddressConfirm": {
+    "Confirm": {
       "component": "Confirm"
     },
     "Reply": {
@@ -108,13 +108,13 @@
         "port": "Out"
       },
       "tgt": {
-        "process": "AddressConfirm",
+        "process": "Confirm",
         "port": "Confirm"
       }
     },
     {
       "src": {
-        "process": "AddressConfirm",
+        "process": "Confirm",
         "port": "Out"
       },
       "tgt": {
@@ -138,7 +138,7 @@
         "port": "Out"
       },
       "tgt": {
-        "process": "AddressConfirm",
+        "process": "Confirm",
         "port": "Cancel"
       }
     },
@@ -148,7 +148,7 @@
         "port": "FlowOut"
       },
       "tgt": {
-        "process": "AddressConfirm",
+        "process": "Confirm",
         "port": "Expire"
       }
     },
@@ -405,7 +405,7 @@
       }
     },
     {
-      "data": "buiness.order.address.confirm",
+      "data": "buiness.confirm",
       "tgt": {
         "process": "ConfirmInt",
         "port": "Intent"
@@ -419,7 +419,7 @@
       }
     },
     {
-      "data": "buiness.order.address.cancel",
+      "data": "buiness.cancel",
       "tgt": {
         "process": "CancelInt",
         "port": "Intent"
