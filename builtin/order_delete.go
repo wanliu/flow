@@ -30,27 +30,36 @@ func (c *OrderDelete) OnCtx(ctx context.Context) {
 
 	if numInt, exist := aiResult.Params["order-numder"]; exist {
 		orderNo := numInt.(string)
-		order, err := database.GetOrderByNo(orderNo)
-
-		if err != nil {
-			reply := fmt.Sprintf("找不到订单号为 %v 的订单", orderNo)
-			c.Out <- ReplyData{reply, ctx}
+		if orderNo == "" {
+			c.setupResolve(ctx)
 		} else {
-			reply := ""
 
-			err = order.Delete()
-			if err == nil {
-				reply = fmt.Sprintf("%v 号订单删除成功", orderNo)
+			order, err := database.GetOrderByNo(orderNo)
+
+			if err != nil {
+				reply := fmt.Sprintf("找不到订单号为 %v 的订单", orderNo)
+				c.Out <- ReplyData{reply, ctx}
 			} else {
-				reply = fmt.Sprintf("%v 号订单删除失败，请访问 http://jiejie.wanliu.biz/orders/%v 进行操作", orderNo, order.GlobelId())
-			}
+				reply := ""
 
-			c.Out <- ReplyData{reply, ctx}
+				err = order.Delete()
+				if err == nil {
+					reply = fmt.Sprintf("%v 号订单删除成功", orderNo)
+				} else {
+					reply = fmt.Sprintf("%v 号订单删除失败，请访问 http://jiejie.wanliu.biz/orders/%v 进行操作", orderNo, order.GlobelId())
+				}
+
+				c.Out <- ReplyData{reply, ctx}
+			}
 		}
 	} else {
-		deleteResolve := resolves.OrderDeleteResolve{}
-		deleteResolve.SetUp(ctx)
-
-		c.Out <- ReplyData{deleteResolve.Hint(), ctx}
+		c.setupResolve(ctx)
 	}
+}
+
+func (c *OrderDelete) setupResolve(ctx context.Context) {
+	deleteResolve := resolves.OrderDeleteResolve{}
+	deleteResolve.SetUp(ctx)
+
+	c.Out <- ReplyData{deleteResolve.Hint(), ctx}
 }
