@@ -176,7 +176,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	gifts := make([]database.GiftItem, 0, 0)
 
 	for _, pr := range r.Products.Products {
-		item, err := database.NewOrderItem("", pr.Product, uint(pr.Quantity), pr.Price)
+		item, err := database.NewOrderItem("", pr.Product, uint(pr.Quantity), "", pr.Price)
 		if err != nil {
 			return err.Error()
 		}
@@ -184,7 +184,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	}
 
 	for _, pr := range r.Gifts.Products {
-		gift, err := database.NewGiftItem("", pr.Product, uint(pr.Quantity))
+		gift, err := database.NewGiftItem("", pr.Product, uint(pr.Quantity), "")
 		if err != nil {
 			return err.Error()
 		}
