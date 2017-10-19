@@ -8,6 +8,7 @@ type Item struct {
 	Product     string
 	Quantity    int
 	Price       float64
+	Unit        string
 	ResolveList []string
 }
 

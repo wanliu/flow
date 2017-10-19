@@ -168,6 +168,13 @@ func (aa ApiAiOrder) ExtractQuantities(t string) []Item {
 				qf := q.(float64)
 				item := Item{Quantity: int(qf)}
 				result = append(result, item)
+			case map[string]interface{}:
+				log.Panicf("....... quantity .........")
+				qf := t["number"].(int)
+				quantity := int(qf)
+				unit := t["unit"].(string)
+				item := Item{Quantity: quantity, Unit: unit}
+				result = append(result, item)
 			default:
 				log.Println("Unknown Quantity type: %v", t)
 			}

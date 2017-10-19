@@ -100,12 +100,15 @@ func (r *OrderResolve) ExtractFromParams() {
 func (r *OrderResolve) ExtractItems() {
 	for _, i := range r.AiParams.Items() {
 		name := strings.Replace(i.Product, "%", "%%", -1)
+		unit := strings.Replace(i.Unit, " ", "", -1)
+
 		item := &ItemResolve{
 			Resolved: true,
 			Name:     name,
 			Price:    i.Price,
 			Quantity: i.Quantity,
 			Product:  name,
+			Unit:     unit,
 		}
 
 		r.Products.Products = append(r.Products.Products, item)
@@ -115,12 +118,15 @@ func (r *OrderResolve) ExtractItems() {
 func (r *OrderResolve) ExtractGiftItems() {
 	for _, i := range r.AiParams.GiftItems() {
 		name := strings.Replace(i.Product, "%", "%%", -1)
+		unit := strings.Replace(i.Unit, " ", "", -1)
+
 		item := &ItemResolve{
 			Resolved: true,
 			Name:     name,
 			Price:    i.Price,
 			Quantity: i.Quantity,
 			Product:  name,
+			Unit:     unit,
 		}
 
 		r.Gifts.Products = append(r.Gifts.Products, item)
@@ -176,7 +182,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	gifts := make([]database.GiftItem, 0, 0)
 
 	for _, pr := range r.Products.Products {
-		item, err := database.NewOrderItem("", pr.Product, uint(pr.Quantity), "", pr.Price)
+		item, err := database.NewOrderItem("", pr.Product, uint(pr.Quantity), pr.Unit, pr.Price)
 		if err != nil {
 			return err.Error()
 		}
@@ -184,7 +190,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	}
 
 	for _, pr := range r.Gifts.Products {
-		gift, err := database.NewGiftItem("", pr.Product, uint(pr.Quantity), "")
+		gift, err := database.NewGiftItem("", pr.Product, uint(pr.Quantity), pr.Unit)
 		if err != nil {
 			return err.Error()
 		}
@@ -255,7 +261,7 @@ func (r OrderResolve) AnswerBody() string {
 		desc = desc + "申请的赠品:\n"
 
 		for _, g := range r.Gifts.Products {
-			desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + "件\n"
+			desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + g.Unit + "\n"
 		}
 	}
 
