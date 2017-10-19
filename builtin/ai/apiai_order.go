@@ -169,7 +169,7 @@ func (aa ApiAiOrder) ExtractQuantities(t string) []Item {
 				item := Item{Quantity: int(qf)}
 				result = append(result, item)
 			case map[string]interface{}:
-				log.Panicf("....... quantity .........")
+				log.Printf("....... quantity .........")
 				qf := t["number"].(int)
 				quantity := int(qf)
 				unit := t["unit"].(string)
