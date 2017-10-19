@@ -59,7 +59,7 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer()
 			c.Out <- ReplyData{reply, ctx}
 
-			if cOrder.Fulfiled() {
+			if cOrder.Resolved() {
 				ctx.SetValue(config.CtxKeyOrder, nil)
 				ctx.SetValue(config.CtxKeyLastOrder, cOrder)
 			}

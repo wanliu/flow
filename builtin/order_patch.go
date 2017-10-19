@@ -30,7 +30,7 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 
 		output = curResolve.Answer()
 
-		if curResolve.Fulfiled() {
+		if curResolve.Resolved() {
 			ctx.SetValue(CtxKeyOrder, nil)
 			ctx.SetValue(CtxKeyLastOrder, curResolve)
 		} else {

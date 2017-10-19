@@ -9,7 +9,7 @@ import (
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/ai"
-	. "github.com/wanliu/flow/builtin/config"
+	"github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/context"
 )
 
@@ -60,7 +60,7 @@ func (r PatchOrderResolve) Answer() string {
 		return "ERROR"
 	}
 
-	shtMns := PatchShortMinutes
+	shtMns := config.PatchShortMinutes
 
 	if r.Origin.Fulfiled() {
 		return r.LongAnswer()

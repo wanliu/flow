@@ -1,11 +1,6 @@
 package resolves
 
-import (
-// "strconv"
-// "strings"
-
-// "github.com/hysios/apiai-go"
-)
+import ()
 
 type ItemsResolve struct {
 	Products []*ItemResolve

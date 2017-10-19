@@ -24,10 +24,11 @@ type OrderResolve struct {
 	Time     time.Time
 	DefTime  string
 	// Current   Resolve
-	Note      string
-	UpdatedAt time.Time
-	Editing   bool
-	Canceled  bool
+	Note       string
+	UpdatedAt  time.Time
+	Editing    bool
+	Canceled   bool
+	IsResolved bool
 
 	Id uint
 
@@ -74,8 +75,14 @@ func (r *OrderResolve) Cancel() bool {
 	return true
 }
 
+// 是否达到可以生成订单的条件
 func (r OrderResolve) Fulfiled() bool {
 	return len(r.Products.Products) > 0 && (r.Address != "" || r.Customer != "")
+}
+
+// 是否已经成功生成订单
+func (c OrderResolve) Resolved() bool {
+	return c.IsResolved
 }
 
 func (r OrderResolve) Expired(expireMin int) bool {
@@ -206,6 +213,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		if err != nil {
 			return err.Error()
 		} else {
+			r.IsResolved = true
 			r.Id = order.ID
 			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}
@@ -215,6 +223,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		if err != nil {
 			return err.Error()
 		} else {
+			r.IsResolved = true
 			r.Id = order.ID
 			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}

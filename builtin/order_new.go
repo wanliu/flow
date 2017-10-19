@@ -39,8 +39,9 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 	} else {
 		output = orderResolve.Answer()
 
-		if orderResolve.Fulfiled() {
+		if orderResolve.Resolved() {
 			ctx.SetValue(config.CtxKeyLastOrder, *orderResolve)
+			ctx.SetValue(config.CtxKeyOrder, nil)
 		} else {
 			ctx.SetValue(config.CtxKeyOrder, *orderResolve)
 		}
