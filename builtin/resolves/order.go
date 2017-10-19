@@ -29,6 +29,7 @@ type OrderResolve struct {
 	Editing    bool
 	Canceled   bool
 	IsResolved bool
+	IsFailed   bool
 
 	Id uint
 
@@ -83,6 +84,10 @@ func (r OrderResolve) Fulfiled() bool {
 // 是否已经成功生成订单
 func (c OrderResolve) Resolved() bool {
 	return c.IsResolved
+}
+
+func (c OrderResolve) Failed() bool {
+	return c.IsFailed
 }
 
 func (r OrderResolve) Expired(expireMin int) bool {
@@ -191,7 +196,8 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	for _, pr := range r.Products.Products {
 		item, err := database.NewOrderItem("", pr.Product, uint(pr.Quantity), pr.Unit, pr.Price)
 		if err != nil {
-			return err.Error()
+			r.IsFailed = true
+			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		}
 		items = append(items, *item)
 	}
@@ -199,7 +205,8 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	for _, pr := range r.Gifts.Products {
 		gift, err := database.NewGiftItem("", pr.Product, uint(pr.Quantity), pr.Unit)
 		if err != nil {
-			return err.Error()
+			r.IsFailed = true
+			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		}
 
 		gifts = append(gifts, *gift)
@@ -211,6 +218,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		order, err := user.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
 
 		if err != nil {
+			r.IsFailed = true
 			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true
@@ -221,6 +229,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
 
 		if err != nil {
+			r.IsFailed = true
 			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true

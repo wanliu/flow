@@ -104,6 +104,8 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 				if order.Resolved() {
 					ctx.SetValue(config.CtxKeyOrder, nil)
 					ctx.SetValue(config.CtxKeyLastOrder, order)
+				} else if order.Failed() {
+					ctx.SetValue(config.CtxKeyOrder, nil)
 				} else {
 					ctx.SetValue(config.CtxKeyOrder, order)
 				}

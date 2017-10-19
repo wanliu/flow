@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	. "github.com/wanliu/flow/builtin/config"
+	"github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
 )
@@ -25,16 +25,18 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 	if patchResolve.EmptyProducts() {
 		output = "没有相关的产品"
 	} else {
-		curResolve := ctx.Value(CtxKeyOrder).(OrderResolve)
+		curResolve := ctx.Value(config.CtxKeyOrder).(OrderResolve)
 		patchResolve.Patch(&curResolve)
 
 		output = curResolve.Answer()
 
 		if curResolve.Resolved() {
-			ctx.SetValue(CtxKeyOrder, nil)
-			ctx.SetValue(CtxKeyLastOrder, curResolve)
+			ctx.SetValue(config.CtxKeyOrder, nil)
+			ctx.SetValue(config.CtxKeyLastOrder, curResolve)
+		} else if curResolve.Failed() {
+			ctx.SetValue(config.CtxKeyOrder, nil)
 		} else {
-			ctx.SetValue(CtxKeyOrder, curResolve)
+			ctx.SetValue(config.CtxKeyOrder, curResolve)
 		}
 
 	}

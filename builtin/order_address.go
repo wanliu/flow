@@ -62,6 +62,8 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 			if cOrder.Resolved() {
 				ctx.SetValue(config.CtxKeyOrder, nil)
 				ctx.SetValue(config.CtxKeyLastOrder, cOrder)
+			} else if cOrder.Failed() {
+				ctx.SetValue(config.CtxKeyOrder, nil)
 			}
 		} else {
 			var values []string
