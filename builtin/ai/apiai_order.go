@@ -29,6 +29,7 @@ func (aa ApiAiOrder) Items() []Item {
 	for i, q := range quantities {
 		if len(products) >= i+1 {
 			products[i].Quantity = q.Quantity
+			products[i].Unit = q.Unit
 		}
 	}
 
@@ -50,6 +51,7 @@ func (aa ApiAiOrder) GiftItems() []Item {
 	for i, q := range quantities {
 		if len(gifts) >= i+1 {
 			gifts[i].Quantity = q.Quantity
+			products[i].Unit = q.Unit
 		}
 	}
 
