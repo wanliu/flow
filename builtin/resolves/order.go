@@ -254,7 +254,7 @@ func (r OrderResolve) AnswerBody() string {
 	desc := ""
 
 	for _, p := range r.Products.Products {
-		desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + "件\n"
+		desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + p.Unit + "\n"
 	}
 
 	if len(r.Gifts.Products) > 0 {
