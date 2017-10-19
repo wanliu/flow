@@ -211,7 +211,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		order, err := user.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
 
 		if err != nil {
-			return err.Error()
+			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true
 			r.Id = order.ID
@@ -221,7 +221,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
 
 		if err != nil {
-			return err.Error()
+			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true
 			r.Id = order.ID
