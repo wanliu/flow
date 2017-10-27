@@ -8,6 +8,7 @@ import (
 
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/brain_data/database"
+	"github.com/wanliu/brain_data/wrapper"
 	"github.com/wanliu/flow/builtin/ai"
 
 	. "github.com/wanliu/flow/context"
@@ -214,8 +215,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 
 	if r.User == nil {
 		// return "无法创建订单，请与工作人员联系！"
-		user := database.User{}
-		order, err := user.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
+		order, err := wrapper.CreateOrder(r.Address, r.Note, r.Time, 0, 0, 0, items, gifts)
 
 		if err != nil {
 			r.IsFailed = true
@@ -226,7 +226,8 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}
 	} else {
-		order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
+		// order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
+		order, err := wrapper.CreateOrder(r.Address, r.Note, r.Time, 0, r.User.ID, 0, items, gifts)
 
 		if err != nil {
 			r.IsFailed = true
