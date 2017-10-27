@@ -1,8 +1,9 @@
-INPORT=Ai.In:Text
+INPORT=TextProc.In:Text
 INPORT=Ai.Ctx:Ctx
 INPORT=Voice.In:Voice
 
-Ai(ApiAi) Out -> Ctx CM(ContextManager)
+TextProc(TextPreprocesor) Out -> In Ai(ApiAi)
+Ai() Out -> Ctx CM(ContextManager)
 
 CM() Process -> Ctx OrderTouch(OrderTouch)
 OrderTouch() Timeout -> Ctx OrderTimeout(OrderTimeout)

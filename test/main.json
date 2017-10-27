@@ -1,5 +1,8 @@
 {
   "processes": {
+    "TextProc": {
+      "component": "TextPreprocesor"
+    },
     "Ai": {
       "component": "ApiAi"
     },
@@ -74,6 +77,16 @@
     }
   },
   "connections": [
+    {
+      "src": {
+        "process": "TextProc",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Ai",
+        "port": "In"
+      }
+    },
     {
       "src": {
         "process": "Ai",
@@ -608,7 +621,7 @@
   ],
   "inports": {
     "Text": {
-      "process": "Ai",
+      "process": "TextProc",
       "port": "In"
     },
     "Ctx": {
