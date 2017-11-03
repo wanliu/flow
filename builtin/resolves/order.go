@@ -26,6 +26,7 @@ type OrderResolve struct {
 	DefTime  string
 	// Current   Resolve
 	Note       string
+	Storehouse string
 	UpdatedAt  time.Time
 	Editing    bool
 	Canceled   bool
@@ -215,7 +216,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 
 	if r.User == nil {
 		// return "无法创建订单，请与工作人员联系！"
-		order, err := wrapper.CreateOrder(r.Address, r.Note, r.Time, 0, 0, 0, items, gifts)
+		order, err := wrapper.CreateFlowOrder(r.Address, r.Note, r.Time, r.Customer, 0, r.Storehouse, items, gifts)
 
 		if err != nil {
 			r.IsFailed = true
@@ -227,7 +228,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 		}
 	} else {
 		// order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
-		order, err := wrapper.CreateOrder(r.Address, r.Note, r.Time, 0, r.User.ID, 0, items, gifts)
+		order, err := wrapper.CreateFlowOrder(r.Address, r.Note, r.Time, r.Customer, r.User.ID, r.Storehouse, items, gifts)
 
 		if err != nil {
 			r.IsFailed = true
@@ -238,7 +239,6 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}
 	}
-
 }
 
 func (r OrderResolve) AddressInfo() string {
