@@ -35,7 +35,8 @@ func NewTextPreprocesor() interface{} {
 }
 
 func (c *TextPreprocesor) OnIn(input string) {
-	output := numberAfterLetter(input)
+	output := atFilter(input)
+	output = numberAfterLetter(output)
 	output = dateTransfer(output)
 	output = dictTransfer(output)
 	c.Out <- output
@@ -89,6 +90,18 @@ func dateTransfer(s string) string {
 func dictTransfer(s string) string {
 	for k, v := range REPLACE_DICT {
 		s = strings.Replace(s, k, v, -1)
+	}
+
+	return s
+}
+
+func atFilter(s string) string {
+	r := regexp.MustCompile("^@[\u4e00-\u9fa5\\w]+\\s")
+	is := r.FindStringIndex(s)
+
+	if len(is) == 2 {
+		i := is[1]
+		s = s[i:]
 	}
 
 	return s
