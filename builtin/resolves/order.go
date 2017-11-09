@@ -35,7 +35,8 @@ type OrderResolve struct {
 
 	Id uint
 
-	User *database.User
+	User       *database.User
+	BrainOrder *database.Order
 }
 
 func NewOrderResolve(ctx Context) *OrderResolve {
@@ -223,6 +224,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true
+			r.BrainOrder = &order
 			r.Id = order.ID
 			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}
@@ -235,6 +237,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true
+			r.BrainOrder = &order
 			r.Id = order.ID
 			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(order.No, order.GlobelId())
 		}
@@ -272,22 +275,46 @@ func (r OrderResolve) AnswerHead() string {
 func (r OrderResolve) AnswerBody() string {
 	desc := ""
 
-	for _, p := range r.Products.Products {
-		desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + p.Unit + "\n"
-	}
-
-	if len(r.Gifts.Products) > 0 {
-		desc = desc + "申请的赠品:\n"
-
-		for _, g := range r.Gifts.Products {
-			desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + g.Unit + "\n"
+	if r.IsResolved && r.BrainOrder != nil {
+		for _, i := range r.BrainOrder.OrderItems {
+			desc = desc + fmt.Sprintf("%v %v %v\n", i.ProductName, i.Quantity, i.Unit)
 		}
-	}
 
-	desc = desc + "时间:" + r.Time.Format("2006年01月02日") + "\n"
+		if len(r.BrainOrder.GiftItems) > 0 {
+			desc = desc + "申请的赠品:\n"
 
-	if r.Note != "" {
-		desc = desc + "备注：" + r.Note + "\n"
+			for _, g := range r.BrainOrder.GiftItems {
+				desc = desc + fmt.Sprintf("%v %v %v\n", g.ProductName, g.Quantity, g.Unit)
+			}
+		}
+
+		desc = desc + fmt.Sprintf("时间:%v\n", r.BrainOrder.DeliveryTime.Format("2006年01月02日"))
+
+		if r.BrainOrder.Note != "" {
+			desc = desc + "备注：" + r.BrainOrder.Note + "\n"
+		}
+	} else {
+		for _, p := range r.Products.Products {
+			// desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + p.Unit + "\n"
+			desc = desc + fmt.Sprintf("%v %v %v\n", p.Product, p.Quantity, p.Unit)
+
+		}
+
+		if len(r.Gifts.Products) > 0 {
+			desc = desc + "申请的赠品:\n"
+
+			for _, g := range r.Gifts.Products {
+				// desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + g.Unit + "\n"
+				desc = desc + fmt.Sprintf("%v %v %v\n", g.Product, g.Quantity, g.Unit)
+			}
+		}
+
+		// desc = desc + "时间:" + r.Time.Format("2006年01月02日") + "\n"
+		desc = desc + fmt.Sprintf("时间:%v\n", r.Time.Format("2006年01月02日"))
+
+		if r.Note != "" {
+			desc = desc + "备注：" + r.Note + "\n"
+		}
 	}
 
 	return desc
