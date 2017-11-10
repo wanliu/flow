@@ -98,7 +98,7 @@ func dictTransfer(s string) string {
 }
 
 func atFilter(s string) string {
-	r := regexp.MustCompile("^@[\u4e00-\u9fa5\\w]+\\s")
+	r := regexp.MustCompile("^@[\u4e00-\u9fa5\\w]+[\\s\u2005]")
 	is := r.FindStringIndex(s)
 
 	if len(is) == 2 {
