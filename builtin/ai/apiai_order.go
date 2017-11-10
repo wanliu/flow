@@ -177,6 +177,8 @@ func (aa ApiAiOrder) ExtractQuantities(t string) []Item {
 				item := Item{Quantity: quantity}
 
 				if unit, ok := t["unit"].(string); ok {
+					unit = strings.Replace(unit, "龘", "", -1)
+					unit = strings.Replace(unit, " ", "", -1)
 					item.Unit = unit
 				}
 

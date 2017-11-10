@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -39,6 +40,7 @@ func (c *TextPreprocesor) OnIn(input string) {
 	output = numberAfterLetter(output)
 	output = dateTransfer(output)
 	output = dictTransfer(output)
+	output = replaceUnit(output)
 	c.Out <- output
 }
 
@@ -102,6 +104,27 @@ func atFilter(s string) string {
 	if len(is) == 2 {
 		i := is[1]
 		s = s[i:]
+	}
+
+	return s
+}
+
+// 件 条 个 支 => 龘件 龘条 龘个 龘支
+func replaceUnit(s string) string {
+	palceholder := "龘"
+	units := []string{
+		"件", "条", "个", "支",
+	}
+
+	for _, unit := range units {
+		r := regexp.MustCompile("\\d" + unit)
+		is := r.FindStringIndex(s)
+		for len(is) == 2 {
+			total := is[1] - is[0]
+			unitlen := len(unit)
+			s = fmt.Sprintf("%v%v%v", s[:is[0]+total-unitlen], palceholder, s[is[1]-unitlen:])
+			is = r.FindStringIndex(s)
+		}
 	}
 
 	return s
