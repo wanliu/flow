@@ -117,7 +117,7 @@ func replaceUnit(s string) string {
 	}
 
 	for _, unit := range units {
-		r := regexp.MustCompile("\\d\\s*" + unit)
+		r := regexp.MustCompile("[\\d一二三四五六七八九十零]\\s*" + unit)
 		is := r.FindStringIndex(s)
 		for len(is) == 2 {
 			total := is[1] - is[0]
