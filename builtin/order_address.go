@@ -45,18 +45,19 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 		params := ai.ApiAiOrder{AiResult: aiResult}
 
 		if c.confirmScore != 0 && params.Score() >= c.confirmScore {
-			address := params.Address()
+			// address := params.Address()
 			customer := params.Customer()
 
-			if address != "" {
-				cOrder.Address = address
-			}
+			// if address != "" {
+			// 	cOrder.Address = address
+			// }
 
 			if customer != "" {
 				cOrder.Customer = customer
 			}
 
-			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer()
+			// reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer()
+			reply := "收到客户信息：" + customer + "\n" + cOrder.Answer()
 			c.Out <- ReplyData{reply, ctx}
 
 			if cOrder.Resolved() {
@@ -69,13 +70,14 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 			var values []string
 
 			query := params.Query()
-			address := params.Address() + params.Customer()
+			// address := params.Address() + params.Customer()
+			customer := params.Customer()
 
-			if address == "" {
-				values = []string{query}
-			} else {
-				values = []string{address, query}
-			}
+			// if address == "" {
+			// 	values = []string{query}
+			// } else {
+			values = []string{customer, query}
+			// }
 
 			addressConfirm := confirm.AddressConfirm{Values: values}
 
@@ -86,6 +88,6 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 			c.Out <- ReplyData{reply, ctx}
 		}
 	} else {
-		c.Out <- ReplyData{"地址输入无效，当前没有正在进行中的订单", ctx}
+		c.Out <- ReplyData{"客户/地址输入无效，当前没有正在进行中的订单", ctx}
 	}
 }

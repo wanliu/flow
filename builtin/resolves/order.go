@@ -81,7 +81,8 @@ func (r *OrderResolve) Cancel() bool {
 
 // 是否达到可以生成订单的条件
 func (r OrderResolve) Fulfiled() bool {
-	return len(r.Products.Products) > 0 && (r.Address != "" || r.Customer != "")
+	// return len(r.Products.Products) > 0 && (r.Address != "" || r.Customer != "")
+	return len(r.Products.Products) > 0 && r.Customer != ""
 }
 
 // 是否已经成功生成订单
@@ -245,11 +246,12 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 }
 
 func (r OrderResolve) AddressInfo() string {
-	if r.Address != "" && r.Customer != "" {
-		return "地址:" + r.Address + r.Customer + "\n"
-	} else if r.Address != "" {
-		return "地址:" + r.Address + "\n"
-	} else if r.Customer != "" {
+	// if r.Address != "" && r.Customer != "" {
+	// 	return "地址:" + r.Address + r.Customer + "\n"
+	// } else if r.Address != "" {
+	// 	return "地址:" + r.Address + "\n"
+	// } else if r.Customer != "" {
+	if r.Customer != "" {
 		return "客户:" + r.Customer + "\n"
 	} else {
 		return ""
@@ -328,7 +330,7 @@ func (r OrderResolve) AnswerFooter(no, id interface{}) string {
 		desc = desc + "订单已经生成，订单号为：" + fmt.Sprint(no) + "\n"
 		desc = desc + "订单入口: http://jiejie.wanliu.biz/order/QueryDetail/" + fmt.Sprint(id)
 	} else {
-		desc = desc + "还缺少收货地址或客户信息\n"
+		desc = desc + "还缺少客户信息\n"
 	}
 
 	return desc
