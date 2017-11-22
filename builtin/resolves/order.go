@@ -17,21 +17,22 @@ import (
 // 处理开单的逻辑结构, 不需要是组件
 // 作为context的一个部分，或者存在一个Value中
 type OrderResolve struct {
-	AiParams ai.AiOrder
-	Products ItemsResolve
-	Gifts    ItemsResolve
-	Address  string
-	Customer string
-	Time     time.Time
-	DefTime  string
+	AiParams          ai.AiOrder
+	Products          ItemsResolve
+	Gifts             ItemsResolve
+	Address           string
+	ExtractedCustomer string
+	Customer          string
+	Time              time.Time
+	DefTime           string
+	Note              string
+	Storehouse        string
+	UpdatedAt         time.Time
+	Editing           bool
+	Canceled          bool
+	IsResolved        bool
+	IsFailed          bool
 	// Current   Resolve
-	Note       string
-	Storehouse string
-	UpdatedAt  time.Time
-	Editing    bool
-	Canceled   bool
-	IsResolved bool
-	IsFailed   bool
 
 	Id uint
 
@@ -153,7 +154,17 @@ func (r *OrderResolve) ExtractAddress() {
 }
 
 func (r *OrderResolve) ExtractCustomer() {
-	r.Customer = r.AiParams.Customer()
+	r.ExtractedCustomer = r.AiParams.Customer()
+
+	if r.ExtractedCustomer != "" {
+		var count int
+
+		database.DB.Where(&database.People{}, "name = ?", r.ExtractedCustomer).Count(&count)
+
+		if count > 0 {
+			r.Customer = r.ExtractedCustomer
+		}
+	}
 }
 
 func (r *OrderResolve) ExtractTime() {
@@ -328,7 +339,11 @@ func (r OrderResolve) AnswerFooter(no, id interface{}) string {
 		desc = desc + "订单已经生成，订单号为：" + fmt.Sprint(no) + "\n"
 		desc = desc + "订单入口: http://jiejie.wanliu.biz/order/QueryDetail/" + fmt.Sprint(id)
 	} else {
-		desc = desc + "还缺少收货地址或客户信息\n"
+		if r.ExtractedCustomer != "" && r.Customer == "" {
+			desc = desc + fmt.Sprintf("\"%v\"为无效的客户，还缺少客户信息\n", r.ExtractedCustomer)
+		} else {
+			desc = desc + "还缺少客户信息\n"
+		}
 	}
 
 	return desc
