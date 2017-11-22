@@ -159,7 +159,7 @@ func (r *OrderResolve) ExtractCustomer() {
 	if r.ExtractedCustomer != "" {
 		var count int
 
-		database.DB.Where(&database.People{}, "name = ?", r.ExtractedCustomer).Count(&count)
+		database.DB.Model(&database.People{}).Where("name = ?", r.ExtractedCustomer).Count(&count)
 
 		if count > 0 {
 			r.Customer = r.ExtractedCustomer
