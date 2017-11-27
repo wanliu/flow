@@ -113,7 +113,7 @@ func atFilter(s string) string {
 func replaceUnit(s string) string {
 	palceholder := "龘"
 	units := []string{
-		"件", "条", "个", "支",
+		"件", "条", "个", "支", "瓶",
 	}
 
 	for _, unit := range units {
