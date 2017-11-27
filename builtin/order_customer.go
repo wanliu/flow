@@ -34,7 +34,8 @@ func (c *OrderCustomer) OnCtx(ctx Context) {
 		customer := params.Customer()
 
 		cOrder := currentOrder.(OrderResolve)
-		cOrder.Customer = customer
+		cOrder.ExtractedCustomer = customer
+		cOrder.CheckExtractedCustomer()
 
 		reply := "收到客户信息：" + customer + "\n" + cOrder.Answer()
 		c.Out <- ReplyData{reply, ctx}

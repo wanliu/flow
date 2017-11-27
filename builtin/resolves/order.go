@@ -155,7 +155,10 @@ func (r *OrderResolve) ExtractAddress() {
 
 func (r *OrderResolve) ExtractCustomer() {
 	r.ExtractedCustomer = r.AiParams.Customer()
+	r.CheckExtractedCustomer()
+}
 
+func (r *OrderResolve) CheckExtractedCustomer() {
 	if r.ExtractedCustomer != "" {
 		var count int
 
