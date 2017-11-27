@@ -33,13 +33,13 @@ func (ac AddressConfirm) Notice(ctx context.Context) string {
 		}
 
 		if len(ac.Values) > 0 {
-			return fmt.Sprintf("是否将 “%v” 做为收货地址?", ac.Values[0])
+			return fmt.Sprintf("是否将 “%v” 做为收货客户?", ac.Values[0])
 		} else {
 			// ctx.SetValue(config.CtxKeyConfirm, nil)
 			ac.ClearUp(ctx)
 
 			if order.Address == "" {
-				return "取消操作完成，当前订单收货地址尚未确认，请输入收货地址"
+				return "取消操作完成，当前订单收货客户尚未确认，请输入收货客户"
 			}
 		}
 	} else {
@@ -66,13 +66,13 @@ func (ac AddressConfirm) Cancel(ctx context.Context) string {
 			// ctx.SetValue(config.CtxKeyConfirm, ac)
 			ac.SetUp(ctx)
 
-			return fmt.Sprintf("是否将 “%v” 做为收货地址?", newValues[0])
+			return fmt.Sprintf("是否将 “%v” 做为收货客户?", newValues[0])
 		} else {
 			// ctx.SetValue(config.CtxKeyConfirm, nil)
 			ac.ClearUp(ctx)
 
 			if order.Address == "" {
-				return "取消操作完成，当前订单收货地址尚未确认，请输入收货地址"
+				return "取消操作完成，当前订单收货客户尚未确认，请输入收货客户"
 			}
 		}
 	} else {
@@ -99,7 +99,7 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 			if len(ac.Values) > 0 {
 				order.Address = ac.Values[0]
 
-				reply := fmt.Sprintf("已经确认\"%v\"为收货地址\n%v", ac.Values[0], order.Answer())
+				reply := fmt.Sprintf("已经确认\"%v\"为收货客户\n%v", ac.Values[0], order.Answer())
 
 				if order.Resolved() {
 					ctx.SetValue(config.CtxKeyOrder, nil)

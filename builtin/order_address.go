@@ -86,6 +86,6 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 			c.Out <- ReplyData{reply, ctx}
 		}
 	} else {
-		c.Out <- ReplyData{"地址输入无效，当前没有正在进行中的订单", ctx}
+		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx}
 	}
 }
