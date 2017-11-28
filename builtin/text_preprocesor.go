@@ -59,15 +59,6 @@ func numberAfterLetter(s string) string {
 	return s
 }
 
-// 今早 => 今天早上
-// 今下 => 今天下午
-// 明早 => 明天早上
-// 明下 => 明天下午
-// 今早上 => 今天早上
-// 今下午 => 今天下午
-// 明早上 => 明天早上
-// 明下午 => 明天下午
-// 后天
 // [星期日,星期天,周日]
 func dateTransfer(s string) string {
 	dat := time.Now().AddDate(0, 0, 2)
