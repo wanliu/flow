@@ -30,7 +30,24 @@ func (cc CustomerCreation) Notice(ctx context.Context) string {
 func (cc CustomerCreation) Cancel(ctx context.Context) string {
 	cc.ClearUp(ctx)
 
-	return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作", cc.Customer)
+	oInt := ctx.Value(config.CtxKeyOrder)
+	// confirm := ctx.Value(config.CtxKeyConfirm)
+
+	if oInt != nil {
+		order := oInt.(OrderResolve)
+		order.ExtractedCustomer = ""
+
+		if order.Expired(config.SesssionExpiredMinutes) {
+			return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作", cc.Customer)
+		}
+
+		ctx.SetValue(config.CtxKeyOrder, order)
+		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作\n%v", cc.Customer, order.Answer(ctx))
+	} else {
+		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作, 当前没有正在进行中的订单", cc.Customer)
+	}
+
+	return ""
 }
 
 func (cc CustomerCreation) Confirm(ctx context.Context) string {
@@ -47,13 +64,24 @@ func (cc CustomerCreation) Confirm(ctx context.Context) string {
 		if oInt != nil {
 			order := oInt.(OrderResolve)
 
+			order.Customer = person.Name
+
 			if order.Expired(config.SesssionExpiredMinutes) {
 				return fmt.Sprintf("添加了新的客户\"%v\", 当前没有正在进行中的订单", cc.Customer)
 			}
 
-			order.Customer = person.Name
+			reply := fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, order.Answer(ctx))
 
-			return fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, order.Answer(ctx))
+			if order.Resolved() {
+				ctx.SetValue(config.CtxKeyOrder, nil)
+				ctx.SetValue(config.CtxKeyLastOrder, order)
+			} else if order.Failed() {
+				ctx.SetValue(config.CtxKeyOrder, nil)
+			} else {
+				ctx.SetValue(config.CtxKeyOrder, order)
+			}
+
+			return reply
 		} else {
 			return fmt.Sprintf("添加了新的客户\"%v\", 当前没有正在进行中的订单", cc.Customer)
 		}
