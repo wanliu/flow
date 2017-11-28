@@ -69,12 +69,12 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 			var values []string
 
 			query := params.Query()
-			address := params.Address() + params.Customer()
+			customer := params.Customer()
 
-			if address == "" {
+			if customer == "" {
 				values = []string{query}
 			} else {
-				values = []string{address, query}
+				values = []string{customer, query}
 			}
 
 			addressConfirm := confirm.AddressConfirm{Values: values}

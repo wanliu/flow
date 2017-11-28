@@ -38,7 +38,7 @@ func (ac AddressConfirm) Notice(ctx context.Context) string {
 			// ctx.SetValue(config.CtxKeyConfirm, nil)
 			ac.ClearUp(ctx)
 
-			if order.Address == "" {
+			if order.Customer == "" {
 				return "取消操作完成，当前订单收货客户尚未确认，请输入收货客户"
 			}
 		}
@@ -71,7 +71,7 @@ func (ac AddressConfirm) Cancel(ctx context.Context) string {
 			// ctx.SetValue(config.CtxKeyConfirm, nil)
 			ac.ClearUp(ctx)
 
-			if order.Address == "" {
+			if order.Customer == "" {
 				return "取消操作完成，当前订单收货客户尚未确认，请输入收货客户"
 			}
 		}
@@ -95,9 +95,10 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 
 		// cConfirm := confirm.(AddressConfirm)
 
-		if order.Address == "" {
+		if order.Customer == "" {
 			if len(ac.Values) > 0 {
-				order.Address = ac.Values[0]
+				order.ExtractedCustomer = ac.Values[0]
+				order.CheckExtractedCustomer()
 
 				reply := fmt.Sprintf("已经确认\"%v\"为收货客户\n%v", ac.Values[0], order.Answer())
 
