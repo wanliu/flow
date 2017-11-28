@@ -3,7 +3,7 @@ package builtin
 import (
 	// "log"
 
-	"github.com/wanliu/flow/builtin/confirm"
+	"github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
 
 	config "github.com/wanliu/flow/builtin/config"
@@ -39,7 +39,7 @@ func (c *Confirm) OnConfirm(ctx Context) {
 	cIn := ctx.Value(config.CtxKeyConfirm)
 
 	if cIn != nil {
-		cfm := cIn.(confirm.Data)
+		cfm := cIn.(resolves.Data)
 		reply := cfm.Confirm(ctx)
 		c.Out <- ReplyData{reply, ctx}
 	} else {
@@ -52,7 +52,7 @@ func (c *Confirm) OnCancel(ctx Context) {
 	cIn := ctx.Value(config.CtxKeyConfirm)
 
 	if cIn != nil {
-		cfm := cIn.(confirm.Data)
+		cfm := cIn.(resolves.Data)
 		reply := cfm.Cancel(ctx)
 		c.Out <- ReplyData{reply, ctx}
 	} else {

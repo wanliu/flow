@@ -1,16 +1,15 @@
-package confirm
+package resolves
 
 import (
 	"fmt"
 
 	"github.com/wanliu/flow/builtin/config"
-	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
 )
 
 type AddressConfirm struct {
 	Values []string
-	// order  *resolves.OrderResolve
+	// order  *OrderResolve
 }
 
 func (ac AddressConfirm) SetUp(ctx context.Context) {
@@ -26,7 +25,7 @@ func (ac AddressConfirm) Notice(ctx context.Context) string {
 	// confirm := ctx.Value(config.CtxKeyConfirm)
 
 	if oIn != nil {
-		order := oIn.(resolves.OrderResolve)
+		order := oIn.(OrderResolve)
 
 		if order.Expired(config.SesssionExpiredMinutes) {
 			return "当前没有正在进行中的订单"
@@ -54,7 +53,7 @@ func (ac AddressConfirm) Cancel(ctx context.Context) string {
 	// confirm := ctx.Value(config.CtxKeyConfirm)
 
 	if oIn != nil {
-		order := oIn.(resolves.OrderResolve)
+		order := oIn.(OrderResolve)
 
 		if order.Expired(config.SesssionExpiredMinutes) {
 			return "当前没有正在进行中的订单"
@@ -87,7 +86,7 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 	// confirm := ctx.Value(config.CtxKeyConfirm)
 
 	if oIn != nil {
-		order := oIn.(resolves.OrderResolve)
+		order := oIn.(OrderResolve)
 
 		if order.Expired(config.SesssionExpiredMinutes) {
 			return "当前没有正在进行中的订单"
@@ -100,7 +99,7 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 				order.ExtractedCustomer = ac.Values[0]
 				order.CheckExtractedCustomer()
 
-				reply := fmt.Sprintf("已经确认\"%v\"为收货客户\n%v", ac.Values[0], order.Answer())
+				reply := fmt.Sprintf("已经确认\"%v\"为收货客户\n%v", ac.Values[0], order.Answer(ctx))
 
 				if order.Resolved() {
 					ctx.SetValue(config.CtxKeyOrder, nil)

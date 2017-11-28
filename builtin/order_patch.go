@@ -28,7 +28,7 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 		curResolve := ctx.Value(config.CtxKeyOrder).(OrderResolve)
 		patchResolve.Patch(&curResolve)
 
-		output = curResolve.Answer()
+		output = curResolve.Answer(ctx)
 
 		if curResolve.Resolved() {
 			ctx.SetValue(config.CtxKeyOrder, nil)

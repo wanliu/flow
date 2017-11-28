@@ -1,4 +1,4 @@
-package confirm
+package resolves
 
 import (
 	"fmt"
@@ -8,30 +8,30 @@ import (
 	"github.com/wanliu/flow/context"
 )
 
-type OrderDelete struct {
+type OrderDeleteConfirm struct {
 	OrderNo string
 	// OrderId uint
 }
 
-func (od OrderDelete) SetUp(ctx context.Context) {
+func (od OrderDeleteConfirm) SetUp(ctx context.Context) {
 	ctx.SetValue(config.CtxKeyConfirm, od)
 }
 
-func (od OrderDelete) ClearUp(ctx context.Context) {
+func (od OrderDeleteConfirm) ClearUp(ctx context.Context) {
 	ctx.SetValue(config.CtxKeyConfirm, nil)
 }
 
-func (od OrderDelete) Notice(ctx context.Context) string {
+func (od OrderDeleteConfirm) Notice(ctx context.Context) string {
 	return fmt.Sprintf("确认删除订单号为 %v 的订单么？", od.OrderNo)
 }
 
-func (od OrderDelete) Cancel(ctx context.Context) string {
+func (od OrderDeleteConfirm) Cancel(ctx context.Context) string {
 	od.ClearUp(ctx)
 
 	return "已经取消操作"
 }
 
-func (od OrderDelete) Confirm(ctx context.Context) string {
+func (od OrderDeleteConfirm) Confirm(ctx context.Context) string {
 	order, err := database.GetOrderByNo(od.OrderNo)
 
 	if err != nil {

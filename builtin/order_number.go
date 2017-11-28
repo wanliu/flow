@@ -3,9 +3,8 @@ package builtin
 import (
 	// "time"
 
-	"github.com/wanliu/flow/builtin/config"
-	// "github.com/wanliu/flow/builtin/confirm"
 	"github.com/hysios/apiai-go"
+	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
 

@@ -37,7 +37,7 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 	if orderResolve.EmptyProducts() {
 		output = "没有相关的产品"
 	} else {
-		output = orderResolve.Answer()
+		output = orderResolve.Answer(ctx)
 
 		if orderResolve.Resolved() {
 			ctx.SetValue(config.CtxKeyLastOrder, *orderResolve)

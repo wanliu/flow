@@ -6,7 +6,6 @@ import (
 
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/config"
-	"github.com/wanliu/flow/builtin/confirm"
 	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
 
@@ -40,7 +39,7 @@ func (c *OrderCancel) OnCtx(ctx context.Context) {
 					order, err := database.GetOrder(preOrder.Id)
 					if err == nil {
 						orderNo := order.No
-						deleteComfirm := confirm.OrderDelete{OrderNo: orderNo}
+						deleteComfirm := resolves.OrderDeleteConfirm{OrderNo: orderNo}
 
 						deleteComfirm.SetUp(ctx)
 

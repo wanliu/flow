@@ -3,7 +3,7 @@ package builtin
 import (
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
-	"github.com/wanliu/flow/builtin/confirm"
+	"github.com/wanliu/flow/builtin/resolves"
 
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
@@ -56,7 +56,7 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 				cOrder.Customer = customer
 			}
 
-			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer()
+			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer(ctx)
 			c.Out <- ReplyData{reply, ctx}
 
 			if cOrder.Resolved() {
@@ -77,7 +77,7 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 				values = []string{customer, query}
 			}
 
-			addressConfirm := confirm.AddressConfirm{Values: values}
+			addressConfirm := resolves.AddressConfirm{Values: values}
 
 			ctx.SetValue(config.CtxKeyConfirm, addressConfirm)
 

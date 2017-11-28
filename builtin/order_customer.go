@@ -37,7 +37,7 @@ func (c *OrderCustomer) OnCtx(ctx Context) {
 		cOrder.ExtractedCustomer = customer
 		cOrder.CheckExtractedCustomer()
 
-		reply := "收到客户信息：" + customer + "\n" + cOrder.Answer()
+		reply := "收到客户信息：" + customer + "\n" + cOrder.Answer(ctx)
 		c.Out <- ReplyData{reply, ctx}
 
 		if cOrder.Resolved() {

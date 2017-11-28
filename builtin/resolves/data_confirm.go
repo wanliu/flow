@@ -1,4 +1,4 @@
-package confirm
+package resolves
 
 import (
 	"github.com/wanliu/flow/context"

@@ -1,11 +1,10 @@
-package confirm
+package resolves
 
 import (
 	"fmt"
 
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/config"
-	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
 )
 
@@ -46,7 +45,7 @@ func (cc CustomerCreation) Confirm(ctx context.Context) string {
 		// confirm := ctx.Value(config.CtxKeyConfirm)
 
 		if oInt != nil {
-			order := oInt.(resolves.OrderResolve)
+			order := oInt.(OrderResolve)
 
 			if order.Expired(config.SesssionExpiredMinutes) {
 				return fmt.Sprintf("添加了新的客户\"%v\", 当前没有正在进行中的订单", cc.Customer)
@@ -54,7 +53,7 @@ func (cc CustomerCreation) Confirm(ctx context.Context) string {
 
 			order.Customer = person.Name
 
-			return fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, order.Answer())
+			return fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, order.Answer(ctx))
 		} else {
 			return fmt.Sprintf("添加了新的客户\"%v\", 当前没有正在进行中的订单", cc.Customer)
 		}
