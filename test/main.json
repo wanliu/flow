@@ -45,6 +45,12 @@
     "OrderPrinter": {
       "component": "OrderPrinter"
     },
+    "CustomerOrdersInt": {
+      "component": "IntentCheck"
+    },
+    "CustomerOrders": {
+      "component": "CustomerOrders"
+    },
     "OrderCancelInt": {
       "component": "IntentCheck"
     },
@@ -270,6 +276,36 @@
     {
       "src": {
         "process": "OrderPrinterInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "CustomerOrdersInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerOrdersInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "CustomerOrders",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerOrders",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerOrdersInt",
         "port": "Next"
       },
       "tgt": {
@@ -552,6 +588,20 @@
       "data": 0.7,
       "tgt": {
         "process": "OrderNumberInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.customer.orders.query",
+      "tgt": {
+        "process": "CustomerOrdersInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.5,
+      "tgt": {
+        "process": "CustomerOrdersInt",
         "port": "Score"
       }
     },

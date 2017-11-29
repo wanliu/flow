@@ -28,7 +28,11 @@ OrderNumberInt() Next -> Ctx OrderPrinterInt(IntentCheck)
 OrderPrinterInt() Out -> Ctx OrderPrinter(OrderPrinter)
 OrderPrinter() Out -> In Reply()
 
-OrderPrinterInt() Next -> Ctx OrderCancelInt(IntentCheck)
+OrderPrinterInt() Next -> Ctx CustomerOrdersInt(IntentCheck)
+CustomerOrdersInt() Out -> Ctx CustomerOrders(CustomerOrders)
+CustomerOrders() Out -> In Reply()
+
+CustomerOrdersInt() Next -> Ctx OrderCancelInt(IntentCheck)
 OrderCancelInt() Out -> Ctx OrderCancel(OrderCancel)
 OrderCancel() Out -> In Reply()
 
@@ -74,6 +78,9 @@ true -> Flow CancelInt()
 
 'business.order.number' -> Intent OrderNumberInt()
 0.7 -> Score OrderNumberInt()
+
+'business.customer.orders.query' -> Intent CustomerOrdersInt()
+0.5 -> Score CustomerOrdersInt()
 
 'business.order.create.address' -> Intent AdressInt()
 0.1 -> Score AdressInt()

@@ -3,6 +3,7 @@ package builtin
 import (
 	"fmt"
 
+	"github.com/hysios/apiai-go"
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/context"
@@ -38,13 +39,13 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 		return
 	}
 
-	var orders database.Order
+	var orders []database.Order
 	result := ""
 
 	if queryTime.IsZero() {
-		person.GerRecentOrders(&orders, nil)
+		person.GetRecentOrders(&orders, nil)
 		if len(orders) == 0 {
-			reply = fmt.Sprintf("客户\"%v\"最近没有订单", customer)
+			reply := fmt.Sprintf("客户\"%v\"最近没有订单", customer)
 			c.Out <- ReplyData{reply, ctx}
 			return
 		}
@@ -54,7 +55,7 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 		person.GetRecentOrders(&orders, &queryTime)
 		date := queryTime.Format("2006年01月02日")
 
-		if len(order) == 0 {
+		if len(orders) == 0 {
 			reply := fmt.Sprintf("客户\"%v\"在%v没有订单", customer, date)
 			c.Out <- ReplyData{reply, ctx}
 			return
