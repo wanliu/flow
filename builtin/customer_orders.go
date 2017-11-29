@@ -43,7 +43,7 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 	result := ""
 
 	if queryTime.IsZero() {
-		person.GetRecentOrders(&orders, nil)
+		person.GetRecentOrders(&orders, nil, 2)
 		if len(orders) == 0 {
 			reply := fmt.Sprintf("客户\"%v\"最近没有订单", customer)
 			c.Out <- ReplyData{reply, ctx}
@@ -52,7 +52,7 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 
 		result = fmt.Sprintf("客户\"%v\"最近的%v个订单：\n", customer, len(orders))
 	} else {
-		person.GetRecentOrders(&orders, &queryTime)
+		person.GetRecentOrders(&orders, &queryTime, 2)
 		date := queryTime.Format("2006年01月02日")
 
 		if len(orders) == 0 {
@@ -65,7 +65,23 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 	}
 
 	for _, order := range orders {
-		result = result + fmt.Sprintf("订单号：%v   总金额：%v\n", order.No, order.Amount)
+		result = result + "------------------------\n"
+		result = result + fmt.Sprintf("订单号：%v\n总金额：%v\n送货时间：%v\n", order.No, order.Amount, order.DeliveryTime.Format("2006年01月02日"))
+		if order.Note != "" {
+			result = result + fmt.Sprint("备注：%v\n", order.Note)
+		}
+
+		result = result + "商品:\n"
+		for _, item := range order.OrderItems {
+			result = result + fmt.Sprintf("  %v %v%v\n", item.ProductName, item.Quantity, item.Unit)
+		}
+
+		if len(order.GiftItems) > 0 {
+			result = result + "赠品:\n"
+			for _, gift := range order.GiftItems {
+				result = result + fmt.Sprintf("  %v %v%v\n", gift.ProductName, gift.Quantity, gift.Unit)
+			}
+		}
 	}
 
 	c.Out <- ReplyData{result, ctx}
