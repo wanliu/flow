@@ -63,6 +63,7 @@ Voice(Voice) Out -> In Reply()
 '4ae1a59715104c32a6bacabd88cfc070' -> Token Ai()
 
 5 -> ExpireMinutes OpenOrder()
+'command-queue-data-sync' -> SyncQueue OpenOrder()
 
 '今天' -> Deftime NewOrder()
 

@@ -10,6 +10,7 @@ import (
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/brain_data/wrapper"
 	"github.com/wanliu/flow/builtin/ai"
+	"github.com/wanliu/flow/builtin/config"
 
 	"github.com/wanliu/flow/context"
 )
@@ -32,6 +33,7 @@ type OrderResolve struct {
 	Canceled          bool
 	IsResolved        bool
 	IsFailed          bool
+	OrderSyncQueue    string
 	// Current   Resolve
 
 	Id uint
@@ -48,6 +50,10 @@ func NewOrderResolve(ctx context.Context) *OrderResolve {
 
 	resolve.AiParams = ai.ApiAiOrder{AiResult: aiResult}
 	resolve.ExtractFromParams()
+
+	if syncQueue := ctx.Value(config.CtxKeySyncQueue); syncQueue != nil {
+		resolve.OrderSyncQueue = syncQueue.(string)
+	}
 
 	if viewer := ctx.Value("Viewer"); viewer != nil {
 		user := viewer.(*database.User)
@@ -231,7 +237,7 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 
 	if r.User == nil {
 		// return "无法创建订单，请与工作人员联系！"
-		order, err := wrapper.CreateFlowOrder(r.Address, r.Note, r.Time, r.Customer, 0, r.Storehouse, items, gifts)
+		order, err := wrapper.CreateFlowOrder(r.OrderSyncQueue, r.Address, r.Note, r.Time, r.Customer, 0, r.Storehouse, items, gifts)
 
 		if err != nil {
 			r.IsFailed = true
@@ -244,7 +250,7 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 		}
 	} else {
 		// order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
-		order, err := wrapper.CreateFlowOrder(r.Address, r.Note, r.Time, r.Customer, r.User.ID, r.Storehouse, items, gifts)
+		order, err := wrapper.CreateFlowOrder(r.OrderSyncQueue, r.Address, r.Note, r.Time, r.Customer, r.User.ID, r.Storehouse, items, gifts)
 
 		if err != nil {
 			r.IsFailed = true

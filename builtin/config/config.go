@@ -15,4 +15,5 @@ const (
 	CtxkeyResult         = "Result"
 	CtxKeyConfirm        = "Confirm"
 	CtxKeyOrderNum       = "OrderNum"
+	CtxKeySyncQueue      = "SyncQueue"
 )

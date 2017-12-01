@@ -519,6 +519,13 @@
       }
     },
     {
+      "data": "command-queue-data-sync",
+      "tgt": {
+        "process": "OpenOrder",
+        "port": "SyncQueue"
+      }
+    },
+    {
       "data": "今天",
       "tgt": {
         "process": "NewOrder",
