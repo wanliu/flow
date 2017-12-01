@@ -34,6 +34,10 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 		count = 2
 	}
 
+	if count > 5 {
+		count = 5
+	}
+
 	if customer == "" {
 		c.Out <- ReplyData{"请提供要查询的客户", ctx}
 		return
