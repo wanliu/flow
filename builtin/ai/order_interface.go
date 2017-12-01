@@ -27,6 +27,7 @@ type AiOrder interface {
 
 	Address() string
 	Customer() string
+	Duration() string
 	Count() int
 
 	Time() time.Time

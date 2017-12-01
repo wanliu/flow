@@ -137,6 +137,14 @@ func (aa ApiAiOrder) Count() int {
 	return 0
 }
 
+func (aa ApiAiOrder) Duration() string {
+	if c, exist := aa.AiResult.Params["duration"]; exist {
+		return c.(string)
+	}
+
+	return ""
+}
+
 func (aa ApiAiOrder) Time() time.Time {
 	if t, exist := aa.AiResult.Params["date"]; exist {
 		if aiTime, err := time.Parse("2006-01-02", t.(string)); err == nil {
