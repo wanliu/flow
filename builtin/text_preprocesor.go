@@ -20,6 +20,7 @@ var REPLACE_DICT map[string]string = map[string]string{
 	"明下午":  "明天下午",
 	"1.1红": "1100红",
 	"1.1原": "1100原",
+	"上次":   "上一次",
 }
 
 type TextPreprocesor struct {

@@ -112,6 +112,31 @@ func (aa ApiAiOrder) Customer() string {
 	return ""
 }
 
+func (aa ApiAiOrder) Count() int {
+	if c, exist := aa.AiResult.Params["number"]; exist {
+		switch c.(type) {
+		case float64:
+			fval := c.(float64)
+			return int(fval)
+		case float32:
+			fval := c.(float32)
+			return int(fval)
+		case int:
+			return c.(int)
+		case string:
+			sval := c.(string)
+			ival, err := strconv.Atoi(sval)
+			if err != nil {
+				return 0
+			} else {
+				return ival
+			}
+		}
+	}
+
+	return 0
+}
+
 func (aa ApiAiOrder) Time() time.Time {
 	if t, exist := aa.AiResult.Params["date"]; exist {
 		if aiTime, err := time.Parse("2006-01-02", t.(string)); err == nil {

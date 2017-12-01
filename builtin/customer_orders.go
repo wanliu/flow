@@ -26,6 +26,13 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 
 	customer := aiParams.Customer()
 	queryTime := aiParams.Time()
+	count := aiParams.Count()
+
+	fmt.Printf("[NUMBER]---->%v", count)
+
+	if count == 0 {
+		count = 2
+	}
 
 	if customer == "" {
 		c.Out <- ReplyData{"请提供要查询的客户", ctx}
@@ -43,16 +50,20 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 	result := ""
 
 	if queryTime.IsZero() {
-		person.GetRecentOrders(&orders, nil, 2)
+		person.GetRecentOrders(&orders, nil, count)
 		if len(orders) == 0 {
 			reply := fmt.Sprintf("客户\"%v\"最近没有订单", customer)
 			c.Out <- ReplyData{reply, ctx}
 			return
 		}
 
-		result = fmt.Sprintf("客户\"%v\"最近的%v个订单：\n", customer, len(orders))
+		if count > len(orders) {
+			result = fmt.Sprintf("客户\"%v\"只有%v个订单：\n", customer, len(orders))
+		} else {
+			result = fmt.Sprintf("客户\"%v\"最近的%v个订单：\n", customer, len(orders))
+		}
 	} else {
-		person.GetRecentOrders(&orders, &queryTime, 2)
+		person.GetRecentOrders(&orders, &queryTime, count)
 		date := queryTime.Format("2006年01月02日")
 
 		if len(orders) == 0 {
@@ -61,7 +72,11 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 			return
 		}
 
-		result = fmt.Sprintf("客户\"%v\"%v最近的%v个订单：\n", customer, date, len(orders))
+		if count > len(orders) {
+			result = fmt.Sprintf("客户\"%v\"%v只有%v个订单：\n", customer, date, len(orders))
+		} else {
+			result = fmt.Sprintf("客户\"%v\"%v最近的%v个订单：\n", customer, date, len(orders))
+		}
 	}
 
 	for _, order := range orders {
