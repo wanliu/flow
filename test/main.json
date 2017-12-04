@@ -645,7 +645,7 @@
     {
       "data": 0.7,
       "tgt": {
-        "process": "CustomerOrdersInt",
+        "process": "CustomerOrdersPageInt",
         "port": "Score"
       }
     },
