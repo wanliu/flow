@@ -87,7 +87,7 @@ true -> Flow CancelInt()
 0.5 -> Score CustomerOrdersInt()
 
 'business.customer.orders.page' -> Intent CustomerOrdersPageInt()
-0.7 -> Score CustomerOrdersInt()
+0.7 -> Score CustomerOrdersPageInt()
 
 'business.order.create.address' -> Intent AdressInt()
 0.1 -> Score AdressInt()
