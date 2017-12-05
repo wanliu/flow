@@ -21,14 +21,19 @@ type CustomerOrdersResolve struct {
 
 	CustomerName string
 	Customer     *database.People
-	Count        int
-	QuertyTime   time.Time
-	Duration     string
-	BeginT       *time.Time
-	EndT         *time.Time
+	ProductName  string
+	Product      *database.Product
+
+	Count      int
+	QuertyTime time.Time
+	Duration   string
+	BeginT     *time.Time
+	EndT       *time.Time
 }
 
 func NewCusOrdersResolve(ctx context.Context, perPage int) *CustomerOrdersResolve {
+	var product string
+
 	if perPage <= 0 {
 		perPage = 5
 	}
@@ -41,10 +46,15 @@ func NewCusOrdersResolve(ctx context.Context, perPage int) *CustomerOrdersResolv
 	count := aiParams.Count()
 	duration := aiParams.Duration()
 
+	if productsInt, exist := aiResult.Params["products"]; exist {
+		product = productsInt.(string)
+	}
+
 	beginT, endT := getBeginAndEndTime(duration, queryTime)
 
 	rsv := CustomerOrdersResolve{
 		CustomerName: customerName,
+		ProductName:  product,
 		Duration:     duration,
 		QuertyTime:   queryTime,
 		BeginT:       beginT,
@@ -53,6 +63,9 @@ func NewCusOrdersResolve(ctx context.Context, perPage int) *CustomerOrdersResolv
 		Per:          perPage,
 		Total:        -1,
 	}
+
+	rsv.FetchCustomer()
+	rsv.FetchProduct()
 
 	return &rsv
 }
@@ -67,11 +80,14 @@ func (r *CustomerOrdersResolve) Answer() string {
 		return "查询的订单已经显示完毕"
 	}
 
-	r.FetchCustomer()
-
 	if r.Customer == nil {
 		r.Done = true
 		return fmt.Sprintf("客户\"%v\"不存在，无法查询客户订单", r.CustomerName)
+	}
+
+	if r.ProductName != "" && r.Product == nil {
+		r.Done = true
+		return fmt.Sprintf("商品\"%v\"不存在，无法查询包含该商品的订单", r.ProductName)
 	}
 
 	result := r.AnswerHeader()
@@ -137,11 +153,23 @@ func (r *CustomerOrdersResolve) Answer() string {
 
 func (r *CustomerOrdersResolve) AnswerHeader() string {
 	if r.Duration != "" {
-		return fmt.Sprintf("查询客户\"%v\"%v的订单\n", r.CustomerName, r.Duration)
+		if r.ProductName != "" {
+			return fmt.Sprintf("查询客户\"%v\"%v包含\"%v\"的订单\n", r.CustomerName, r.Duration, r.ProductName)
+		} else {
+			return fmt.Sprintf("查询客户\"%v\"%v的订单\n", r.CustomerName, r.Duration)
+		}
 	} else if !r.QuertyTime.IsZero() {
-		return fmt.Sprintf("查询客户\"%v\"%v的订单\n", r.CustomerName, r.QuertyTime.Format("2006年1月2日"))
+		if r.ProductName != "" {
+			return fmt.Sprintf("查询客户\"%v\"%v包含\"%v\"的订单\n", r.CustomerName, r.QuertyTime.Format("2006年1月2日"), r.ProductName)
+		} else {
+			return fmt.Sprintf("查询客户\"%v\"%v的订单\n", r.CustomerName, r.QuertyTime.Format("2006年1月2日"))
+		}
 	} else {
-		return fmt.Sprintf("查询客户\"%v\"最近的订单\n", r.CustomerName)
+		if r.ProductName != "" {
+			return fmt.Sprintf("查询客户\"%v\"最近包含\"%v\"的订单\n", r.CustomerName, r.ProductName)
+		} else {
+			return fmt.Sprintf("查询客户\"%v\"最近的订单\n", r.CustomerName)
+		}
 	}
 }
 
@@ -151,9 +179,21 @@ func (r *CustomerOrdersResolve) FetchCustomer() {
 	}
 }
 
+func (r *CustomerOrdersResolve) FetchProduct() {
+	if r.Product == nil && r.ProductName != "" {
+		r.Product, _ = database.GetProductByName(r.ProductName)
+	}
+}
+
 func (r *CustomerOrdersResolve) FetchTotal() {
 	if r.Customer != nil {
-		r.Total = r.Customer.GetRecentOrdersTotal(r.BeginT, r.EndT)
+		pids := []uint{}
+
+		if r.Product != nil {
+			pids = []uint{r.Product.ID}
+		}
+
+		r.Total = r.Customer.GetRecentOrdersTotal(pids, r.BeginT, r.EndT)
 	} else {
 		r.Total = 0
 	}
@@ -172,7 +212,13 @@ func (r *CustomerOrdersResolve) FetchOrders() *[]database.Order {
 		per = r.Count - r.Fetched
 	}
 
-	r.Customer.GetRecentOrders(&orders, r.BeginT, r.EndT, r.CursorId, 0, per)
+	pids := make([]uint, 0, 0)
+
+	if r.Product != nil {
+		pids = []uint{r.Product.ID}
+	}
+
+	r.Customer.GetRecentOrders(&orders, pids, r.BeginT, r.EndT, r.CursorId, 0, per)
 
 	l := len(orders)
 	if l > 0 {
