@@ -133,7 +133,7 @@ func (c *ApiAi) SendQuery(txt string) apiai.Result {
 	for err != nil && count < c.retryCount {
 		count++
 
-		log.Printf("意图\"%s\"第重新解析失败:%s", txt, count, err.Error())
+		log.Printf("意图\"%s\"重新解析失败:%s", txt, err.Error())
 		log.Printf("尝试第%v/%v次重新解析", count, c.retryCount)
 
 		res, err = ApiAiQuery(txt, c.token, c.sessionId, c.proxyUrl)
