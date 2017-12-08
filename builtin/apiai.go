@@ -83,18 +83,23 @@ func (c *ApiAi) SendQuery() {
 		ctx := c.CtxQueue.Dequeue().(Context)
 
 		res, err := ApiAiQuery(txt, c.token, c.sessionId, c.proxyUrl)
+		if err != nil {
+			log.Printf("意图\"%s\"第一次解析失败:%s", txt, err.Error())
+			log.Printf("尝试再一次解析")
+
+			res, err = ApiAiQuery(txt, c.token, c.sessionId, c.proxyUrl)
+			if err != nil {
+				log.Printf("意图\"%s\"再一次解析失败:%s", txt, err.Error())
+			}
+		}
 
 		ctx.SetValue(config.CtxkeyResult, res)
 
 		intent := res.Metadata.IntentName
 		score := res.Score
-		query := res.ResolvedQuery
+		// query := res.ResolvedQuery
 
-		if err != nil {
-			log.Printf("意图解析失败:" + err.Error())
-		} else {
-			log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%", query, intent, score*100)
-		}
+		log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%", txt, intent, score*100)
 
 		c.Out <- ctx
 	}
