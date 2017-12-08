@@ -1,6 +1,8 @@
 package builtin
 
 import (
+	"log"
+
 	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
@@ -8,7 +10,9 @@ import (
 
 type NewOrder struct {
 	TryGetEntities
-	DefTime string
+	DefTime    string
+	retryCount int
+
 	Ctx     <-chan context.Context
 	Deftime <-chan string
 	Out     chan<- ReplyData
@@ -17,6 +21,8 @@ type NewOrder struct {
 
 	RetryOut chan<- context.Context
 	RetryIn  <-chan context.Context
+
+	RetryCount <-chan float64
 }
 
 func NewNewOrder() interface{} {
@@ -26,6 +32,10 @@ func NewNewOrder() interface{} {
 // 默认送货时间
 func (c *NewOrder) OnDeftime(t string) {
 	c.DefTime = t
+}
+
+func (c *NewOrder) OnRetryCount(count float64) {
+	c.retryCount = int(count)
 }
 
 func (c *NewOrder) OnCtx(ctx context.Context) {
@@ -38,8 +48,14 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 	output := ""
 
 	if orderResolve.EmptyProducts() {
-		// output = "没有相关的产品"
-		c.RetryOut <- ctx
+		if c.retryCount > 0 {
+			log.Printf("重新获取开单产品，第1次，共%v次", c.retryCount)
+			c.RetryOut <- ctx
+		} else {
+			output = "没有相关的产品"
+			replyData := ReplyData{output, ctx}
+			c.Out <- replyData
+		}
 	} else {
 		output = orderResolve.Answer(ctx)
 
@@ -70,7 +86,25 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 	output := ""
 
 	if orderResolve.EmptyProducts() {
-		output = "没有相关的产品"
+		retriedCount := 1
+		retriedCountInt := ctx.Value(config.CtxKeyRetriedCount)
+
+		if retriedCountInt != nil {
+			retriedCount = retriedCountInt.(int)
+		}
+
+		if retriedCount >= c.retryCount {
+			output = "没有相关的产品"
+
+			replyData := ReplyData{output, ctx}
+			c.Out <- replyData
+		} else {
+			retriedCount++
+			log.Printf("重新获取开单产品，第%v次，共%v次", retriedCount, c.retryCount)
+
+			ctx.SetValue(config.CtxKeyRetriedCount, retriedCount)
+			c.RetryOut <- ctx
+		}
 	} else {
 		output = orderResolve.Answer(ctx)
 
@@ -85,8 +119,9 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 
 		// c.Notice <- ctx
 		c.Timeout <- ctx
+
+		replyData := ReplyData{output, ctx}
+		c.Out <- replyData
 	}
 
-	replyData := ReplyData{output, ctx}
-	c.Out <- replyData
 }

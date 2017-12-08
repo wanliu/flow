@@ -66,11 +66,13 @@ Voice(Voice) Out -> In Reply()
 '123456789' -> SessionId Ai()
 'http://127.0.0.1:8123' -> ProxyUrl Ai()
 '9e48732878a34e7d960cb4a29ac0f72a' -> Token Ai()
+1 -> RetryCount Ai()
 
 5 -> ExpireMinutes OpenOrder()
 'command-queue-data-sync' -> SyncQueue OpenOrder()
 
 '今天' -> Deftime NewOrder()
+1 -> RetryCount NewOrder()
 
 'buiness.confirm' -> Intent ConfirmInt()
 0.5 -> Score ConfirmInt()

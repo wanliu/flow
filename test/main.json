@@ -555,6 +555,13 @@
       }
     },
     {
+      "data": 1,
+      "tgt": {
+        "process": "Ai",
+        "port": "RetryCount"
+      }
+    },
+    {
       "data": 5,
       "tgt": {
         "process": "OpenOrder",
@@ -573,6 +580,13 @@
       "tgt": {
         "process": "NewOrder",
         "port": "Deftime"
+      }
+    },
+    {
+      "data": 1,
+      "tgt": {
+        "process": "NewOrder",
+        "port": "RetryCount"
       }
     },
     {

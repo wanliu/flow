@@ -17,4 +17,5 @@ const (
 	CtxKeyOrderNum       = "OrderNum"
 	CtxKeySyncQueue      = "SyncQueue"
 	CtxKeyCusOrders      = "CusOrders"
+	CtxKeyRetriedCount   = "RestriedCount"
 )

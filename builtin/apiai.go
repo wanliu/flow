@@ -25,9 +25,10 @@ type ApiAi struct {
 
 	sync.Mutex
 
-	token     string
-	sessionId string
-	proxyUrl  string
+	token      string
+	sessionId  string
+	proxyUrl   string
+	retryCount int
 
 	CtxQueue *lane.Queue
 	TxtQueue *lane.Queue
@@ -39,6 +40,8 @@ type ApiAi struct {
 	ProxyUrl  <-chan string
 	Out       chan<- context.Context
 	Ctx       <-chan context.Context
+
+	RetryCount <-chan float64
 
 	RetryIn  <-chan context.Context
 	RetryOut chan<- context.Context
@@ -60,6 +63,10 @@ func (c *ApiAi) OnIn(input string) {
 
 func (c *ApiAi) OnToken(token string) {
 	c.token = token
+}
+
+func (c *ApiAi) OnRetryCount(count float64) {
+	c.retryCount = int(count)
 }
 
 func (c *ApiAi) OnSessionId(sessionId string) {
@@ -120,14 +127,18 @@ func (c *ApiAi) SendCtxQuery() {
 }
 
 func (c *ApiAi) SendQuery(txt string) apiai.Result {
+	count := 0
 	res, err := ApiAiQuery(txt, c.token, c.sessionId, c.proxyUrl)
-	if err != nil {
-		log.Printf("意图\"%s\"第一次解析失败:%s", txt, err.Error())
-		log.Printf("尝试再一次解析")
+
+	for err != nil && count < c.retryCount {
+		count++
+
+		log.Printf("意图\"%s\"第重新解析失败:%s", txt, count, err.Error())
+		log.Printf("尝试第%v/%v次重新解析", count, c.retryCount)
 
 		res, err = ApiAiQuery(txt, c.token, c.sessionId, c.proxyUrl)
 		if err != nil {
-			log.Printf("意图\"%s\"再一次解析失败:%s", txt, err.Error())
+			log.Printf("意图\"%s\"再第%v/%v次重新解析失败:%s", txt, count, c.retryCount, err.Error())
 		}
 	}
 
