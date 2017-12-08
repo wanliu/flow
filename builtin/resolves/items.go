@@ -28,3 +28,17 @@ func (r *ItemsResolve) Patch(isr ItemsResolve) {
 		}
 	}
 }
+
+func (r ItemsResolve) MismatchQuantity() bool {
+	for _, p := range r.Products {
+		if p.Product == "" {
+			return true
+		}
+
+		if p.Quantity == 0 {
+			return true
+		}
+	}
+
+	return false
+}

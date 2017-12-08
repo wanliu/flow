@@ -26,14 +26,16 @@ func (aa ApiAiOrder) Items() []Item {
 	products := aa.Products()
 	quantities := aa.Quantities()
 
-	for i, q := range quantities {
-		if len(products) >= i+1 {
-			products[i].Quantity = q.Quantity
-			products[i].Unit = q.Unit
-		}
-	}
+	return composeItems(products, quantities)
 
-	return products
+	// for i, q := range quantities {
+	// 	if len(products) >= i+1 {
+	// 		products[i].Quantity = q.Quantity
+	// 		products[i].Unit = q.Unit
+	// 	}
+	// }
+
+	// return products
 }
 
 func (aa ApiAiOrder) Products() []Item {
@@ -48,14 +50,45 @@ func (aa ApiAiOrder) GiftItems() []Item {
 	gifts := aa.GiftProducts()
 	quantities := aa.GiftQuantities()
 
-	for i, q := range quantities {
-		if len(gifts) >= i+1 {
-			gifts[i].Quantity = q.Quantity
-			gifts[i].Unit = q.Unit
-		}
+	return composeItems(gifts, quantities)
+
+	// for i, q := range quantities {
+	// 	if len(gifts) >= i+1 {
+	// 		gifts[i].Quantity = q.Quantity
+	// 		gifts[i].Unit = q.Unit
+	// 	}
+	// }
+
+	// return gifts
+}
+
+func composeItems(products []Item, quantities []Item) []Item {
+	result := make([]Item, 0, 0)
+	l := len(products)
+	qlen := len(quantities)
+
+	if l < qlen {
+		l = qlen
 	}
 
-	return gifts
+	for i := 0; i < l; i++ {
+		item := Item{}
+
+		if len(products) >= i+1 {
+			p := products[i]
+			item.Product = p.Product
+		}
+
+		if len(quantities) >= i+1 {
+			q := quantities[i]
+			item.Quantity = q.Quantity
+			item.Unit = q.Unit
+		}
+
+		result = append(result, item)
+	}
+
+	return result
 }
 
 func (aa ApiAiOrder) GiftProducts() []Item {

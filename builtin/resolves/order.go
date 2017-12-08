@@ -96,6 +96,10 @@ func (c OrderResolve) Resolved() bool {
 	return c.IsResolved
 }
 
+func (c OrderResolve) MismatchQuantity() bool {
+	return c.Products.MismatchQuantity() || c.Gifts.MismatchQuantity()
+}
+
 func (c OrderResolve) Failed() bool {
 	return c.IsFailed
 }
@@ -204,12 +208,79 @@ func (r OrderResolve) EmptyProducts() bool {
 	return len(r.Products.Products) == 0
 }
 
+// 商品与数量不匹配, 识别为:
+// 商品:
+// [ 伊利金典纯牛奶 , 红谷粒多1*12瓶, 伊利安幕希酸奶原味 , 190QQ星儿童成长牛奶健固型, xxxxx]
+// 数量:
+// [ 16 提,  3 盒 , 3 提 ,  6 提 ]
 func (r *OrderResolve) Answer(ctx context.Context) string {
-	if r.Fulfiled() {
+	if r.MismatchQuantity() {
+		return r.MismatchAnswer()
+	} else if r.Fulfiled() {
 		return r.PostOrderAndAnswer(ctx)
 	} else {
 		return r.AnswerHead() + r.AnswerFooter(ctx, "", "")
 	}
+}
+
+func (r *OrderResolve) MismatchAnswer() string {
+	if r.Products.MismatchQuantity() {
+		return r.MismatchProductsAnswer()
+	} else if r.Gifts.MismatchQuantity() {
+		return r.MismatchGiftsAnswer()
+	} else {
+		return "数量匹配"
+	}
+}
+
+func (r *OrderResolve) MismatchProductsAnswer() string {
+	result := "商品与数量不匹配, 识别为:\n"
+
+	ps := make([]string, 0)
+	pq := make([]string, 0)
+
+	for _, p := range r.Products.Products {
+		if p.Product != "" {
+			ps = append(ps, p.Product)
+		}
+
+		if p.Quantity != 0 {
+			pq = append(pq, fmt.Sprint(p.Quantity))
+		}
+	}
+
+	result = result + "商品:\n"
+	result = result + "[" + strings.Join(ps, ", ") + "]\n"
+
+	result = result + "数量:\n"
+	result = result + "[" + strings.Join(pq, ", ") + "]\n"
+
+	return result
+}
+
+func (r *OrderResolve) MismatchGiftsAnswer() string {
+	result := "赠品与数量不匹配, 识别为:\n"
+
+	ps := make([]string, 0)
+	pq := make([]string, 0)
+
+	for _, p := range r.Gifts.Products {
+		if p.Product != "" {
+			ps = append(ps, p.Product)
+		}
+
+		if p.Quantity != 0 {
+			pq = append(pq, fmt.Sprint(p.Quantity))
+		}
+	}
+
+	result = result + "赠品:\n"
+	result = result + "[" + strings.Join(ps, ", ") + "]\n"
+
+	result = result + "数量:\n"
+	result = result + "[" + strings.Join(pq, ", ") + "]\n"
+
+	return result
 }
 
 func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
