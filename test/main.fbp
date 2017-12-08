@@ -49,6 +49,8 @@ OpenOrder() New -> Ctx NewOrder(NewOrder)
 OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
 OpenOrder() Out -> In Reply()
 
+NewOrder() RetryOut -> RetryIn Ai()
+Ai() RetryOut -> RetryIn NewOrder()
 NewOrder() Out -> In Reply()
 NewOrder() Timeout -> Ctx OrderTimeout()
 OrderTimeout() Out -> In Reply()

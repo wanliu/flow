@@ -46,7 +46,7 @@ func NewOrderResolve(ctx context.Context) *OrderResolve {
 	resolve := new(OrderResolve)
 	resolve.Touch()
 
-	aiResult := ctx.Value("Result").(apiai.Result)
+	aiResult := ctx.Value(config.ValueKeyResult).(apiai.Result)
 
 	resolve.AiParams = ai.ApiAiOrder{AiResult: aiResult}
 	resolve.ExtractFromParams()
@@ -205,7 +205,7 @@ func (r *OrderResolve) SetTimeByDef() {
 }
 
 func (r OrderResolve) EmptyProducts() bool {
-	return len(r.Products.Products) == 0
+	return r.Products.Empty()
 }
 
 // 商品与数量不匹配, 识别为:

@@ -42,3 +42,17 @@ func (r ItemsResolve) MismatchQuantity() bool {
 
 	return false
 }
+
+func (r ItemsResolve) Empty() bool {
+	if len(r.Products) == 0 {
+		return true
+	}
+
+	for _, p := range r.Products {
+		if p.Product != "" {
+			return false
+		}
+	}
+
+	return true
+}

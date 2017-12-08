@@ -439,6 +439,26 @@
     {
       "src": {
         "process": "NewOrder",
+        "port": "RetryOut"
+      },
+      "tgt": {
+        "process": "Ai",
+        "port": "RetryIn"
+      }
+    },
+    {
+      "src": {
+        "process": "Ai",
+        "port": "RetryOut"
+      },
+      "tgt": {
+        "process": "NewOrder",
+        "port": "RetryIn"
+      }
+    },
+    {
+      "src": {
+        "process": "NewOrder",
         "port": "Out"
       },
       "tgt": {

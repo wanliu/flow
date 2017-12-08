@@ -14,6 +14,9 @@ type NewOrder struct {
 	Out     chan<- ReplyData
 	Notice  chan<- context.Context
 	Timeout chan<- context.Context
+
+	RetryOut chan<- context.Context
+	RetryIn  <-chan context.Context
 }
 
 func NewNewOrder() interface{} {
@@ -26,6 +29,38 @@ func (c *NewOrder) OnDeftime(t string) {
 }
 
 func (c *NewOrder) OnCtx(ctx context.Context) {
+	orderResolve := resolves.NewOrderResolve(ctx)
+
+	if c.DefTime != "" {
+		orderResolve.SetDefTime(c.DefTime)
+	}
+
+	output := ""
+
+	if orderResolve.EmptyProducts() {
+		// output = "没有相关的产品"
+		c.RetryOut <- ctx
+	} else {
+		output = orderResolve.Answer(ctx)
+
+		if orderResolve.Resolved() {
+			ctx.SetValue(config.CtxKeyLastOrder, *orderResolve)
+			ctx.SetValue(config.CtxKeyOrder, nil)
+		} else if orderResolve.Failed() {
+			ctx.SetValue(config.CtxKeyOrder, nil)
+		} else {
+			ctx.SetValue(config.CtxKeyOrder, *orderResolve)
+		}
+
+		// c.Notice <- ctx
+		c.Timeout <- ctx
+
+		replyData := ReplyData{output, ctx}
+		c.Out <- replyData
+	}
+}
+
+func (c *NewOrder) OnRetryIn(ctx context.Context) {
 	orderResolve := resolves.NewOrderResolve(ctx)
 
 	if c.DefTime != "" {
