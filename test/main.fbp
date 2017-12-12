@@ -90,6 +90,8 @@ true -> Flow CancelInt()
 'business.customer.orders.query' -> Intent CustomerOrdersInt()
 0.5 -> Score CustomerOrdersInt()
 
+5 -> ExpireMin CustomerOrders()
+
 'business.customer.orders.page' -> Intent CustomerOrdersPageInt()
 0.7 -> Score CustomerOrdersPageInt()
 

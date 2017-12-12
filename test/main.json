@@ -670,6 +670,13 @@
       }
     },
     {
+      "data": 5,
+      "tgt": {
+        "process": "CustomerOrders",
+        "port": "ExpireMin"
+      }
+    },
+    {
       "data": "business.customer.orders.page",
       "tgt": {
         "process": "CustomerOrdersPageInt",

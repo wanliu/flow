@@ -29,6 +29,8 @@ type CustomerOrdersResolve struct {
 	Duration   string
 	BeginT     *time.Time
 	EndT       *time.Time
+
+	LastActiveTime *time.Time
 }
 
 func NewCusOrdersResolve(ctx context.Context, perPage int) *CustomerOrdersResolve {
@@ -103,7 +105,13 @@ func (r *CustomerOrdersResolve) Answer() string {
 
 	orders := r.FetchOrders()
 	if r.Count > 0 {
-		result = result + fmt.Sprintf("共%v个订单，显示最近的%v个订单，以下为第%v到第%v个：\n", r.Total, r.Count, r.Prefetched+1, r.Fetched)
+		count := r.Count
+
+		if r.Count > r.Total {
+			count = r.Total
+		}
+
+		result = result + fmt.Sprintf("共%v个订单，显示最近的%v个订单，以下为第%v到第%v个：\n", r.Total, count, r.Prefetched+1, r.Fetched)
 	} else {
 		result = result + fmt.Sprintf("共%v个订单，以下为第%v到第%v个：\n", r.Total, r.Prefetched+1, r.Fetched)
 	}
@@ -136,7 +144,7 @@ func (r *CustomerOrdersResolve) Answer() string {
 			result = result + "输入\"继续\"，或者\"下一页\"，查看剩下的订单\n"
 		} else {
 			total := 0
-			if r.Count > 0 {
+			if r.Count > 0 && r.Count <= r.Total {
 				total = r.Count
 			} else {
 				total = r.Total
@@ -255,15 +263,19 @@ func (r *CustomerOrdersResolve) Setup(ctx context.Context) {
 	}
 }
 
-func (r *CustomerOrdersResolve) Clear(ctx context.Context) {
+func (r *CustomerOrdersResolve) ClearIfDone(ctx context.Context) {
 	if r.Done {
-		in := ctx.Value(config.CtxKeyCusOrders)
-		if in != nil {
-			rsv := in.(*CustomerOrdersResolve)
+		r.Clear(ctx)
+	}
+}
 
-			if r == rsv {
-				ctx.SetValue(config.CtxKeyCusOrders, nil)
-			}
+func (r *CustomerOrdersResolve) Clear(ctx context.Context) {
+	in := ctx.Value(config.CtxKeyCusOrders)
+	if in != nil {
+		rsv := in.(*CustomerOrdersResolve)
+
+		if r == rsv {
+			ctx.SetValue(config.CtxKeyCusOrders, nil)
 		}
 	}
 }
