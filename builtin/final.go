@@ -65,7 +65,8 @@ func (s Final) DelayRange() int {
 }
 
 func (s *Final) SendReply() {
-	secs := s.DelayRange()
+	// secs := s.DelayRange()
+	secs := 3
 
 	s.RLock()
 	for s.ReplyQueue.Head() != nil {
