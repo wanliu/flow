@@ -120,7 +120,7 @@ func (r *CustomerOrdersResolve) Answer() string {
 	if orders != nil && len(*orders) > 0 {
 		for _, order := range *orders {
 			result = result + "------------------------\n"
-			result = result + fmt.Sprintf("订单号：%v\n总金额：%v\n送货时间：%v\n", order.No, order.Amount, order.DeliveryTime.Format("2006年01月02日"))
+			result = result + fmt.Sprintf("订单号：%v\n总金额：%v\n送货时间：%v\n", order.No, fmt.Sprintf("%.2f", order.Amount), order.DeliveryTime.Format("2006年01月02日"))
 			if order.Note != "" {
 				result = result + fmt.Sprint("备注：%v\n", order.Note)
 			}
