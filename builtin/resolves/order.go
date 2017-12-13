@@ -314,10 +314,11 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 			r.IsFailed = true
 			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
-			r.IsResolved = true
-			r.BrainOrder = &order
-			r.Id = order.ID
-			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			return RenderSolvedOrder(order)
+			// r.IsResolved = true
+			// r.BrainOrder = &order
+			// r.Id = order.ID
+			// return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
 		}
 	} else {
 		// order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
