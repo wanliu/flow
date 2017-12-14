@@ -11,7 +11,6 @@ import (
 	"github.com/wanliu/brain_data/wrapper"
 	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/builtin/config"
-	"github.com/wanliu/flow/builtin/resolves/templates"
 
 	"github.com/wanliu/flow/context"
 )
@@ -316,7 +315,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true
-			return templates.RenderSolvedOrder(order)
+			return RenderSolvedOrder(order)
 
 			// r.BrainOrder = &order
 			// r.Id = order.ID
@@ -331,7 +330,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true
-			return templates.RenderSolvedOrder(order)
+			return RenderSolvedOrder(order)
 
 			// r.BrainOrder = &order
 			// r.Id = order.ID
@@ -365,28 +364,7 @@ func (r OrderResolve) AnswerHead() string {
 }
 
 func (r OrderResolve) AnswerBody() string {
-	desc := ""
-
-	for _, p := range r.Products.Products {
-		desc = desc + fmt.Sprintf("%v %v %v\n", p.Product, p.Quantity, p.Unit)
-
-	}
-
-	if len(r.Gifts.Products) > 0 {
-		desc = desc + "申请的赠品:\n"
-
-		for _, g := range r.Gifts.Products {
-			desc = desc + fmt.Sprintf("%v %v %v\n", g.Product, g.Quantity, g.Unit)
-		}
-	}
-
-	desc = desc + fmt.Sprintf("时间:%v\n", r.Time.Format("2006年01月02日"))
-
-	if r.Note != "" {
-		desc = desc + "备注：" + r.Note + "\n"
-	}
-
-	return desc
+	return RenderOrderBody(r)
 }
 
 func (r OrderResolve) AnswerFooter(ctx context.Context) string {

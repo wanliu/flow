@@ -1,4 +1,4 @@
-package templates
+package resolves
 
 import (
 	"bytes"
@@ -19,7 +19,7 @@ var solvedOrderTemplates = []string{
 {{end}}
 时间:{{.DeliveryTime.Format "2006年01月02日"}}
 客户:{{.Customer.Name}}
-订单已经生成，订单号为：{{.No}}
+订单已经生成，订单号为:{{.No}}
 订单入口: http://jiejie.wanliu.biz/order/QueryDetail/{{.GlobelId}}`,
 }
 
