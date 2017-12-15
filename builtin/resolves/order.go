@@ -339,28 +339,21 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 	}
 }
 
-// func (r OrderResolve) AddressInfo() string {
-// 	if r.Customer != "" {
-// 		return "客户:" + r.Customer + "\n"
-// 	} else {
-// 		return ""
-// 	}
-// }
-
 func (r OrderResolve) AnswerUnfulfiled(ctx context.Context) string {
 	return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(ctx)
 }
 
 func (r OrderResolve) AnswerHead() string {
-	desc := "订单正在处理, 已经添加" + CnNum(len(r.Products.Products)) + "种产品"
+	// desc := "订单正在处理, 已经添加" + CnNum(len(r.Products.Products)) + "种产品"
 
-	if len(r.Gifts.Products) > 0 {
-		desc = desc + ", " + CnNum(len(r.Gifts.Products)) + "种赠品" + "\n"
-	} else {
-		desc = desc + "\n"
-	}
+	// if len(r.Gifts.Products) > 0 {
+	// 	desc = desc + ", " + CnNum(len(r.Gifts.Products)) + "种赠品" + "\n"
+	// } else {
+	// 	desc = desc + "\n"
+	// }
 
-	return desc
+	// return desc
+	return RenderOrderHeader(r)
 }
 
 func (r OrderResolve) AnswerBody() string {
