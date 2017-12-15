@@ -1,5 +1,8 @@
 {
   "processes": {
+    "TextProc": {
+      "component": "TextPreprocesor"
+    },
     "Ai": {
       "component": "ApiAi"
     },
@@ -15,7 +18,7 @@
     "ConfirmInt": {
       "component": "IntentCheck"
     },
-    "AddressConfirm": {
+    "Confirm": {
       "component": "Confirm"
     },
     "Reply": {
@@ -24,11 +27,32 @@
     "CancelInt": {
       "component": "IntentCheck"
     },
+    "OrderDeleteInt": {
+      "component": "IntentCheck"
+    },
+    "OrderDelete": {
+      "component": "OrderDelete"
+    },
+    "OrderNumberInt": {
+      "component": "IntentCheck"
+    },
+    "OrderNumber": {
+      "component": "OrderNumber"
+    },
     "OrderPrinterInt": {
       "component": "IntentCheck"
     },
     "OrderPrinter": {
       "component": "OrderPrinter"
+    },
+    "CustomerOrdersInt": {
+      "component": "IntentCheck"
+    },
+    "CustomerOrders": {
+      "component": "CustomerOrders"
+    },
+    "CustomerOrdersPageInt": {
+      "component": "IntentCheck"
     },
     "OrderCancelInt": {
       "component": "IntentCheck"
@@ -62,6 +86,16 @@
     }
   },
   "connections": [
+    {
+      "src": {
+        "process": "TextProc",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Ai",
+        "port": "In"
+      }
+    },
     {
       "src": {
         "process": "Ai",
@@ -108,13 +142,13 @@
         "port": "Out"
       },
       "tgt": {
-        "process": "AddressConfirm",
+        "process": "Confirm",
         "port": "Confirm"
       }
     },
     {
       "src": {
-        "process": "AddressConfirm",
+        "process": "Confirm",
         "port": "Out"
       },
       "tgt": {
@@ -138,7 +172,7 @@
         "port": "Out"
       },
       "tgt": {
-        "process": "AddressConfirm",
+        "process": "Confirm",
         "port": "Cancel"
       }
     },
@@ -148,13 +182,73 @@
         "port": "FlowOut"
       },
       "tgt": {
-        "process": "AddressConfirm",
+        "process": "Confirm",
         "port": "Expire"
       }
     },
     {
       "src": {
         "process": "CancelInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderDeleteInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderDeleteInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderDelete",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderDelete",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderDeleteInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderNumberInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderNumberInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderNumber",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderNumber",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderNumberInt",
         "port": "Next"
       },
       "tgt": {
@@ -185,6 +279,56 @@
     {
       "src": {
         "process": "OrderPrinterInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "CustomerOrdersInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerOrdersInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "CustomerOrders",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerOrdersInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "CustomerOrdersPageInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerOrdersPageInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "CustomerOrders",
+        "port": "Page"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerOrders",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "CustomerOrdersPageInt",
         "port": "Next"
       },
       "tgt": {
@@ -295,6 +439,26 @@
     {
       "src": {
         "process": "NewOrder",
+        "port": "RetryOut"
+      },
+      "tgt": {
+        "process": "Ai",
+        "port": "RetryIn"
+      }
+    },
+    {
+      "src": {
+        "process": "Ai",
+        "port": "RetryOut"
+      },
+      "tgt": {
+        "process": "NewOrder",
+        "port": "RetryIn"
+      }
+    },
+    {
+      "src": {
+        "process": "NewOrder",
         "port": "Out"
       },
       "tgt": {
@@ -384,10 +548,17 @@
       }
     },
     {
-      "data": "4ae1a59715104c32a6bacabd88cfc070",
+      "data": "9e48732878a34e7d960cb4a29ac0f72a",
       "tgt": {
         "process": "Ai",
         "port": "Token"
+      }
+    },
+    {
+      "data": 1,
+      "tgt": {
+        "process": "Ai",
+        "port": "RetryCount"
       }
     },
     {
@@ -398,6 +569,13 @@
       }
     },
     {
+      "data": "command-queue-data-sync",
+      "tgt": {
+        "process": "OpenOrder",
+        "port": "SyncQueue"
+      }
+    },
+    {
       "data": "今天",
       "tgt": {
         "process": "NewOrder",
@@ -405,7 +583,14 @@
       }
     },
     {
-      "data": "buiness.order.address.confirm",
+      "data": 1,
+      "tgt": {
+        "process": "NewOrder",
+        "port": "RetryCount"
+      }
+    },
+    {
+      "data": "buiness.confirm",
       "tgt": {
         "process": "ConfirmInt",
         "port": "Intent"
@@ -419,7 +604,7 @@
       }
     },
     {
-      "data": "buiness.order.address.cancel",
+      "data": "buiness.cancel",
       "tgt": {
         "process": "CancelInt",
         "port": "Intent"
@@ -439,6 +624,69 @@
       "data": 0.5,
       "tgt": {
         "process": "CancelInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.order.delete",
+      "tgt": {
+        "process": "OrderDeleteInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OrderDeleteInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.order.number",
+      "tgt": {
+        "process": "OrderNumberInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OrderNumberInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.customer.orders.query",
+      "tgt": {
+        "process": "CustomerOrdersInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.5,
+      "tgt": {
+        "process": "CustomerOrdersInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": 5,
+      "tgt": {
+        "process": "CustomerOrders",
+        "port": "ExpireMin"
+      }
+    },
+    {
+      "data": "business.customer.orders.page",
+      "tgt": {
+        "process": "CustomerOrdersPageInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "CustomerOrdersPageInt",
         "port": "Score"
       }
     },
@@ -508,7 +756,7 @@
   ],
   "inports": {
     "Text": {
-      "process": "Ai",
+      "process": "TextProc",
       "port": "In"
     },
     "Ctx": {

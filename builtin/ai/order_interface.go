@@ -8,6 +8,7 @@ type Item struct {
 	Product     string
 	Quantity    int
 	Price       float64
+	Unit        string
 	ResolveList []string
 }
 
@@ -26,6 +27,8 @@ type AiOrder interface {
 
 	Address() string
 	Customer() string
+	Duration() string
+	Count() int
 
 	Time() time.Time
 

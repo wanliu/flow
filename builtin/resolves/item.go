@@ -8,5 +8,6 @@ type ItemResolve struct {
 	Price    float64
 	Quantity int
 	Product  string
+	Unit     string
 	// Resolution Resolution
 }

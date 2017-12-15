@@ -1,25 +1,41 @@
-INPORT=Ai.In:Text
+INPORT=TextProc.In:Text
 INPORT=Ai.Ctx:Ctx
 INPORT=Voice.In:Voice
 
-Ai(ApiAi) Out -> Ctx CM(ContextManager)
+TextProc(TextPreprocesor) Out -> In Ai(ApiAi)
+Ai() Out -> Ctx CM(ContextManager)
 
 CM() Process -> Ctx OrderTouch(OrderTouch)
 OrderTouch() Timeout -> Ctx OrderTimeout(OrderTimeout)
 
 OrderTouch() Next -> Ctx ConfirmInt(IntentCheck)
-ConfirmInt() Out -> Confirm AddressConfirm(Confirm)
-AddressConfirm() Out -> In Reply(Final)
+ConfirmInt() Out -> Confirm Confirm(Confirm)
+Confirm() Out -> In Reply(Final)
 
 ConfirmInt() Next -> Ctx CancelInt(IntentCheck)
-CancelInt() Out -> Cancel AddressConfirm()
-CancelInt() FlowOut -> Expire AddressConfirm()
+CancelInt() Out -> Cancel Confirm()
+CancelInt() FlowOut -> Expire Confirm()
 
-CancelInt() Next -> Ctx OrderPrinterInt(IntentCheck)
+CancelInt() Next -> Ctx OrderDeleteInt(IntentCheck)
+OrderDeleteInt() Out -> Ctx OrderDelete(OrderDelete)
+OrderDelete() Out -> In Reply()
+
+OrderDeleteInt() Next -> Ctx OrderNumberInt(IntentCheck)
+OrderNumberInt() Out -> Ctx OrderNumber(OrderNumber)
+OrderNumber() Out -> In Reply()
+
+OrderNumberInt() Next -> Ctx OrderPrinterInt(IntentCheck)
 OrderPrinterInt() Out -> Ctx OrderPrinter(OrderPrinter)
 OrderPrinter() Out -> In Reply()
 
-OrderPrinterInt() Next -> Ctx OrderCancelInt(IntentCheck)
+OrderPrinterInt() Next -> Ctx CustomerOrdersInt(IntentCheck)
+CustomerOrdersInt() Out -> Ctx CustomerOrders(CustomerOrders)
+
+CustomerOrdersInt() Next -> Ctx CustomerOrdersPageInt(IntentCheck)
+CustomerOrdersPageInt() Out -> Page CustomerOrders()
+CustomerOrders() Out -> In Reply()
+
+CustomerOrdersPageInt() Next -> Ctx OrderCancelInt(IntentCheck)
 OrderCancelInt() Out -> Ctx OrderCancel(OrderCancel)
 OrderCancel() Out -> In Reply()
 
@@ -33,6 +49,8 @@ OpenOrder() New -> Ctx NewOrder(NewOrder)
 OpenOrder() Patch -> Ctx PatchOrder(PatchOrder)
 OpenOrder() Out -> In Reply()
 
+NewOrder() RetryOut -> RetryIn Ai()
+Ai() RetryOut -> RetryIn NewOrder()
 NewOrder() Out -> In Reply()
 NewOrder() Timeout -> Ctx OrderTimeout()
 OrderTimeout() Out -> In Reply()
@@ -47,18 +65,35 @@ Voice(Voice) Out -> In Reply()
 
 '123456789' -> SessionId Ai()
 'http://127.0.0.1:8123' -> ProxyUrl Ai()
-'4ae1a59715104c32a6bacabd88cfc070' -> Token Ai()
+'9e48732878a34e7d960cb4a29ac0f72a' -> Token Ai()
+1 -> RetryCount Ai()
 
 5 -> ExpireMinutes OpenOrder()
+'command-queue-data-sync' -> SyncQueue OpenOrder()
 
 '今天' -> Deftime NewOrder()
+1 -> RetryCount NewOrder()
 
-'buiness.order.address.confirm' -> Intent ConfirmInt()
+'buiness.confirm' -> Intent ConfirmInt()
 0.5 -> Score ConfirmInt()
 
-'buiness.order.address.cancel' -> Intent CancelInt()
+'buiness.cancel' -> Intent CancelInt()
 true -> Flow CancelInt()
 0.5 -> Score CancelInt()
+
+'business.order.delete' -> Intent OrderDeleteInt()
+0.7 -> Score OrderDeleteInt()
+
+'business.order.number' -> Intent OrderNumberInt()
+0.7 -> Score OrderNumberInt()
+
+'business.customer.orders.query' -> Intent CustomerOrdersInt()
+0.5 -> Score CustomerOrdersInt()
+
+5 -> ExpireMin CustomerOrders()
+
+'business.customer.orders.page' -> Intent CustomerOrdersPageInt()
+0.7 -> Score CustomerOrdersPageInt()
 
 'business.order.create.address' -> Intent AdressInt()
 0.1 -> Score AdressInt()

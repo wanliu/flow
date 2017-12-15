@@ -3,6 +3,7 @@ package builtin
 import (
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
+	"github.com/wanliu/flow/builtin/resolves"
 
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
@@ -55,34 +56,36 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 				cOrder.Customer = customer
 			}
 
-			if cOrder.Fulfiled() {
+			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer(ctx)
+			c.Out <- ReplyData{reply, ctx}
+
+			if cOrder.Resolved() {
 				ctx.SetValue(config.CtxKeyOrder, nil)
 				ctx.SetValue(config.CtxKeyLastOrder, cOrder)
+			} else if cOrder.Failed() {
+				ctx.SetValue(config.CtxKeyOrder, nil)
 			}
-
-			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer()
-			c.Out <- ReplyData{reply, ctx}
 		} else {
 			var values []string
 
 			query := params.Query()
-			address := params.Address() + params.Customer()
+			customer := params.Customer()
 
-			if address == "" {
+			if customer == "" {
 				values = []string{query}
 			} else {
-				values = []string{address, query}
+				values = []string{customer, query}
 			}
 
-			addressConfirm := AddressConfirm{Order: &cOrder, Value: values}
+			addressConfirm := resolves.AddressConfirm{Values: values}
 
 			ctx.SetValue(config.CtxKeyConfirm, addressConfirm)
 
 			reply := "收到您的回复:" + query + "\n"
-			reply = reply + "是否将 “" + values[0] + "” 做为收货地址?"
+			reply = reply + addressConfirm.Notice(ctx)
 			c.Out <- ReplyData{reply, ctx}
 		}
 	} else {
-		c.Out <- ReplyData{"地址输入无效，当前没有正在进行中的订单", ctx}
+		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx}
 	}
 }

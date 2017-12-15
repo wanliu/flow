@@ -32,7 +32,7 @@ func (c *OrderTimeout) OnCtx(ctx Context) {
 		expiredMins := config.SesssionExpiredMinutes
 		settedMins := ctx.Value(config.CtxKeyExpiredMinutes)
 
-		if settedMins != 0 {
+		if settedMins != nil {
 			expiredMins = settedMins.(int)
 		}
 
