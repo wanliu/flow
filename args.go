@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wanliu/flow/context"
 	goflow "github.com/wanliu/goflow"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -135,6 +136,11 @@ func GuessType(typ string, val string) (ch interface{}, name string, v interface
 				panic(fmt.Sprintf("invalid bool value %s", err))
 			}
 			ch = make(chan float64)
+			return
+		case "context":
+			v, _ = context.NewContext()
+			ch = make(chan context.Context)
+
 			return
 		default:
 			ch = make(chan string)

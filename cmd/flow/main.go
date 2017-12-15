@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"reflect"
+
+	// "github.com/kr/pretty"
 
 	"github.com/wanliu/flow"
 	goflow "github.com/wanliu/goflow"
@@ -36,11 +39,11 @@ func main() {
 	switch kingpin.Parse() {
 	case "run":
 
-		if bpk, err := flow.LoadBuilitnPackage(); err != nil {
-			log.Fatalf("load builitn package failed: %s", err)
+		if bpk, err := flow.LoadbuiltinPackage(); err != nil {
+			log.Fatalf("load builtin package failed: %s", err)
 		} else {
 			if err := bpk.RegisterComponents(); err != nil {
-				log.Fatalf("load builitn  components failed: %s", err)
+				log.Fatalf("load builtin  components failed: %s", err)
 			}
 		}
 
@@ -65,17 +68,20 @@ func main() {
 		// log.Printf("net %# v", pretty.Formatter(net))
 		// net.in
 		inports.SetInPorts(net)
-		outports.SetOutPorts(net)
+		// outports.SetOutPorts(net)
 		goflow.RunNet(net)
+		// log.Printf("net: %# v", pretty.Formatter(net))
 
 		// Wait for the network setup
 		<-net.Ready()
-
 		inports.Send()
-		// if len(outports) > 0 {
-		outports.Wait()
-		// }
-		inports.Close()
+		// inports.Close()
+
+		// WaitNetEnd(net, outports)
+		// // if len(outports) > 0 {
+		// outports.Wait()
+		// // }
+
 		<-net.Wait()
 
 	case "register":
@@ -106,6 +112,30 @@ func main() {
 			log.Fatalf("save to Config:%s failed: %s", *rtfile, err)
 		}
 		fmt.Printf("Uninstalled component's package '%s#%s' successful\n", pkg.Name, pkg.Version)
+	}
+}
+
+func WaitNetEnd(net *goflow.Graph, ports flow.PortsValues) error {
+	var cases = make([]reflect.SelectCase, 0)
+	cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(net.Wait())})
+
+	for _, chVal := range ports {
+		v := reflect.ValueOf(chVal.Chan)
+		cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: v})
+	}
+
+	for {
+		chosen, recv, recvOK := reflect.Select(cases)
+		if !recvOK {
+			if chosen == 0 {
+				// Net Wait signal
+				return nil
+			} else {
+				log.Printf("recv close chosen: %d", chosen)
+			}
+		} else {
+			log.Printf("recv: %v", recv)
+		}
 	}
 }
 

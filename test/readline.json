@@ -1,7 +1,7 @@
 {
   "processes": {
-    "Read": {
-      "component": "ReadFile"
+    "ReadLine": {
+      "component": "ReadLine"
     },
     "Display": {
       "component": "Output"
@@ -10,7 +10,7 @@
   "connections": [
     {
       "src": {
-        "process": "Read",
+        "process": "ReadLine",
         "port": "Out"
       },
       "tgt": {
@@ -21,8 +21,8 @@
   ],
   "inports": {
     "FILENAME": {
-      "process": "Read",
-      "port": "Read"
+      "process": "ReadLine",
+      "port": "In"
     }
   },
   "outports": {

@@ -6,7 +6,7 @@ import (
 	"plugin"
 
 	"github.com/wanliu/components"
-	"github.com/wanliu/flow/builitn"
+	"github.com/wanliu/flow/builtin"
 	goflow "github.com/wanliu/goflow"
 )
 
@@ -60,11 +60,11 @@ func LoadPackage(filename string) (*Package, error) {
 	return &pk, nil
 }
 
-func LoadBuilitnPackage() (*Package, error) {
+func LoadbuiltinPackage() (*Package, error) {
 	var pk Package
-	pk.Name = builitn.Info.Name
-	pk.Version = builitn.Info.Version
-	pk.componentList = builitn.ComponentList()
+	pk.Name = builtin.Info.Name
+	pk.Version = builtin.Info.Version
+	pk.componentList = builtin.ComponentList()
 
 	for name, _ := range pk.componentList {
 		// goflow.Register(name, constructor)

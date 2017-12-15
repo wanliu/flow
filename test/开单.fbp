@@ -1,0 +1,11 @@
+INPORT=ReadLine.In:FILENAME
+OUTPORT=Display.Out:Out
+'AppId' -> AppId Luis(LuisAnalyze)
+'Key' -> Key Luis(LuisAnalyze)
+ReadLine(ReadLine) Out -> In Luis()
+# Result 是 QueryResult 的类型，包括了 TopScoringIntent 与 Entities
+Luis() Result -> In OpenOrder(IntentAnalyze:intent=1234,score=05)
+Luis() Result -> In Hello(IntentAnalyze:intent=1234,score=05)
+Luis() Result -> In Help(IntentAnalyze:intent=1234,score=05)
+
+

@@ -1,14 +1,10 @@
 {
   "processes": {
-    "ReadLine": {
-      "component": "ReadLine"
-    },
     "Luis": {
-      "component": "LuisAnalyze",
-      "metadata": {
-        "appId": "12341234",
-        "secret": "12341234"
-      }
+      "component": "LuisAnalyze"
+    },
+    "ToString": {
+      "component": "Stringifier"
     },
     "Display": {
       "component": "Output"
@@ -16,10 +12,7 @@
   },
   "connections": [
     {
-      "src": {
-        "process": "ReadLine",
-        "port": "Out"
-      },
+      "data": "纯牛奶5件",
       "tgt": {
         "process": "Luis",
         "port": "In"
@@ -28,6 +21,16 @@
     {
       "src": {
         "process": "Luis",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "ToString",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "ToString",
         "port": "Out"
       },
       "tgt": {
@@ -37,8 +40,8 @@
     }
   ],
   "inports": {
-    "FILENAME": {
-      "process": "ReadLine",
+    "Start": {
+      "process": "Luis",
       "port": "In"
     }
   },

@@ -1,0 +1,524 @@
+{
+  "processes": {
+    "Ai": {
+      "component": "ApiAi"
+    },
+    "CM": {
+      "component": "ContextManager"
+    },
+    "OrderTouch": {
+      "component": "OrderTouch"
+    },
+    "OrderTimeout": {
+      "component": "OrderTimeout"
+    },
+    "ConfirmInt": {
+      "component": "IntentCheck"
+    },
+    "AddressConfirm": {
+      "component": "Confirm"
+    },
+    "Reply": {
+      "component": "Final"
+    },
+    "CancelInt": {
+      "component": "IntentCheck"
+    },
+    "OrderPrinterInt": {
+      "component": "IntentCheck"
+    },
+    "OrderPrinter": {
+      "component": "OrderPrinter"
+    },
+    "OrderCancelInt": {
+      "component": "IntentCheck"
+    },
+    "OrderCancel": {
+      "component": "OrderCancel"
+    },
+    "AdressInt": {
+      "component": "IntentCheck"
+    },
+    "OrderAddress": {
+      "component": "OrderAddress"
+    },
+    "OrderInt": {
+      "component": "IntentCheck"
+    },
+    "OpenOrder": {
+      "component": "Order"
+    },
+    "NewOrder": {
+      "component": "NewOrder"
+    },
+    "PatchOrder": {
+      "component": "PatchOrder"
+    },
+    "Unimplemented": {
+      "component": "Unimplemented"
+    },
+    "Voice": {
+      "component": "Voice"
+    }
+  },
+  "connections": [
+    {
+      "src": {
+        "process": "Ai",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "CM",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CM",
+        "port": "Process"
+      },
+      "tgt": {
+        "process": "OrderTouch",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderTouch",
+        "port": "Timeout"
+      },
+      "tgt": {
+        "process": "OrderTimeout",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderTouch",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "ConfirmInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "ConfirmInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "AddressConfirm",
+        "port": "Confirm"
+      }
+    },
+    {
+      "src": {
+        "process": "AddressConfirm",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "ConfirmInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "CancelInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "CancelInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "AddressConfirm",
+        "port": "Cancel"
+      }
+    },
+    {
+      "src": {
+        "process": "CancelInt",
+        "port": "FlowOut"
+      },
+      "tgt": {
+        "process": "AddressConfirm",
+        "port": "Expire"
+      }
+    },
+    {
+      "src": {
+        "process": "CancelInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderPrinterInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderPrinterInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderPrinter",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderPrinter",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderPrinterInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderCancelInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderCancelInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderCancel",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderCancel",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderCancelInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "AdressInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "AdressInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderAddress",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderAddress",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "AdressInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OpenOrder",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OpenOrder",
+        "port": "New"
+      },
+      "tgt": {
+        "process": "NewOrder",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OpenOrder",
+        "port": "Patch"
+      },
+      "tgt": {
+        "process": "PatchOrder",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OpenOrder",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "NewOrder",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "NewOrder",
+        "port": "Timeout"
+      },
+      "tgt": {
+        "process": "OrderTimeout",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderTimeout",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "PatchOrder",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "Unimplemented",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "Unimplemented",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "Voice",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "data": "dfadsafdsafdsafdsafdsa",
+      "tgt": {
+        "process": "Voice",
+        "port": "Token"
+      }
+    },
+    {
+      "data": "123456789",
+      "tgt": {
+        "process": "Ai",
+        "port": "SessionId"
+      }
+    },
+    {
+      "data": "http://127.0.0.1:8123",
+      "tgt": {
+        "process": "Ai",
+        "port": "ProxyUrl"
+      }
+    },
+    {
+      "data": "4ae1a59715104c32a6bacabd88cfc070",
+      "tgt": {
+        "process": "Ai",
+        "port": "Token"
+      }
+    },
+    {
+      "data": 5,
+      "tgt": {
+        "process": "OpenOrder",
+        "port": "ExpireMinutes"
+      }
+    },
+    {
+      "data": "今天",
+      "tgt": {
+        "process": "NewOrder",
+        "port": "Deftime"
+      }
+    },
+    {
+      "data": "buiness.order.address.confirm",
+      "tgt": {
+        "process": "ConfirmInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.5,
+      "tgt": {
+        "process": "ConfirmInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "buiness.order.address.cancel",
+      "tgt": {
+        "process": "CancelInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "src": {
+        "process": "true",
+        "port": "OUT"
+      },
+      "tgt": {
+        "process": "CancelInt",
+        "port": "Flow"
+      }
+    },
+    {
+      "data": 0.5,
+      "tgt": {
+        "process": "CancelInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.order.create.address",
+      "tgt": {
+        "process": "AdressInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.1,
+      "tgt": {
+        "process": "AdressInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OrderAddress",
+        "port": "ConfirmScore"
+      }
+    },
+    {
+      "data": "business.order.current.display",
+      "tgt": {
+        "process": "OrderPrinterInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OrderPrinterInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.order.create.cancel",
+      "tgt": {
+        "process": "OrderCancelInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OrderCancelInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "business.order.create",
+      "tgt": {
+        "process": "OrderInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.7,
+      "tgt": {
+        "process": "OrderInt",
+        "port": "Score"
+      }
+    }
+  ],
+  "inports": {
+    "Text": {
+      "process": "Ai",
+      "port": "In"
+    },
+    "Ctx": {
+      "process": "Ai",
+      "port": "Ctx"
+    },
+    "Voice": {
+      "process": "Voice",
+      "port": "In"
+    }
+  },
+  "caseSensitive": true
+}
