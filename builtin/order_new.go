@@ -64,6 +64,8 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			ctx.SetValue(config.CtxKeyOrder, nil)
 		} else if orderResolve.Failed() {
 			ctx.SetValue(config.CtxKeyOrder, nil)
+		} else if orderResolve.MismatchQuantity() {
+			ctx.SetValue(config.CtxKeyOrder, nil)
 		} else {
 			ctx.SetValue(config.CtxKeyOrder, *orderResolve)
 		}
