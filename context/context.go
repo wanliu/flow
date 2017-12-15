@@ -233,10 +233,10 @@ LOOP:
 		select {
 		case txt := <-ctx.send:
 			ctx.counter--
-			err = ctx.Reply.Text(txt)
+			err = ctx.Reply.Text(txt, ctx)
 		case table := <-ctx.sendTable:
 			ctx.counter--
-			err = ctx.Reply.Table(table)
+			err = ctx.Reply.Table(table, ctx)
 		case <-ctx.quit:
 			// ctx.waitingEnd()
 			break LOOP
