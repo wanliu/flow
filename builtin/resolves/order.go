@@ -2,7 +2,6 @@ package resolves
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/wanliu/brain_data/wrapper"
 	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/builtin/config"
+	"github.com/wanliu/flow/builtin/resolves/templates"
 
 	"github.com/wanliu/flow/context"
 )
@@ -315,7 +315,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true
-			return RenderSolvedOrder(order)
+			return templates.RenderSolvedOrder(order)
 
 			// r.BrainOrder = &order
 			// r.Id = order.ID
@@ -330,7 +330,7 @@ func (r *OrderResolve) PostOrderAndAnswer() string {
 			return fmt.Sprintf("%v, 订单创建失败", err.Error())
 		} else {
 			r.IsResolved = true
-			return RenderSolvedOrder(order)
+			return templates.RenderSolvedOrder(order)
 
 			// r.BrainOrder = &order
 			// r.Id = order.ID
@@ -353,11 +353,11 @@ func (r OrderResolve) AnswerHead() string {
 	// }
 
 	// return desc
-	return RenderOrderHeader(r)
+	return templates.RenderOrderHeader(r)
 }
 
 func (r OrderResolve) AnswerBody() string {
-	return RenderOrderBody(r)
+	return templates.RenderOrderBody(r)
 }
 
 func (r OrderResolve) AnswerFooter(ctx context.Context) string {
@@ -377,31 +377,4 @@ func (r OrderResolve) AnswerFooter(ctx context.Context) string {
 	}
 
 	return desc
-}
-
-func CnNum(num int) string {
-	switch num {
-	case 1:
-		return "一"
-	case 2:
-		return "两"
-	case 3:
-		return "三"
-	case 4:
-		return "四"
-	case 5:
-		return "五"
-	case 6:
-		return "六"
-	case 7:
-		return "七"
-	case 8:
-		return "八"
-	case 9:
-		return "九"
-	case 10:
-		return "十"
-	default:
-		return strconv.Itoa(num)
-	}
 }
