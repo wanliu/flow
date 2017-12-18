@@ -14,6 +14,16 @@ type ApiAiOrder struct {
 	AiResult apiai.Result
 }
 
+func (aa ApiAiOrder) Mode() int {
+	mode := 1
+
+	if _, ok := aa.AiResult.Params["productItems"]; ok {
+		mode = 2
+	}
+
+	return mode
+}
+
 func (aa ApiAiOrder) Score() float64 {
 	return aa.AiResult.Score
 }
@@ -23,6 +33,10 @@ func (aa ApiAiOrder) Query() string {
 }
 
 func (aa ApiAiOrder) Items() []Item {
+	if aa.Mode() == 2 {
+		return aa.ExtractProductItems("productItems")
+	}
+
 	products := aa.Products()
 	quantities := aa.Quantities()
 
@@ -47,6 +61,10 @@ func (aa ApiAiOrder) Quantities() []Item {
 }
 
 func (aa ApiAiOrder) GiftItems() []Item {
+	if aa.Mode() == 2 {
+		return aa.ExtractProductItems("giftItems")
+	}
+
 	gifts := aa.GiftProducts()
 	quantities := aa.GiftQuantities()
 
@@ -200,6 +218,7 @@ func (aa ApiAiOrder) Note() string {
 	return ""
 }
 
+// MODE 1 extracting, by key products
 func (aa ApiAiOrder) ExtractProducts(t string) []Item {
 	result := make([]Item, 0, 50)
 
@@ -210,6 +229,40 @@ func (aa ApiAiOrder) ExtractProducts(t string) []Item {
 			p := ps.Index(i)
 			name := p.Interface().(string)
 			item := Item{Product: name}
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
+
+// MODE 2 extracting, by key productItems
+func (aa ApiAiOrder) ExtractProductItems(s string) []Item {
+	result := make([]Item, 0)
+
+	if prodItems, ok := aa.AiResult.Params[s]; ok {
+		ps := reflect.ValueOf(prodItems)
+
+		for i := 0; i < ps.Len(); i++ {
+			var name, unit string
+			var quantity int
+
+			p := ps.Index(i)
+			prodItem := p.Interface().(map[string]interface{})
+			name, _ = prodItem["product"].(string)
+			quanMap, _ := prodItem["quantity"].(map[string]interface{})
+			numberFloat, ok := quanMap["number"].(float64)
+			if ok {
+				quantity = int(numberFloat)
+			}
+
+			unit, _ = quanMap["unit"].(string)
+
+			item := Item{
+				Product:  name,
+				Quantity: quantity,
+				Unit:     unit,
+			}
 			result = append(result, item)
 		}
 	}
