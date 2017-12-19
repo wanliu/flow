@@ -118,7 +118,7 @@ func (c *ApiAi) SendCtxQuery() {
 		score := res.Score
 		// query := res.ResolvedQuery
 
-		log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%", txt, intent, score*100)
+		log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%\n结果:%v", txt, intent, score*100, res)
 
 		c.Out <- ctx
 	}
