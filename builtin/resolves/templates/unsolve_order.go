@@ -1,4 +1,4 @@
-package resolves
+package templates
 
 import (
 	"bytes"
@@ -22,14 +22,14 @@ var body string = `{{range .Products.Products }}{{.Product}} {{.Quantity}}{{.Uni
 备注：{{.Note}}
 {{end}}`
 
-func RenderOrderBody(r OrderResolve) string {
+func RenderOrderBody(resolve interface{}) string {
 	tmpl, err := template.New("orderBody").Parse(body)
 	if err != nil {
 		return err.Error()
 	}
 
 	var tpl bytes.Buffer
-	err = tmpl.Execute(&tpl, r)
+	err = tmpl.Execute(&tpl, resolve)
 	if err != nil {
 		return err.Error()
 	}
@@ -40,7 +40,7 @@ func RenderOrderBody(r OrderResolve) string {
 	return result
 }
 
-func RenderOrderHeader(r OrderResolve) string {
+func RenderOrderHeader(resolve interface{}) string {
 	tmpl, err := template.New("orderHeader").Funcs(template.FuncMap{
 		"CnNum": CnNum,
 	}).Parse(header)
@@ -50,7 +50,7 @@ func RenderOrderHeader(r OrderResolve) string {
 	}
 
 	var tpl bytes.Buffer
-	err = tmpl.Execute(&tpl, r)
+	err = tmpl.Execute(&tpl, resolve)
 	if err != nil {
 		return err.Error()
 	}
