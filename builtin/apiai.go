@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"encoding/json"
 	"log"
 	"sync"
 
@@ -96,8 +97,8 @@ func (c *ApiAi) OnRetryIn(ctx context.Context) {
 
 		intent := res.Metadata.IntentName
 		score := res.Score
-
-		log.Printf("重试意图解析\"%s\" -> %s 准确度: %2.2f%%", query, intent, score*100)
+		data, _ := json.Marshal(res)
+		log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%\n结果:%v", query, intent, score*100, string(data))
 
 		c.RetryOut <- ctx
 	}
@@ -117,8 +118,9 @@ func (c *ApiAi) SendCtxQuery() {
 		intent := res.Metadata.IntentName
 		score := res.Score
 		// query := res.ResolvedQuery
+		data, _ := json.Marshal(res)
 
-		log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%\n结果:%v", txt, intent, score*100, res)
+		log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%\n结果:%v", txt, intent, score*100, string(data))
 
 		c.Out <- ctx
 	}
