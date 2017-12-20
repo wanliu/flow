@@ -24,8 +24,8 @@ type TestReply struct {
 }
 
 type Replyer interface {
-	Text(string) error
-	Table(*Table) error
+	Text(string, ...Context) error
+	Table(*Table, ...Context) error
 }
 
 func NewReply(w io.Writer) *Reply {
@@ -34,12 +34,12 @@ func NewReply(w io.Writer) *Reply {
 	}
 }
 
-func (r *Reply) Text(text string) error {
+func (r *Reply) Text(text string, ctxs ...Context) error {
 	fmt.Fprintf(r.Writer, text)
 	return nil
 }
 
-func (r *Reply) Table(table *Table) error {
+func (r *Reply) Table(table *Table, ctxs ...Context) error {
 	t := tablewriter.NewWriter(r.Writer)
 	t.SetHeader(table.Headers)
 	t.SetFooter(table.Footers)
@@ -56,7 +56,7 @@ func NewTestReply() *TestReply {
 	}
 }
 
-func (tr *TestReply) Text(text string) error {
+func (tr *TestReply) Text(text string, ctxs ...Context) error {
 	// tr.Reply.Text(text)
 	log.Printf("Reply: %s", text)
 	go func() {
@@ -65,7 +65,7 @@ func (tr *TestReply) Text(text string) error {
 	return nil
 }
 
-func (tr *TestReply) Table(table *Table) error {
+func (tr *TestReply) Table(table *Table, ctxs ...Context) error {
 	var buf bytes.Buffer
 
 	tr.Writer = &buf
