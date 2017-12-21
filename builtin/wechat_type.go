@@ -40,8 +40,10 @@ func GroupChat(ctx context.Context) bool {
 // WeixinUin:"528219641",
 // BotName:"客服"
 func wechatType(ctx context.Context) int {
+	log.Printf("[WECHAT GROUP] BEGIN")
 	data, _ := json.Marshal(ctx)
 	log.Printf("[WECHAT GROUP] ctx value: %v", string(data))
+	log.Printf("[WECHAT GROUP] END")
 
 	wechatInfo := ctx.Value("WECHAT_INFO")
 
