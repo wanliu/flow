@@ -41,7 +41,7 @@ func GroupChat(ctx context.Context) bool {
 // BotName:"客服"
 func wechatType(ctx context.Context) int {
 	log.Printf("[WECHAT GROUP] BEGIN")
-	data, _ := json.Marshal(ctx)
+	data, _ := json.Marshal(ctx.Value("WECHAT_INFO"))
 	log.Printf("[WECHAT GROUP] ctx value: %v", string(data))
 	log.Printf("[WECHAT GROUP] END")
 
