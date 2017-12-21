@@ -1,7 +1,9 @@
 package builtin
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/wanliu/flow/context"
@@ -38,6 +40,9 @@ func GroupChat(ctx context.Context) bool {
 // WeixinUin:"528219641",
 // BotName:"客服"
 func wechatType(ctx context.Context) int {
+	data, _ := json.Marshal(ctx)
+	log.Printf("[WECHAT GROUP] ctx value: %v", string(data))
+
 	wechatInfo := ctx.Value("WECHAT_INFO")
 
 	if wechatInfo == nil {
