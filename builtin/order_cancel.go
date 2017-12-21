@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	// "fmt"
+	"log"
 	"time"
 
 	"github.com/wanliu/brain_data/database"
@@ -24,6 +24,11 @@ type OrderCancel struct {
 }
 
 func (c *OrderCancel) OnCtx(ctx context.Context) {
+	if GroupChat(ctx) {
+		log.Printf("不回应非开单相关的普通群聊")
+		return
+	}
+
 	currentOrder := ctx.Value(config.CtxKeyOrder)
 
 	if nil == currentOrder {

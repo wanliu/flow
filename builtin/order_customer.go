@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	// "log"
+	"log"
 
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
@@ -25,6 +25,11 @@ func NewOrderCustomer() interface{} {
 }
 
 func (c *OrderCustomer) OnCtx(ctx Context) {
+	if GroupChat(ctx) {
+		log.Printf("不回应非开单相关的普通群聊")
+		return
+	}
+
 	currentOrder := ctx.Value(CtxKeyOrder)
 
 	if nil != currentOrder {

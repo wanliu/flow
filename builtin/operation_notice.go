@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"log"
 	"strconv"
 
 	. "github.com/wanliu/flow/builtin/config"
@@ -21,6 +22,11 @@ func NewOperationNotice() interface{} {
 }
 
 func (s OperationNotice) OnCtx(ctx Context) {
+	if GroupChat(ctx) {
+		log.Printf("不回应非开单相关的普通群聊")
+		return
+	}
+
 	currentOrder := ctx.Value(CtxKeyOrder)
 
 	if nil != currentOrder {

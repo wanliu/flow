@@ -31,6 +31,11 @@ func (c *Order) OnSyncQueue(queue string) {
 }
 
 func (c *Order) OnCtx(ctx context.Context) {
+	if GroupChat(ctx) {
+		c.New <- ctx
+		return
+	}
+
 	currentOrder := ctx.Value(config.CtxKeyOrder)
 
 	if c.expMins != 0 {

@@ -52,11 +52,21 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			log.Printf("重新获取开单产品，第1次，共%v次", c.retryCount)
 			c.RetryOut <- ctx
 		} else {
+			if GroupChat(ctx) {
+				c.GroupAnswer(ctx, orderResolve)
+				return
+			}
+
 			output = "没有相关的产品"
 			replyData := ReplyData{output, ctx}
 			c.Out <- replyData
 		}
 	} else {
+		if GroupChat(ctx) {
+			c.GroupAnswer(ctx, orderResolve)
+			return
+		}
+
 		output = orderResolve.Answer(ctx)
 
 		if orderResolve.Resolved() {
@@ -128,4 +138,15 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 		c.Out <- replyData
 	}
 
+}
+
+func (c *NewOrder) GroupAnswer(ctx context.Context, orderResolve *resolves.OrderResolve) {
+	output := orderResolve.Answer(ctx)
+
+	if orderResolve.Fulfiled() {
+		replyData := ReplyData{output, ctx}
+		c.Out <- replyData
+	} else {
+		log.Printf("群聊开单失败, 取消回复。失败原因：%v", output)
+	}
 }

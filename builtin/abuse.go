@@ -1,6 +1,8 @@
 package builtin
 
 import (
+	"log"
+
 	. "github.com/wanliu/flow/context"
 )
 
@@ -17,6 +19,10 @@ func NewAbuse() interface{} {
 
 // entity: 贬低
 func (order *Abuse) OnCtx(ctx Context) {
+	if GroupChat(ctx) {
+		log.Printf("不回应非开单相关的普通群聊")
+		return
+	}
 	// entities := ctx.Value("Result").(ResultParams).Entities
 	output := "请不要脏话哦"
 

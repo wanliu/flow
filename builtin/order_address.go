@@ -1,6 +1,8 @@
 package builtin
 
 import (
+	"log"
+
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/builtin/resolves"
@@ -31,6 +33,11 @@ func (c *OrderAddress) OnConfirmScore(score float64) {
 }
 
 func (c *OrderAddress) OnCtx(ctx Context) {
+	if GroupChat(ctx) {
+		log.Printf("不回应非开单相关的普通群聊")
+		return
+	}
+
 	currentOrder := ctx.Value(config.CtxKeyOrder)
 
 	if nil != currentOrder {

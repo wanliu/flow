@@ -1,6 +1,8 @@
 package builtin
 
 import (
+	"log"
+
 	. "github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
 
@@ -20,6 +22,11 @@ type OrderPrinter struct {
 }
 
 func (s *OrderPrinter) OnCtx(ctx Context) {
+	if GroupChat(ctx) {
+		log.Printf("不回应非开单相关的普通群聊")
+		return
+	}
+
 	currentOrder := ctx.Value(config.CtxKeyOrder)
 
 	if nil == currentOrder {

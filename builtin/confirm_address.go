@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	// "log"
+	"log"
 
 	"github.com/wanliu/flow/builtin/resolves"
 	. "github.com/wanliu/flow/context"
@@ -43,6 +43,12 @@ func (c *Confirm) OnConfirm(ctx Context) {
 		reply := cfm.Confirm(ctx)
 		c.Out <- ReplyData{reply, ctx}
 	} else {
+		// 群聊无待确认项目时，不回应
+		if GroupChat(ctx) {
+			log.Printf("不回应非开单相关的普通群聊")
+			return
+		}
+
 		reply := ReplyData{"确认操作已经过期", ctx}
 		c.Out <- reply
 	}
@@ -56,6 +62,12 @@ func (c *Confirm) OnCancel(ctx Context) {
 		reply := cfm.Cancel(ctx)
 		c.Out <- ReplyData{reply, ctx}
 	} else {
+		// 群聊无待确认项目时，不回应
+		if GroupChat(ctx) {
+			log.Printf("不回应非开单相关的普通群聊")
+			return
+		}
+
 		reply := ReplyData{"确认操作已经过期", ctx}
 		c.Out <- reply
 	}

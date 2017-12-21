@@ -32,6 +32,11 @@ func NewCustomerOrders() interface{} {
 }
 
 func (c *CustomerOrders) OnCtx(ctx context.Context) {
+	if GroupChat(ctx) {
+		log.Printf("不回应非开单相关的普通群聊")
+		return
+	}
+
 	rsv := resolves.NewCusOrdersResolve(ctx, Per)
 
 	reply := rsv.Answer()
