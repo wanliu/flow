@@ -25,11 +25,6 @@ func NewOrderCustomer() interface{} {
 }
 
 func (c *OrderCustomer) OnCtx(ctx context.Context) {
-	if context.GroupChat(ctx) {
-		log.Printf("不回应非开单相关的普通群聊")
-		return
-	}
-
 	currentOrder := ctx.Value(CtxKeyOrder)
 
 	if nil != currentOrder {
@@ -52,6 +47,11 @@ func (c *OrderCustomer) OnCtx(ctx context.Context) {
 			ctx.SetValue(CtxKeyOrder, nil)
 		}
 	} else {
+		if context.GroupChat(ctx) {
+			log.Printf("不回应单独输入客户的的普通群聊")
+			return
+		}
+
 		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx}
 	}
 }

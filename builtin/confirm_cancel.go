@@ -45,10 +45,10 @@ func (c *Confirm) OnConfirm(ctx context.Context) {
 		c.Out <- ReplyData{reply, ctx}
 	} else {
 		// 群聊无待确认项目时，不回应
-		if context.GroupChat(ctx) {
-			log.Printf("不回应非开单相关的普通群聊")
-			return
-		}
+		// if context.GroupChat(ctx) {
+		// 	log.Printf("不回应非开单相关的普通群聊")
+		// 	return
+		// }
 
 		reply := ReplyData{"确认操作已经过期", ctx}
 		c.Out <- reply
@@ -64,10 +64,10 @@ func (c *Confirm) OnCancel(ctx context.Context) {
 		c.Out <- ReplyData{reply, ctx}
 	} else {
 		// 群聊无待确认项目时，不回应
-		if context.GroupChat(ctx) {
-			log.Printf("不回应非开单相关的普通群聊")
-			return
-		}
+		// if context.GroupChat(ctx) {
+		// 	log.Printf("不回应非开单相关的普通群聊")
+		// 	return
+		// }
 
 		reply := ReplyData{"确认操作已经过期", ctx}
 		c.Out <- reply

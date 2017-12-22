@@ -63,11 +63,6 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			c.Out <- replyData
 		}
 	} else {
-		if context.GroupChat(ctx) {
-			c.GroupAnswer(ctx, orderResolve)
-			return
-		}
-
 		output = orderResolve.Answer(ctx)
 
 		if orderResolve.Resolved() {
@@ -81,7 +76,6 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			ctx.SetValue(config.CtxKeyOrder, *orderResolve)
 		}
 
-		// c.Notice <- ctx
 		c.Timeout <- ctx
 
 		replyData := ReplyData{output, ctx}
@@ -107,6 +101,11 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 		}
 
 		if retriedCount >= c.retryCount {
+			if context.GroupChat(ctx) {
+				c.GroupAnswer(ctx, orderResolve)
+				return
+			}
+
 			output = "没有相关的产品"
 
 			replyData := ReplyData{output, ctx}
