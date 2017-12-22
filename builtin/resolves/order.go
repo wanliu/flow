@@ -88,7 +88,8 @@ func (r *OrderResolve) Cancel() bool {
 
 // 是否达到可以生成订单的条件
 func (r OrderResolve) Fulfiled() bool {
-	return len(r.Products.Products) > 0 && (r.Address != "" || r.Customer != "")
+	// return len(r.Products.Products) > 0 && (r.Address != "" || r.Customer != "")
+	return len(r.Products.Products) > 0 && r.Customer != ""
 }
 
 // 是否已经成功生成订单
