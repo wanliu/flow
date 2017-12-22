@@ -1,9 +1,9 @@
 package context
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
-	"log"
+	// "log"
 	"strings"
 )
 
@@ -39,8 +39,8 @@ func GroupChat(ctx Context) bool {
 // "WeixinUin":"528219641"}
 func wechatType(ctx Context) int {
 	// log.Printf("[WECHAT GROUP] BEGIN")
-	data, _ := json.Marshal(ctx.Value("WECHAT_INFO"))
-	log.Printf("[WECHAT GROUP] ctx value: %v", string(data))
+	// data, _ := json.Marshal(ctx.Value("WECHAT_INFO"))
+	// log.Printf("[WECHAT GROUP] ctx value: %v", string(data))
 	// log.Printf("[WECHAT GROUP] END")
 
 	wechatInfo := ctx.Value("WECHAT_INFO")
