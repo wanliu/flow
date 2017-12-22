@@ -6,5 +6,6 @@ import (
 
 type ReplyData struct {
 	Reply string
+	Table *context.Table
 	Ctx   context.Context
 }

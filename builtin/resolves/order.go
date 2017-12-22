@@ -384,12 +384,6 @@ func (r OrderResolve) AnswerBody() string {
 				desc = desc + fmt.Sprintf("%v %v %v\n", g.ProductName, g.Quantity, g.Unit)
 			}
 		}
-
-		desc = desc + fmt.Sprintf("时间:%v\n", r.BrainOrder.DeliveryTime.Format("2006年01月02日"))
-
-		if r.BrainOrder.Note != "" {
-			desc = desc + "备注：" + r.BrainOrder.Note + "\n"
-		}
 	} else {
 		for _, p := range r.Products.Products {
 			// desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + p.Unit + "\n"
@@ -405,13 +399,6 @@ func (r OrderResolve) AnswerBody() string {
 				desc = desc + fmt.Sprintf("%v %v %v\n", g.Product, g.Quantity, g.Unit)
 			}
 		}
-
-		// desc = desc + "时间:" + r.Time.Format("2006年01月02日") + "\n"
-		desc = desc + fmt.Sprintf("时间:%v\n", r.Time.Format("2006年01月02日"))
-
-		if r.Note != "" {
-			desc = desc + "备注：" + r.Note + "\n"
-		}
 	}
 
 	return desc
@@ -421,6 +408,12 @@ func (r OrderResolve) AnswerFooter(ctx context.Context, no, id interface{}) stri
 	desc := ""
 
 	if r.Fulfiled() {
+		desc = desc + fmt.Sprintf("时间:%v\n", r.Time.Format("2006年01月02日"))
+
+		if r.Note != "" {
+			desc = desc + "备注：" + r.Note + "\n"
+		}
+
 		desc = desc + r.AddressInfo()
 		desc = desc + "订单已经生成，订单号为：" + fmt.Sprint(no) + "\n"
 		desc = desc + "订单入口: http://jiejie.wanliu.biz/order/QueryDetail/" + fmt.Sprint(id) + "\n"
