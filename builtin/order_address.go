@@ -31,10 +31,10 @@ func (c *OrderAddress) OnConfirmScore(score float64) {
 }
 
 func (c *OrderAddress) OnCtx(ctx context.Context) {
-	if context.GroupChat(ctx) {
-		log.Printf("不回应非开单相关的普通群聊")
-		return
-	}
+	// if context.GroupChat(ctx) {
+	// 	log.Printf("不回应非开单相关的普通群聊")
+	// 	return
+	// }
 
 	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
@@ -43,7 +43,7 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 		cOrder := currentOrder.(resolves.OrderResolve)
 
 		if cOrder.Expired(config.SesssionExpiredMinutes) {
-			c.Out <- ReplyData{"当前没有正在进行中的订单", ctx}
+			c.Out <- ReplyData{"会话已经过时，当前没有正在进行中的订单", ctx}
 			return
 		}
 
@@ -91,6 +91,11 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 			c.Out <- ReplyData{reply, ctx}
 		}
 	} else {
+		if context.GroupChat(ctx) {
+			log.Printf("不回应群聊无效的客户输入")
+			return
+		}
+
 		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx}
 	}
 }
