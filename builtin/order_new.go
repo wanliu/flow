@@ -66,14 +66,14 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 		output = orderResolve.Answer(ctx)
 
 		if orderResolve.Resolved() {
-			ctx.SetValue(config.CtxKeyLastOrder, *orderResolve)
-			ctx.SetValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyLastOrder, *orderResolve)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
 		} else if orderResolve.Failed() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
 		} else if orderResolve.MismatchQuantity() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
 		} else {
-			ctx.SetValue(config.CtxKeyOrder, *orderResolve)
+			ctx.SetCtxValue(config.CtxKeyOrder, *orderResolve)
 		}
 
 		c.Timeout <- ctx
@@ -121,14 +121,14 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 		output = orderResolve.Answer(ctx)
 
 		if orderResolve.Resolved() {
-			ctx.SetValue(config.CtxKeyLastOrder, *orderResolve)
-			ctx.SetValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyLastOrder, *orderResolve)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
 		} else if orderResolve.Failed() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
 		} else if orderResolve.MismatchQuantity() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
 		} else {
-			ctx.SetValue(config.CtxKeyOrder, *orderResolve)
+			ctx.SetCtxValue(config.CtxKeyOrder, *orderResolve)
 		}
 
 		// c.Notice <- ctx

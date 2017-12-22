@@ -55,7 +55,7 @@ func NewOrderResolve(ctx context.Context) *OrderResolve {
 		resolve.OrderSyncQueue = syncQueue.(string)
 	}
 
-	if viewer := ctx.Value("Viewer"); viewer != nil {
+	if viewer := ctx.CtxValue("Viewer"); viewer != nil {
 		user := viewer.(*database.User)
 		resolve.User = user
 	}
@@ -220,7 +220,7 @@ func (r *OrderResolve) Answer(ctx context.Context) string {
 	} else if r.Fulfiled() {
 		return r.PostOrderAndAnswer(ctx)
 	} else {
-		return r.AnswerHead() + r.AnswerFooter(ctx, "", "")
+		return r.AnswerHead(ctx) + r.AnswerFooter(ctx, "", "")
 	}
 }
 
@@ -318,7 +318,7 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 			r.IsResolved = true
 			r.BrainOrder = &order
 			r.Id = order.ID
-			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			return r.AnswerHead(ctx) + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
 		}
 	} else {
 		// order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
@@ -331,7 +331,7 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 			r.IsResolved = true
 			r.BrainOrder = &order
 			r.Id = order.ID
-			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			return r.AnswerHead(ctx) + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
 		}
 	}
 }
@@ -350,11 +350,14 @@ func (r OrderResolve) AddressInfo() string {
 	}
 }
 
-func (r OrderResolve) AnswerHead() string {
+func (r OrderResolve) AnswerHead(ctx context.Context) string {
 	desc := "订单正在处理, 已经添加" + CnNum(len(r.Products.Products)) + "种产品"
 
 	if r.Fulfiled() {
 		desc = "订单已经生成, 共" + CnNum(len(r.Products.Products)) + "种产品"
+		if context.GroupChat(ctx) {
+			desc = "已经帮你开单, 共" + CnNum(len(r.Products.Products)) + "种产品"
+		}
 	}
 
 	if len(r.Gifts.Products) > 0 {
@@ -420,7 +423,11 @@ func (r OrderResolve) AnswerFooter(ctx context.Context, no, id interface{}) stri
 	if r.Fulfiled() {
 		desc = desc + r.AddressInfo()
 		desc = desc + "订单已经生成，订单号为：" + fmt.Sprint(no) + "\n"
-		desc = desc + "订单入口: http://jiejie.wanliu.biz/order/QueryDetail/" + fmt.Sprint(id)
+		desc = desc + "订单入口: http://jiejie.wanliu.biz/order/QueryDetail/" + fmt.Sprint(id) + "\n"
+
+		if context.GroupChat(ctx) {
+			desc = desc + "你可以随时取消订单"
+		}
 	} else {
 		if r.ExtractedCustomer != "" && r.Customer == "" {
 			confirm := CustomerCreation{

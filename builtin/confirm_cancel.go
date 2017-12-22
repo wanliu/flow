@@ -33,11 +33,11 @@ func (c *Confirm) OnExpMins(mins float64) {
 }
 
 func (c Confirm) OnExpire(ctx context.Context) {
-	ctx.SetValue(config.CtxKeyConfirm, nil)
+	ctx.SetCtxValue(config.CtxKeyConfirm, nil)
 }
 
 func (c *Confirm) OnConfirm(ctx context.Context) {
-	cIn := ctx.Value(config.CtxKeyConfirm)
+	cIn := ctx.CtxValue(config.CtxKeyConfirm)
 
 	if cIn != nil {
 		cfm := cIn.(resolves.Data)
@@ -56,7 +56,7 @@ func (c *Confirm) OnConfirm(ctx context.Context) {
 }
 
 func (c *Confirm) OnCancel(ctx context.Context) {
-	cIn := ctx.Value(config.CtxKeyConfirm)
+	cIn := ctx.CtxValue(config.CtxKeyConfirm)
 
 	if cIn != nil {
 		cfm := cIn.(resolves.Data)

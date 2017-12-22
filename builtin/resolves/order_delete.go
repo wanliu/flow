@@ -19,12 +19,12 @@ func (odr OrderDeleteResolve) Hint() string {
 
 func (odr OrderDeleteResolve) SetUp(ctx context.Context) {
 	// need order number to resolve
-	ctx.SetValue(config.CtxKeyOrderNum, odr)
+	ctx.SetCtxValue(config.CtxKeyOrderNum, odr)
 }
 
 func (odr OrderDeleteResolve) ClearUp(ctx context.Context) {
 	// need order number to resolve, clear mark
-	ctx.SetValue(config.CtxKeyOrderNum, nil)
+	ctx.SetCtxValue(config.CtxKeyOrderNum, nil)
 }
 
 func (odr OrderDeleteResolve) Resolve(orderNo string, ctx context.Context) string {

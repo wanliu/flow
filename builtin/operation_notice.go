@@ -28,7 +28,7 @@ func (s OperationNotice) OnCtx(ctx context.Context) {
 		return
 	}
 
-	currentOrder := ctx.Value(CtxKeyOrder)
+	currentOrder := ctx.CtxValue(CtxKeyOrder)
 
 	if nil != currentOrder {
 		cOrder := currentOrder.(OrderResolve)
@@ -36,8 +36,8 @@ func (s OperationNotice) OnCtx(ctx context.Context) {
 		if !cOrder.Fulfiled() {
 			expMins := SesssionExpiredMinutes
 
-			if nil != ctx.Value(CtxKeyExpiredMinutes) {
-				expMins = ctx.Value(CtxKeyExpiredMinutes).(int)
+			if nil != ctx.CtxValue(CtxKeyExpiredMinutes) {
+				expMins = ctx.CtxValue(CtxKeyExpiredMinutes).(int)
 			}
 
 			s.Out <- ReplyData{"你可以继续提交产品到订单，也可以立刻取消当前任务（" + strconv.Itoa(expMins) + "分钟以内）", ctx}

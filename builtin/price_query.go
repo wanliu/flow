@@ -47,7 +47,7 @@ func (query *PriceQuery) TaskHandle(ctx Context, raw interface{}) error {
 
 	// params := raw.(Context).Value("Result").(ResultParams)
 
-	// priceQuery := ctx.Value("priceQuery").(*PriceQueryResolve)
+	// priceQuery := ctx.CtxValue("priceQuery").(*PriceQueryResolve)
 
 	// solved, finishNotition, nextNotition := priceQuery.Solve(params)
 

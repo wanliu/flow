@@ -30,7 +30,7 @@ func NewOrderTimeout() interface{} {
 func (c *OrderTimeout) OnCtx(ctx Context) {
 	go func() {
 		expiredMins := config.SesssionExpiredMinutes
-		settedMins := ctx.Value(config.CtxKeyExpiredMinutes)
+		settedMins := ctx.CtxValue(config.CtxKeyExpiredMinutes)
 
 		if settedMins != nil {
 			expiredMins = settedMins.(int)
@@ -38,12 +38,12 @@ func (c *OrderTimeout) OnCtx(ctx Context) {
 
 		time.Sleep(time.Duration(expiredMins) * time.Minute)
 
-		order := ctx.Value(config.CtxKeyOrder)
+		order := ctx.CtxValue(config.CtxKeyOrder)
 
 		if order != nil {
 			cOrder := order.(OrderResolve)
 			if cOrder.Expired(expiredMins) {
-				ctx.SetValue(config.CtxKeyOrder, nil)
+				ctx.SetCtxValue(config.CtxKeyOrder, nil)
 				c.Out <- ReplyData{"由于长时间未操作完成，当前订单已经失效", ctx}
 			}
 		}

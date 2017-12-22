@@ -25,18 +25,18 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 	if patchResolve.EmptyProducts() {
 		output = "没有相关的产品"
 	} else {
-		curResolve := ctx.Value(config.CtxKeyOrder).(OrderResolve)
+		curResolve := ctx.CtxValue(config.CtxKeyOrder).(OrderResolve)
 		patchResolve.Patch(&curResolve)
 
 		output = curResolve.Answer(ctx)
 
 		if curResolve.Resolved() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
-			ctx.SetValue(config.CtxKeyLastOrder, curResolve)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyLastOrder, curResolve)
 		} else if curResolve.Failed() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
 		} else {
-			ctx.SetValue(config.CtxKeyOrder, curResolve)
+			ctx.SetCtxValue(config.CtxKeyOrder, curResolve)
 		}
 
 	}

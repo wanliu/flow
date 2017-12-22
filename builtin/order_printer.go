@@ -27,7 +27,7 @@ func (s *OrderPrinter) OnCtx(ctx context.Context) {
 		return
 	}
 
-	currentOrder := ctx.Value(config.CtxKeyOrder)
+	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
 	if nil == currentOrder {
 		s.Out <- ReplyData{"当前没有正在进行中的订单", ctx}

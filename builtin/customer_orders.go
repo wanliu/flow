@@ -49,7 +49,7 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 }
 
 func (c *CustomerOrders) OnPage(ctx context.Context) {
-	in := ctx.Value(config.CtxKeyCusOrders)
+	in := ctx.CtxValue(config.CtxKeyCusOrders)
 	if in == nil {
 		c.Out <- ReplyData{"当前没有正在进行的查询", ctx}
 	} else {

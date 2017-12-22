@@ -47,7 +47,7 @@ func (query *StockQuery) TaskHandle(ctx Context, raw interface{}) error {
 
 	// params := raw.(Context).Value("Result").(ResultParams)
 
-	// stockQuery := ctx.Value("stockQuery").(*StockQueryResolve)
+	// stockQuery := ctx.CtxValue("stockQuery").(*StockQueryResolve)
 
 	// solved, finishNotition, nextNotition := stockQuery.Solve(params)
 

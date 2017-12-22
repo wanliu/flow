@@ -35,7 +35,7 @@ func (c *OrderNumber) OnCtx(ctx context.Context) {
 	if numInt, exist := aiResult.Params["order-numder"]; exist {
 		orderNo := numInt.(string)
 
-		resolveInt := ctx.Value(config.CtxKeyOrderNum)
+		resolveInt := ctx.CtxValue(config.CtxKeyOrderNum)
 		if resolveInt != nil {
 			resolve := resolveInt.(resolves.OrderNumberResolve)
 			reply := resolve.Resolve(orderNo, ctx)

@@ -259,7 +259,7 @@ func (r *CustomerOrdersResolve) IsDone() bool {
 
 func (r *CustomerOrdersResolve) Setup(ctx context.Context) {
 	if !r.Done {
-		ctx.SetValue(config.CtxKeyCusOrders, r)
+		ctx.SetCtxValue(config.CtxKeyCusOrders, r)
 	}
 }
 
@@ -270,12 +270,12 @@ func (r *CustomerOrdersResolve) ClearIfDone(ctx context.Context) {
 }
 
 func (r *CustomerOrdersResolve) Clear(ctx context.Context) {
-	in := ctx.Value(config.CtxKeyCusOrders)
+	in := ctx.CtxValue(config.CtxKeyCusOrders)
 	if in != nil {
 		rsv := in.(*CustomerOrdersResolve)
 
 		if r == rsv {
-			ctx.SetValue(config.CtxKeyCusOrders, nil)
+			ctx.SetCtxValue(config.CtxKeyCusOrders, nil)
 		}
 	}
 }

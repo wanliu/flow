@@ -37,7 +37,7 @@ func (c *Order) OnCtx(ctx context.Context) {
 	}
 
 	if c.expMins != 0 {
-		ctx.SetValue(config.CtxKeyExpiredMinutes, int(c.expMins))
+		ctx.SetCtxValue(config.CtxKeyExpiredMinutes, int(c.expMins))
 	}
 
 	if context.GroupChat(ctx) {
@@ -45,7 +45,7 @@ func (c *Order) OnCtx(ctx context.Context) {
 		return
 	}
 
-	currentOrder := ctx.Value(config.CtxKeyOrder)
+	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
 	if nil != currentOrder {
 		cOrder := currentOrder.(resolves.OrderResolve)

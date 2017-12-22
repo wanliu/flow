@@ -25,7 +25,6 @@ func (order *Unimplemented) OnCtx(ctx context.Context) {
 	}
 
 	output := "你好，请问有什么可以帮您？"
-
 	aiResult := ctx.Value("Result").(apiai.Result)
 
 	if r := aiResult.Fulfillment.Speech; r != "" {

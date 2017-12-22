@@ -30,10 +30,10 @@ func (c *OrderCancel) OnCtx(ctx context.Context) {
 		return
 	}
 
-	currentOrder := ctx.Value(config.CtxKeyOrder)
+	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
 	if nil == currentOrder {
-		preOrderInt := ctx.Value(config.CtxKeyLastOrder)
+		preOrderInt := ctx.CtxValue(config.CtxKeyLastOrder)
 
 		if preOrderInt != nil {
 			preOrder := preOrderInt.(resolves.OrderResolve)
@@ -66,7 +66,7 @@ func (c *OrderCancel) OnCtx(ctx context.Context) {
 
 		if curOrder.Cancelable() {
 			if curOrder.Cancel() {
-				ctx.SetValue(config.CtxKeyOrder, nil)
+				ctx.SetCtxValue(config.CtxKeyOrder, nil)
 				c.Out <- ReplyData{"当前订单取消成功", ctx}
 			} else {
 				c.Out <- ReplyData{"很抱歉，订单取消失败！请联系客服处理", ctx}

@@ -14,11 +14,11 @@ type OrderDeleteConfirm struct {
 }
 
 func (od OrderDeleteConfirm) SetUp(ctx context.Context) {
-	ctx.SetValue(config.CtxKeyConfirm, od)
+	ctx.SetCtxValue(config.CtxKeyConfirm, od)
 }
 
 func (od OrderDeleteConfirm) ClearUp(ctx context.Context) {
-	ctx.SetValue(config.CtxKeyConfirm, nil)
+	ctx.SetCtxValue(config.CtxKeyConfirm, nil)
 }
 
 func (od OrderDeleteConfirm) Notice(ctx context.Context) string {

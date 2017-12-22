@@ -36,7 +36,7 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 		return
 	}
 
-	currentOrder := ctx.Value(config.CtxKeyOrder)
+	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
 	if nil != currentOrder {
 		aiResult := ctx.Value(config.ValueKeyResult).(apiai.Result)
@@ -65,10 +65,10 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 			c.Out <- ReplyData{reply, ctx}
 
 			if cOrder.Resolved() {
-				ctx.SetValue(config.CtxKeyOrder, nil)
-				ctx.SetValue(config.CtxKeyLastOrder, cOrder)
+				ctx.SetCtxValue(config.CtxKeyOrder, nil)
+				ctx.SetCtxValue(config.CtxKeyLastOrder, cOrder)
 			} else if cOrder.Failed() {
-				ctx.SetValue(config.CtxKeyOrder, nil)
+				ctx.SetCtxValue(config.CtxKeyOrder, nil)
 			}
 		} else {
 			var values []string
@@ -84,7 +84,7 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 
 			addressConfirm := resolves.AddressConfirm{Values: values}
 
-			ctx.SetValue(config.CtxKeyConfirm, addressConfirm)
+			ctx.SetCtxValue(config.CtxKeyConfirm, addressConfirm)
 
 			reply := "收到您的回复:" + query + "\n"
 			reply = reply + addressConfirm.Notice(ctx)

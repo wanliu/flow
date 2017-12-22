@@ -7,7 +7,7 @@ import (
 	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/context"
 
-	. "github.com/wanliu/flow/builtin/config"
+	"github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
 )
 
@@ -25,7 +25,7 @@ func NewOrderCustomer() interface{} {
 }
 
 func (c *OrderCustomer) OnCtx(ctx context.Context) {
-	currentOrder := ctx.Value(CtxKeyOrder)
+	currentOrder := ctx.Value(config.CtxKeyOrder)
 
 	if nil != currentOrder {
 		aiResult := ctx.Value("Result").(apiai.Result)
@@ -41,10 +41,10 @@ func (c *OrderCustomer) OnCtx(ctx context.Context) {
 		c.Out <- ReplyData{reply, ctx}
 
 		if cOrder.Resolved() {
-			ctx.SetValue(CtxKeyOrder, nil)
-			ctx.SetValue(CtxKeyLastOrder, cOrder)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyLastOrder, cOrder)
 		} else if cOrder.Failed() {
-			ctx.SetValue(CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, nil)
 		}
 	} else {
 		if context.GroupChat(ctx) {

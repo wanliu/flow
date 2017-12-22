@@ -16,11 +16,11 @@ type CustomerCreation struct {
 }
 
 func (cc CustomerCreation) SetUp(ctx context.Context) {
-	ctx.SetValue(config.CtxKeyConfirm, cc)
+	ctx.SetCtxValue(config.CtxKeyConfirm, cc)
 }
 
 func (cc CustomerCreation) ClearUp(ctx context.Context) {
-	ctx.SetValue(config.CtxKeyConfirm, nil)
+	ctx.SetCtxValue(config.CtxKeyConfirm, nil)
 }
 
 func (cc CustomerCreation) Notice(ctx context.Context) string {
@@ -30,8 +30,8 @@ func (cc CustomerCreation) Notice(ctx context.Context) string {
 func (cc CustomerCreation) Cancel(ctx context.Context) string {
 	cc.ClearUp(ctx)
 
-	oInt := ctx.Value(config.CtxKeyOrder)
-	// confirm := ctx.Value(config.CtxKeyConfirm)
+	oInt := ctx.CtxValue(config.CtxKeyOrder)
+	// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
 	if oInt != nil {
 		order := oInt.(OrderResolve)
@@ -41,7 +41,7 @@ func (cc CustomerCreation) Cancel(ctx context.Context) string {
 			return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作", cc.Customer)
 		}
 
-		ctx.SetValue(config.CtxKeyOrder, order)
+		ctx.SetCtxValue(config.CtxKeyOrder, order)
 		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作\n%v", cc.Customer, order.Answer(ctx))
 	} else {
 		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作, 当前没有正在进行中的订单", cc.Customer)
@@ -58,8 +58,8 @@ func (cc CustomerCreation) Confirm(ctx context.Context) string {
 	err := database.CreatePerson(&person)
 
 	if err == nil {
-		oInt := ctx.Value(config.CtxKeyOrder)
-		// confirm := ctx.Value(config.CtxKeyConfirm)
+		oInt := ctx.CtxValue(config.CtxKeyOrder)
+		// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
 		if oInt != nil {
 			order := oInt.(OrderResolve)
@@ -73,12 +73,12 @@ func (cc CustomerCreation) Confirm(ctx context.Context) string {
 			reply := fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, order.Answer(ctx))
 
 			if order.Resolved() {
-				ctx.SetValue(config.CtxKeyOrder, nil)
-				ctx.SetValue(config.CtxKeyLastOrder, order)
+				ctx.SetCtxValue(config.CtxKeyOrder, nil)
+				ctx.SetCtxValue(config.CtxKeyLastOrder, order)
 			} else if order.Failed() {
-				ctx.SetValue(config.CtxKeyOrder, nil)
+				ctx.SetCtxValue(config.CtxKeyOrder, nil)
 			} else {
-				ctx.SetValue(config.CtxKeyOrder, order)
+				ctx.SetCtxValue(config.CtxKeyOrder, order)
 			}
 
 			return reply

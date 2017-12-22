@@ -32,7 +32,7 @@ func NewPatchOrderResolve(ctx Context) *PatchOrderResolve {
 		resolve.OrderSyncQueue = syncQueue.(string)
 	}
 
-	if viewer := ctx.Value("Viewer"); viewer != nil {
+	if viewer := ctx.CtxValue("Viewer"); viewer != nil {
 		user := viewer.(*database.User)
 		resolve.User = user
 	}
