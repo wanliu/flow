@@ -2,7 +2,7 @@ package builtin
 
 import (
 	"fmt"
-	"log"
+	// "log"
 	// "time"
 
 	// "github.com/wanliu/flow/builtin/config"
@@ -27,10 +27,10 @@ type OrderDelete struct {
 }
 
 func (c *OrderDelete) OnCtx(ctx context.Context) {
-	if context.GroupChat(ctx) {
-		log.Printf("不回应非开单相关的普通群聊")
-		return
-	}
+	// if context.GroupChat(ctx) {
+	// 	log.Printf("不回应非开单相关的普通群聊")
+	// 	return
+	// }
 
 	aiResult := ctx.Value("Result").(apiai.Result)
 

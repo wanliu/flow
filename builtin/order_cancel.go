@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	"log"
+	// "log"
 	"time"
 
 	"github.com/wanliu/brain_data/database"
@@ -25,10 +25,10 @@ type OrderCancel struct {
 }
 
 func (c *OrderCancel) OnCtx(ctx context.Context) {
-	if context.GroupChat(ctx) {
-		log.Printf("不回应非开单相关的普通群聊")
-		return
-	}
+	// if context.GroupChat(ctx) {
+	// 	log.Printf("不回应非开单相关的普通群聊")
+	// 	return
+	// }
 
 	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
@@ -55,6 +55,13 @@ func (c *OrderCancel) OnCtx(ctx context.Context) {
 					}
 				}
 			}
+		}
+
+		// 暂时不在群聊中提供根据订单号删除订单的功能,只能删除最近订单
+		if context.GroupChat(ctx) {
+			// log.Printf("不回应非开单相关的普通群聊")
+			c.Out <- ReplyData{"当前没有可以取消的订单", ctx}
+			return
 		}
 
 		deleteResolve := resolves.OrderDeleteResolve{}

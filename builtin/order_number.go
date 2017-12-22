@@ -41,6 +41,11 @@ func (c *OrderNumber) OnCtx(ctx context.Context) {
 			reply := resolve.Resolve(orderNo, ctx)
 			c.Out <- ReplyData{reply, ctx}
 		} else {
+			// if context.GroupChat(ctx) {
+			// 	log.Printf("不回应非开单相关的普通群聊")
+			// 	return
+			// }
+
 			c.Out <- ReplyData{"接收到订单号输入，但是没有对应的操作哦", ctx}
 		}
 
