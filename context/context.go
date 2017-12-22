@@ -143,15 +143,28 @@ func (ctx *ctxt) Pop() Context {
 	return ctx.Stack.Pop()
 }
 
-// TODO 混合私聊和群聊情况，私聊可以去读群聊，而群聊不可以读取私聊信息？
+// 混合私聊和群聊情况，私聊可以去读群聊，而群聊不可以读取私聊信息
 func (ctx *ctxt) CtxValue(name interface{}) interface{} {
 	if GroupChat(ctx) {
 		name = fmt.Sprintf("Group:%v", name)
+
+		ctx.RLock()
+		defer ctx.RUnlock()
+
+		return ctx.values[name]
+	} else {
+		ctx.RLock()
+		defer ctx.RUnlock()
+
+		value := ctx.values[name]
+		if value == nil {
+			name = fmt.Sprintf("Group:%v", name)
+			value = ctx.values[name]
+		}
+
+		return value
 	}
 
-	ctx.RLock()
-	defer ctx.RUnlock()
-	return ctx.values[name]
 }
 
 func (ctx *ctxt) SetCtxValue(name, value interface{}) {
