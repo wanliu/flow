@@ -3,13 +3,12 @@ package builtin
 import (
 	"log"
 
-	"github.com/wanliu/flow/builtin/wechat_type"
-	. "github.com/wanliu/flow/context"
+	"github.com/wanliu/flow/context"
 )
 
 type Critical struct {
 	TryGetEntities
-	Ctx  <-chan Context
+	Ctx  <-chan context.Context
 	Type <-chan string
 	Out  chan<- ReplyData
 }
@@ -19,8 +18,8 @@ func NewCritical() interface{} {
 }
 
 // entity: 贬低
-func (order *Critical) OnCtx(ctx Context) {
-	if wechat_type.GroupChat(ctx) {
+func (order *Critical) OnCtx(ctx context.Context) {
+	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}

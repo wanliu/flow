@@ -5,7 +5,7 @@ import (
 
 	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
-	"github.com/wanliu/flow/builtin/wechat_type"
+
 	"github.com/wanliu/flow/context"
 )
 
@@ -53,7 +53,7 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			log.Printf("重新获取开单产品，第1次，共%v次", c.retryCount)
 			c.RetryOut <- ctx
 		} else {
-			if wechat_type.GroupChat(ctx) {
+			if context.GroupChat(ctx) {
 				c.GroupAnswer(ctx, orderResolve)
 				return
 			}
@@ -63,7 +63,7 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			c.Out <- replyData
 		}
 	} else {
-		if wechat_type.GroupChat(ctx) {
+		if context.GroupChat(ctx) {
 			c.GroupAnswer(ctx, orderResolve)
 			return
 		}

@@ -7,7 +7,7 @@ import (
 
 	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
-	"github.com/wanliu/flow/builtin/wechat_type"
+
 	"github.com/wanliu/flow/context"
 )
 
@@ -33,7 +33,7 @@ func NewCustomerOrders() interface{} {
 }
 
 func (c *CustomerOrders) OnCtx(ctx context.Context) {
-	if wechat_type.GroupChat(ctx) {
+	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}

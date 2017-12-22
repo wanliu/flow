@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/wanliu/flow/builtin/resolves"
-	"github.com/wanliu/flow/builtin/wechat_type"
-	. "github.com/wanliu/flow/context"
+
+	"github.com/wanliu/flow/context"
 
 	config "github.com/wanliu/flow/builtin/config"
 )
@@ -17,9 +17,9 @@ type Confirm struct {
 
 	ExpMins <-chan float64
 
-	Confirm <-chan Context
-	Cancel  <-chan Context
-	Expire  <-chan Context
+	Confirm <-chan context.Context
+	Cancel  <-chan context.Context
+	Expire  <-chan context.Context
 
 	Out chan<- ReplyData
 }
@@ -32,11 +32,11 @@ func (c *Confirm) OnExpMins(mins float64) {
 	c.expMins = mins
 }
 
-func (c Confirm) OnExpire(ctx Context) {
+func (c Confirm) OnExpire(ctx context.Context) {
 	ctx.SetValue(config.CtxKeyConfirm, nil)
 }
 
-func (c *Confirm) OnConfirm(ctx Context) {
+func (c *Confirm) OnConfirm(ctx context.Context) {
 	cIn := ctx.Value(config.CtxKeyConfirm)
 
 	if cIn != nil {
@@ -45,7 +45,7 @@ func (c *Confirm) OnConfirm(ctx Context) {
 		c.Out <- ReplyData{reply, ctx}
 	} else {
 		// 群聊无待确认项目时，不回应
-		if wechat_type.GroupChat(ctx) {
+		if context.GroupChat(ctx) {
 			log.Printf("不回应非开单相关的普通群聊")
 			return
 		}
@@ -55,7 +55,7 @@ func (c *Confirm) OnConfirm(ctx Context) {
 	}
 }
 
-func (c *Confirm) OnCancel(ctx Context) {
+func (c *Confirm) OnCancel(ctx context.Context) {
 	cIn := ctx.Value(config.CtxKeyConfirm)
 
 	if cIn != nil {
@@ -64,7 +64,7 @@ func (c *Confirm) OnCancel(ctx Context) {
 		c.Out <- ReplyData{reply, ctx}
 	} else {
 		// 群聊无待确认项目时，不回应
-		if wechat_type.GroupChat(ctx) {
+		if context.GroupChat(ctx) {
 			log.Printf("不回应非开单相关的普通群聊")
 			return
 		}

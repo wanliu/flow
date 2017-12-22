@@ -6,10 +6,7 @@ import (
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/builtin/resolves"
-	"github.com/wanliu/flow/builtin/wechat_type"
-
-	. "github.com/wanliu/flow/builtin/resolves"
-	. "github.com/wanliu/flow/context"
+	"github.com/wanliu/flow/context"
 
 	config "github.com/wanliu/flow/builtin/config"
 )
@@ -20,7 +17,7 @@ type OrderAddress struct {
 	expMins      float64
 	confirmScore float64
 
-	Ctx          <-chan Context
+	Ctx          <-chan context.Context
 	ConfirmScore <-chan float64
 	Out          chan<- ReplyData
 }
@@ -33,8 +30,8 @@ func (c *OrderAddress) OnConfirmScore(score float64) {
 	c.confirmScore = score
 }
 
-func (c *OrderAddress) OnCtx(ctx Context) {
-	if wechat_type.GroupChat(ctx) {
+func (c *OrderAddress) OnCtx(ctx context.Context) {
+	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}
@@ -43,7 +40,7 @@ func (c *OrderAddress) OnCtx(ctx Context) {
 
 	if nil != currentOrder {
 		aiResult := ctx.Value(config.ValueKeyResult).(apiai.Result)
-		cOrder := currentOrder.(OrderResolve)
+		cOrder := currentOrder.(resolves.OrderResolve)
 
 		if cOrder.Expired(config.SesssionExpiredMinutes) {
 			c.Out <- ReplyData{"当前没有正在进行中的订单", ctx}

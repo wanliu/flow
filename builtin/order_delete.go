@@ -9,7 +9,7 @@ import (
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/resolves"
-	"github.com/wanliu/flow/builtin/wechat_type"
+
 	"github.com/wanliu/flow/context"
 
 	flow "github.com/wanliu/goflow"
@@ -27,7 +27,7 @@ type OrderDelete struct {
 }
 
 func (c *OrderDelete) OnCtx(ctx context.Context) {
-	if wechat_type.GroupChat(ctx) {
+	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}

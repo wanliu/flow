@@ -1,12 +1,10 @@
-package wechat_type
+package context
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
-
-	"github.com/wanliu/flow/context"
 )
 
 var WechatTypeEnum = map[string]int{
@@ -15,13 +13,13 @@ var WechatTypeEnum = map[string]int{
 	"GroupAt": 3,
 }
 
-func PrivateChat(ctx context.Context) bool {
+func PrivateChat(ctx Context) bool {
 	t := wechatType(ctx)
 
 	return t == 1 || t == 3
 }
 
-func GroupChat(ctx context.Context) bool {
+func GroupChat(ctx Context) bool {
 	t := wechatType(ctx)
 
 	return t == 2
@@ -39,7 +37,7 @@ func GroupChat(ctx context.Context) bool {
 // "SenderNickName":"胡义",
 // "TaskId":"528219641",
 // "WeixinUin":"528219641"}
-func wechatType(ctx context.Context) int {
+func wechatType(ctx Context) int {
 	// log.Printf("[WECHAT GROUP] BEGIN")
 	data, _ := json.Marshal(ctx.Value("WECHAT_INFO"))
 	log.Printf("[WECHAT GROUP] ctx value: %v", string(data))

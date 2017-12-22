@@ -5,11 +5,10 @@ import (
 
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
-	"github.com/wanliu/flow/builtin/wechat_type"
+	"github.com/wanliu/flow/context"
 
 	. "github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
-	. "github.com/wanliu/flow/context"
 )
 
 type OrderCustomer struct {
@@ -17,7 +16,7 @@ type OrderCustomer struct {
 
 	expMins float64
 
-	Ctx <-chan Context
+	Ctx <-chan context.Context
 	Out chan<- ReplyData
 }
 
@@ -25,8 +24,8 @@ func NewOrderCustomer() interface{} {
 	return new(OrderCustomer)
 }
 
-func (c *OrderCustomer) OnCtx(ctx Context) {
-	if wechat_type.GroupChat(ctx) {
+func (c *OrderCustomer) OnCtx(ctx context.Context) {
+	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}

@@ -6,15 +6,15 @@ import (
 
 	. "github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
-	"github.com/wanliu/flow/builtin/wechat_type"
-	. "github.com/wanliu/flow/context"
+
+	"github.com/wanliu/flow/context"
 
 	flow "github.com/wanliu/goflow"
 )
 
 type OperationNotice struct {
 	flow.Component
-	Ctx <-chan Context
+	Ctx <-chan context.Context
 	Out chan<- ReplyData
 }
 
@@ -22,8 +22,8 @@ func NewOperationNotice() interface{} {
 	return new(OperationNotice)
 }
 
-func (s OperationNotice) OnCtx(ctx Context) {
-	if wechat_type.GroupChat(ctx) {
+func (s OperationNotice) OnCtx(ctx context.Context) {
+	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}
