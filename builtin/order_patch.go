@@ -21,6 +21,7 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 	patchResolve := NewPatchOrderResolve(ctx)
 
 	output := ""
+	var table *Table
 
 	if patchResolve.EmptyProducts() {
 		output = "没有相关的产品"
@@ -28,7 +29,7 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 		curResolve := ctx.CtxValue(config.CtxKeyOrder).(OrderResolve)
 		patchResolve.Patch(&curResolve)
 
-		output = curResolve.Answer(ctx)
+		output, table = curResolve.AnswerWithTable(ctx)
 
 		if curResolve.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyOrder, nil)
@@ -41,6 +42,6 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 
 	}
 
-	replyData := ReplyData{output, ctx, nil}
+	replyData := ReplyData{output, ctx, table}
 	order.Out <- replyData
 }
