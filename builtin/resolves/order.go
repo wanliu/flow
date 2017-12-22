@@ -224,6 +224,16 @@ func (r *OrderResolve) Answer(ctx context.Context) string {
 	}
 }
 
+func (r *OrderResolve) AnswerWithTable(ctx context.Context) (string, *context.Table) {
+	if r.MismatchQuantity() {
+		return r.MismatchAnswer(), nil
+	} else if r.Fulfiled() {
+		return r.PostOrderAndAnswerWithTable(ctx)
+	} else {
+		return r.AnswerHead(ctx) + r.AnswerFooter(ctx, "", ""), nil
+	}
+}
+
 func (r *OrderResolve) MismatchAnswer() string {
 	if r.Products.MismatchQuantity() {
 		return r.MismatchProductsAnswer()
@@ -336,6 +346,58 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 	}
 }
 
+func (r OrderResolve) PostOrderAndAnswerWithTable(ctx context.Context) (string, *context.Table) {
+	items := make([]database.OrderItem, 0, 0)
+	gifts := make([]database.GiftItem, 0, 0)
+
+	for _, pr := range r.Products.Products {
+		item, err := database.NewOrderItem("", pr.Product, uint(pr.Quantity), pr.Unit, pr.Price)
+		if err != nil {
+			r.IsFailed = true
+			return fmt.Sprintf("%v, 订单创建失败", err.Error()), nil
+		}
+		items = append(items, *item)
+	}
+
+	for _, pr := range r.Gifts.Products {
+		gift, err := database.NewGiftItem("", pr.Product, uint(pr.Quantity), pr.Unit)
+		if err != nil {
+			r.IsFailed = true
+			return fmt.Sprintf("%v, 订单创建失败", err.Error()), nil
+		}
+
+		gifts = append(gifts, *gift)
+	}
+
+	if r.User == nil {
+		// return "无法创建订单，请与工作人员联系！"
+		order, err := wrapper.CreateFlowOrder(r.OrderSyncQueue, r.Address, r.Note, r.Time, r.Customer, 0, r.Storehouse, items, gifts)
+
+		if err != nil {
+			r.IsFailed = true
+			return fmt.Sprintf("%v, 订单创建失败", err.Error()), nil
+		} else {
+			r.IsResolved = true
+			r.BrainOrder = &order
+			r.Id = order.ID
+			return r.AnswerHead(ctx) + r.AnswerFooter(ctx, order.No, order.GlobelId()), r.AnswerBodyTable()
+		}
+	} else {
+		// order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
+		order, err := wrapper.CreateFlowOrder(r.OrderSyncQueue, r.Address, r.Note, r.Time, r.Customer, r.User.ID, r.Storehouse, items, gifts)
+
+		if err != nil {
+			r.IsFailed = true
+			return fmt.Sprintf("%v, 订单创建失败", err.Error()), nil
+		} else {
+			r.IsResolved = true
+			r.BrainOrder = &order
+			r.Id = order.ID
+			return r.AnswerHead(ctx) + r.AnswerFooter(ctx, order.No, order.GlobelId()), r.AnswerBodyTable()
+		}
+	}
+}
+
 func (r OrderResolve) AddressInfo() string {
 	// if r.Address != "" && r.Customer != "" {
 	// 	return "地址:" + r.Address + r.Customer + "\n"
@@ -402,6 +464,84 @@ func (r OrderResolve) AnswerBody() string {
 	}
 
 	return desc
+}
+
+func (r OrderResolve) AnswerBodyTable() *context.Table {
+	table := context.NewTable()
+	table.Headers = []string{"编号", "商品名称", "数量"}
+
+	if r.IsResolved && r.BrainOrder != nil {
+		index := 1
+
+		for _, item := range r.BrainOrder.OrderItems {
+			// desc = desc + fmt.Sprintf("%v %v %v\n", item.ProductName, item.Quantity, item.Unit)
+
+			row := []string{
+				fmt.Sprint(index),
+				fmt.Sprint(item.ProductName),
+				fmt.Sprintf("%v%v", item.Quantity, item.Unit),
+			}
+
+			index++
+
+			table.Rows = append(table.Rows, row)
+		}
+
+		if len(r.BrainOrder.GiftItems) > 0 {
+			// desc = desc + "申请的赠品:\n"
+
+			for _, g := range r.BrainOrder.GiftItems {
+				// desc = desc + fmt.Sprintf("%v %v %v\n", g.ProductName, g.Quantity, g.Unit)
+
+				row := []string{
+					fmt.Sprint(index),
+					fmt.Sprintf("(赠品)%v", g.ProductName),
+					fmt.Sprintf("%v%v", g.Quantity, g.Unit),
+				}
+
+				index++
+
+				table.Rows = append(table.Rows, row)
+			}
+		}
+	} else {
+		index := 1
+
+		for _, p := range r.Products.Products {
+			// desc = desc + fmt.Sprintf("%v %v %v\n", p.Product, p.Quantity, p.Unit)
+
+			row := []string{
+				fmt.Sprint(index),
+				fmt.Sprint(p.Product),
+				fmt.Sprintf("%v%v", p.Quantity, p.Unit),
+			}
+
+			index++
+
+			table.Rows = append(table.Rows, row)
+		}
+
+		if len(r.Gifts.Products) > 0 {
+			// desc = desc + "申请的赠品:\n"
+
+			for _, g := range r.Gifts.Products {
+				// desc = desc + fmt.Sprintf("%v %v %v\n", g.Product, g.Quantity, g.Unit)
+
+				row := []string{
+					fmt.Sprint(index),
+					fmt.Sprint(g.Product),
+					fmt.Sprintf("%v%v", g.Quantity, g.Unit),
+				}
+
+				index++
+
+				table.Rows = append(table.Rows, row)
+			}
+
+		}
+	}
+
+	return table
 }
 
 func (r OrderResolve) AnswerFooter(ctx context.Context, no, id interface{}) string {

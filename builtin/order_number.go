@@ -39,12 +39,12 @@ func (c *OrderNumber) OnCtx(ctx context.Context) {
 		if resolveInt != nil {
 			resolve := resolveInt.(resolves.OrderNumberResolve)
 			reply := resolve.Resolve(orderNo, ctx)
-			c.Out <- ReplyData{reply, ctx}
+			c.Out <- ReplyData{reply, ctx, nil}
 		} else {
-			c.Out <- ReplyData{"接收到订单号输入，但是没有对应的操作哦", ctx}
+			c.Out <- ReplyData{"接收到订单号输入，但是没有对应的操作哦", ctx, nil}
 		}
 
 	} else {
-		c.Out <- ReplyData{"无效的订单号输入", ctx}
+		c.Out <- ReplyData{"无效的订单号输入", ctx, nil}
 	}
 }

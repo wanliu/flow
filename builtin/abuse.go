@@ -26,6 +26,6 @@ func (order *Abuse) OnCtx(ctx context.Context) {
 	// entities := ctx.Value("Result").(ResultParams).Entities
 	output := "请不要脏话哦"
 
-	replyData := ReplyData{output, ctx}
+	replyData := ReplyData{output, ctx, nil}
 	order.Out <- replyData
 }

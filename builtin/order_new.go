@@ -59,26 +59,26 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			}
 
 			output = "没有相关的产品"
-			replyData := ReplyData{output, ctx}
+			replyData := ReplyData{output, ctx, nil}
 			c.Out <- replyData
 		}
 	} else {
-		output = orderResolve.Answer(ctx)
+		output, table := orderResolve.AnswerWithTable(ctx)
 
 		if orderResolve.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyLastOrder, *orderResolve)
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, table)
 		} else if orderResolve.Failed() {
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, table)
 		} else if orderResolve.MismatchQuantity() {
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, table)
 		} else {
 			ctx.SetCtxValue(config.CtxKeyOrder, *orderResolve)
 		}
 
 		c.Timeout <- ctx
 
-		replyData := ReplyData{output, ctx}
+		replyData := ReplyData{output, ctx, table}
 		c.Out <- replyData
 	}
 }
@@ -108,7 +108,7 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 
 			output = "没有相关的产品"
 
-			replyData := ReplyData{output, ctx}
+			replyData := ReplyData{output, ctx, nil}
 			c.Out <- replyData
 		} else {
 			retriedCount++
@@ -118,15 +118,15 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 			c.RetryOut <- ctx
 		}
 	} else {
-		output = orderResolve.Answer(ctx)
+		output, table := orderResolve.AnswerWithTable(ctx)
 
 		if orderResolve.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyLastOrder, *orderResolve)
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, table)
 		} else if orderResolve.Failed() {
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, table)
 		} else if orderResolve.MismatchQuantity() {
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+			ctx.SetCtxValue(config.CtxKeyOrder, table)
 		} else {
 			ctx.SetCtxValue(config.CtxKeyOrder, *orderResolve)
 		}
@@ -134,19 +134,19 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 		// c.Notice <- ctx
 		c.Timeout <- ctx
 
-		replyData := ReplyData{output, ctx}
+		replyData := ReplyData{output, ctx, table}
 		c.Out <- replyData
 	}
 
 }
 
 func (c *NewOrder) GroupAnswer(ctx context.Context, orderResolve *resolves.OrderResolve) {
-	output := orderResolve.Answer(ctx)
+	str, tbl := orderResolve.AnswerWithTable(ctx)
 
 	if orderResolve.Fulfiled() {
-		replyData := ReplyData{output, ctx}
+		replyData := ReplyData{str, ctx, tbl}
 		c.Out <- replyData
 	} else {
-		log.Printf("群聊开单失败, 取消回复。失败原因：%v", output)
+		log.Printf("群聊开单失败, 取消回复。失败原因：%v", str)
 	}
 }

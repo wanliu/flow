@@ -35,7 +35,7 @@ func (query *PriceQuery) OnCtx(ctx Context) {
 	// 	output = priceQuery.Next().Hint()
 	// }
 
-	// replyData := ReplyData{output, ctx}
+	// replyData := ReplyData{output, ctx, nil}
 	// query.Out <- replyData
 
 	// go func(task Context) {
@@ -54,14 +54,14 @@ func (query *PriceQuery) TaskHandle(ctx Context, raw interface{}) error {
 	// if solved {
 	// 	log.Printf("测试输出打印: \n%v", finishNotition)
 
-	// 	reply := ReplyData{finishNotition, ctx}
+	// 	reply := ReplyData{finishNotition, ctx, nil}
 	// 	query.Out <- reply
 
 	// 	ctx.Pop() // 将当前任务踢出队列
 	// } else {
 	// 	log.Printf("测试输出打印: \n%v\n", nextNotition)
 
-	// 	reply := ReplyData{nextNotition, ctx}
+	// 	reply := ReplyData{nextNotition, ctx, nil}
 	// 	query.Out <- reply
 	// }
 	// // ctx.Send(raw)

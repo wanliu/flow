@@ -75,7 +75,13 @@ func (s *Final) SendReply() {
 		log.Printf("[Delay]Delay reply for " + strconv.Itoa(secs) + " seconds.")
 		time.Sleep(time.Second * time.Duration(secs))
 
-		data.Ctx.Post(data.Reply)
+		if data.Reply != "" {
+			data.Ctx.Post(data.Reply)
+		}
+
+		if data.Table != nil {
+			data.Ctx.PostTable(*data.Table)
+		}
 	}
 	s.RUnlock()
 }

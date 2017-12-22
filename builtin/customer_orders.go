@@ -45,19 +45,19 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 	rsv.Setup(ctx)
 	c.ResetTick(rsv, ctx)
 
-	c.Out <- ReplyData{reply, ctx}
+	c.Out <- ReplyData{reply, ctx, nil}
 }
 
 func (c *CustomerOrders) OnPage(ctx context.Context) {
 	in := ctx.CtxValue(config.CtxKeyCusOrders)
 	if in == nil {
-		c.Out <- ReplyData{"当前没有正在进行的查询", ctx}
+		c.Out <- ReplyData{"当前没有正在进行的查询", ctx, nil}
 	} else {
 		rsv := in.(*resolves.CustomerOrdersResolve)
 
 		c.ResetTick(rsv, ctx)
 		reply := rsv.Answer()
-		c.Out <- ReplyData{reply, ctx}
+		c.Out <- ReplyData{reply, ctx, nil}
 
 		rsv.ClearIfDone(ctx)
 	}

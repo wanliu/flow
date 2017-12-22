@@ -46,6 +46,6 @@ func (order *Praise) OnCtx(ctx Context) {
 		output = "谢谢夸奖, 真是不敢当"
 	}
 
-	replyData := ReplyData{output, ctx}
+	replyData := ReplyData{output, ctx, nil}
 	order.Out <- replyData
 }

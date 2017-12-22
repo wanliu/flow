@@ -41,6 +41,6 @@ func (order *Greet) OnCtx(ctx Context) {
 		output = "你好，很高兴为您服务"
 	}
 
-	replyData := ReplyData{output, ctx}
+	replyData := ReplyData{output, ctx, nil}
 	order.Out <- replyData
 }

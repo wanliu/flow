@@ -42,7 +42,7 @@ func (c *Confirm) OnConfirm(ctx context.Context) {
 	if cIn != nil {
 		cfm := cIn.(resolves.Data)
 		reply := cfm.Confirm(ctx)
-		c.Out <- ReplyData{reply, ctx}
+		c.Out <- ReplyData{reply, ctx, nil}
 	} else {
 		// 群聊无待确认项目时，不回应
 		// if context.GroupChat(ctx) {
@@ -50,7 +50,7 @@ func (c *Confirm) OnConfirm(ctx context.Context) {
 		// 	return
 		// }
 
-		reply := ReplyData{"确认操作已经过期", ctx}
+		reply := ReplyData{"确认操作已经过期", ctx, nil}
 		c.Out <- reply
 	}
 }
@@ -61,7 +61,7 @@ func (c *Confirm) OnCancel(ctx context.Context) {
 	if cIn != nil {
 		cfm := cIn.(resolves.Data)
 		reply := cfm.Cancel(ctx)
-		c.Out <- ReplyData{reply, ctx}
+		c.Out <- ReplyData{reply, ctx, nil}
 	} else {
 		// 群聊无待确认项目时，不回应
 		// if context.GroupChat(ctx) {
@@ -69,7 +69,7 @@ func (c *Confirm) OnCancel(ctx context.Context) {
 		// 	return
 		// }
 
-		reply := ReplyData{"确认操作已经过期", ctx}
+		reply := ReplyData{"确认操作已经过期", ctx, nil}
 		c.Out <- reply
 	}
 }

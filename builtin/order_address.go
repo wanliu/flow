@@ -43,7 +43,7 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 		cOrder := currentOrder.(resolves.OrderResolve)
 
 		if cOrder.Expired(config.SesssionExpiredMinutes) {
-			c.Out <- ReplyData{"会话已经过时，当前没有正在进行中的订单", ctx}
+			c.Out <- ReplyData{"会话已经过时，当前没有正在进行中的订单", ctx, nil}
 			return
 		}
 
@@ -62,7 +62,7 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 			}
 
 			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer(ctx)
-			c.Out <- ReplyData{reply, ctx}
+			c.Out <- ReplyData{reply, ctx, nil}
 
 			if cOrder.Resolved() {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
@@ -88,7 +88,7 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 
 			reply := "收到您的回复:" + query + "\n"
 			reply = reply + addressConfirm.Notice(ctx)
-			c.Out <- ReplyData{reply, ctx}
+			c.Out <- ReplyData{reply, ctx, nil}
 		}
 	} else {
 		if context.GroupChat(ctx) {
@@ -96,6 +96,6 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 			return
 		}
 
-		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx}
+		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx, nil}
 	}
 }

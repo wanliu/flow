@@ -43,16 +43,16 @@ func (tr *TryGetProducts) OnCtx(ctx Context) {
 			// log.Printf("找到 %d 产品 (%s)", len(products), ProInfo(products))
 			// tr.No <- ctx
 			reply := fmt.Sprintf("找到 %d 产品 (%s)", len(products), ProInfo(products))
-			replyData := ReplyData{reply, ctx}
+			replyData := ReplyData{reply, ctx, nil}
 			tr.Out <- replyData
 		} else {
 			// tr.No <- ctx
-			replyData := ReplyData{"没有相关的产品", ctx}
+			replyData := ReplyData{"没有相关的产品", ctx, nil}
 			tr.Out <- replyData
 		}
 	} else {
 		// tr.No <- ctx
-		replyData := ReplyData{"出现错误，请稍后重试", ctx}
+		replyData := ReplyData{"出现错误，请稍后重试", ctx, nil}
 		tr.Out <- replyData
 	}
 }

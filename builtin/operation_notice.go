@@ -40,7 +40,7 @@ func (s OperationNotice) OnCtx(ctx context.Context) {
 				expMins = ctx.CtxValue(CtxKeyExpiredMinutes).(int)
 			}
 
-			s.Out <- ReplyData{"你可以继续提交产品到订单，也可以立刻取消当前任务（" + strconv.Itoa(expMins) + "分钟以内）", ctx}
+			s.Out <- ReplyData{"你可以继续提交产品到订单，也可以立刻取消当前任务（" + strconv.Itoa(expMins) + "分钟以内）", ctx, nil}
 		}
 	}
 }

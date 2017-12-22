@@ -50,7 +50,7 @@ func (c *OrderCancel) OnCtx(ctx context.Context) {
 						deleteComfirm.SetUp(ctx)
 
 						notice := deleteComfirm.Notice(ctx)
-						c.Out <- ReplyData{notice, ctx}
+						c.Out <- ReplyData{notice, ctx, nil}
 						return
 					}
 				}
@@ -60,19 +60,19 @@ func (c *OrderCancel) OnCtx(ctx context.Context) {
 		deleteResolve := resolves.OrderDeleteResolve{}
 		deleteResolve.SetUp(ctx)
 
-		c.Out <- ReplyData{deleteResolve.Hint(), ctx}
+		c.Out <- ReplyData{deleteResolve.Hint(), ctx, nil}
 	} else {
 		curOrder := currentOrder.(resolves.OrderResolve)
 
 		if curOrder.Cancelable() {
 			if curOrder.Cancel() {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
-				c.Out <- ReplyData{"当前订单取消成功", ctx}
+				c.Out <- ReplyData{"当前订单取消成功", ctx, nil}
 			} else {
-				c.Out <- ReplyData{"很抱歉，订单取消失败！请联系客服处理", ctx}
+				c.Out <- ReplyData{"很抱歉，订单取消失败！请联系客服处理", ctx, nil}
 			}
 		} else {
-			c.Out <- ReplyData{"没有可以取消的订单", ctx}
+			c.Out <- ReplyData{"没有可以取消的订单", ctx, nil}
 		}
 	}
 }

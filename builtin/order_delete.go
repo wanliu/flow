@@ -44,7 +44,7 @@ func (c *OrderDelete) OnCtx(ctx context.Context) {
 
 			if err != nil {
 				reply := fmt.Sprintf("找不到订单号为 %v 的订单", orderNo)
-				c.Out <- ReplyData{reply, ctx}
+				c.Out <- ReplyData{reply, ctx, nil}
 			} else {
 				reply := ""
 
@@ -55,7 +55,7 @@ func (c *OrderDelete) OnCtx(ctx context.Context) {
 					reply = fmt.Sprintf("%v 号订单删除失败，请访问 http://jiejie.wanliu.biz/orders/%v 进行操作", orderNo, order.GlobelId())
 				}
 
-				c.Out <- ReplyData{reply, ctx}
+				c.Out <- ReplyData{reply, ctx, nil}
 			}
 		}
 	} else {
@@ -67,5 +67,5 @@ func (c *OrderDelete) setupResolve(ctx context.Context) {
 	deleteResolve := resolves.OrderDeleteResolve{}
 	deleteResolve.SetUp(ctx)
 
-	c.Out <- ReplyData{deleteResolve.Hint(), ctx}
+	c.Out <- ReplyData{deleteResolve.Hint(), ctx, nil}
 }
