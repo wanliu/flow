@@ -346,7 +346,7 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 	}
 }
 
-func (r OrderResolve) PostOrderAndAnswerWithTable(ctx context.Context) (string, *context.Table) {
+func (r *OrderResolve) PostOrderAndAnswerWithTable(ctx context.Context) (string, *context.Table) {
 	items := make([]database.OrderItem, 0, 0)
 	gifts := make([]database.GiftItem, 0, 0)
 
