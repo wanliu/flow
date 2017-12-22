@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	"log"
+	// "log"
 
 	"github.com/wanliu/flow/builtin/resolves"
 
