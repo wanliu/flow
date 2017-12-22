@@ -4,6 +4,7 @@ import (
 	"log"
 
 	. "github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/builtin/wechat_type"
 	. "github.com/wanliu/flow/context"
 
 	config "github.com/wanliu/flow/builtin/config"
@@ -22,7 +23,7 @@ type OrderPrinter struct {
 }
 
 func (s *OrderPrinter) OnCtx(ctx Context) {
-	if GroupChat(ctx) {
+	if wechat_type.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}

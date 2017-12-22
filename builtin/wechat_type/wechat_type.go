@@ -1,4 +1,4 @@
-package builtin
+package wechat_type
 
 import (
 	"encoding/json"
@@ -40,10 +40,10 @@ func GroupChat(ctx context.Context) bool {
 // "TaskId":"528219641",
 // "WeixinUin":"528219641"}
 func wechatType(ctx context.Context) int {
-	log.Printf("[WECHAT GROUP] BEGIN")
+	// log.Printf("[WECHAT GROUP] BEGIN")
 	data, _ := json.Marshal(ctx.Value("WECHAT_INFO"))
 	log.Printf("[WECHAT GROUP] ctx value: %v", string(data))
-	log.Printf("[WECHAT GROUP] END")
+	// log.Printf("[WECHAT GROUP] END")
 
 	wechatInfo := ctx.Value("WECHAT_INFO")
 

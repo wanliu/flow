@@ -5,6 +5,7 @@ import (
 
 	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/builtin/wechat_type"
 	"github.com/wanliu/flow/context"
 )
 
@@ -39,7 +40,7 @@ func (c *Order) OnCtx(ctx context.Context) {
 		ctx.SetValue(config.CtxKeyExpiredMinutes, int(c.expMins))
 	}
 
-	if GroupChat(ctx) {
+	if wechat_type.GroupChat(ctx) {
 		c.New <- ctx
 		return
 	}

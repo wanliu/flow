@@ -5,6 +5,7 @@ import (
 
 	"github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
+	"github.com/wanliu/flow/builtin/wechat_type"
 
 	. "github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/builtin/resolves"
@@ -25,7 +26,7 @@ func NewOrderCustomer() interface{} {
 }
 
 func (c *OrderCustomer) OnCtx(ctx Context) {
-	if GroupChat(ctx) {
+	if wechat_type.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}

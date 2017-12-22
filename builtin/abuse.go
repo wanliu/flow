@@ -3,6 +3,7 @@ package builtin
 import (
 	"log"
 
+	"github.com/wanliu/flow/builtin/wechat_type"
 	. "github.com/wanliu/flow/context"
 )
 
@@ -19,7 +20,7 @@ func NewAbuse() interface{} {
 
 // entity: 贬低
 func (order *Abuse) OnCtx(ctx Context) {
-	if GroupChat(ctx) {
+	if wechat_type.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}

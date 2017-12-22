@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/hysios/apiai-go"
+	"github.com/wanliu/flow/builtin/wechat_type"
 	. "github.com/wanliu/flow/context"
 )
 
@@ -19,7 +20,7 @@ func NewUnimplemented() interface{} {
 }
 
 func (order *Unimplemented) OnCtx(ctx Context) {
-	if GroupChat(ctx) {
+	if wechat_type.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
 	}

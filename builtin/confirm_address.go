@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/builtin/wechat_type"
 	. "github.com/wanliu/flow/context"
 
 	config "github.com/wanliu/flow/builtin/config"
@@ -44,7 +45,7 @@ func (c *Confirm) OnConfirm(ctx Context) {
 		c.Out <- ReplyData{reply, ctx}
 	} else {
 		// 群聊无待确认项目时，不回应
-		if GroupChat(ctx) {
+		if wechat_type.GroupChat(ctx) {
 			log.Printf("不回应非开单相关的普通群聊")
 			return
 		}
@@ -63,7 +64,7 @@ func (c *Confirm) OnCancel(ctx Context) {
 		c.Out <- ReplyData{reply, ctx}
 	} else {
 		// 群聊无待确认项目时，不回应
-		if GroupChat(ctx) {
+		if wechat_type.GroupChat(ctx) {
 			log.Printf("不回应非开单相关的普通群聊")
 			return
 		}
