@@ -37,8 +37,9 @@ func (c *OrderCustomer) OnCtx(ctx context.Context) {
 		cOrder.ExtractedCustomer = customer
 		cOrder.CheckExtractedCustomer()
 
-		reply := "收到客户信息：" + customer + "\n" + cOrder.Answer(ctx)
-		c.Out <- ReplyData{reply, ctx, nil}
+		reply, table := cOrder.AnswerWithTable(ctx)
+		reply = "收到客户信息：" + customer + "\n" + reply
+		c.Out <- ReplyData{reply, ctx, table}
 
 		if cOrder.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyOrder, nil)
