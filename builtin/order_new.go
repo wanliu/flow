@@ -13,12 +13,14 @@ type NewOrder struct {
 	TryGetEntities
 	DefTime    string
 	retryCount int
+	TablePrint bool
 
-	Ctx     <-chan context.Context
-	Deftime <-chan string
-	Out     chan<- ReplyData
-	Notice  chan<- context.Context
-	Timeout chan<- context.Context
+	Ctx        <-chan context.Context
+	Deftime    <-chan string
+	PrintTable <-chan string
+	Out        chan<- ReplyData
+	Notice     chan<- context.Context
+	Timeout    chan<- context.Context
 
 	RetryOut chan<- context.Context
 	RetryIn  <-chan context.Context
@@ -35,12 +37,18 @@ func (c *NewOrder) OnDeftime(t string) {
 	c.DefTime = t
 }
 
+func (c *NewOrder) OnPrintTable(prt string) {
+	if prt == "true" {
+		c.TablePrint = true
+	}
+}
+
 func (c *NewOrder) OnRetryCount(count float64) {
 	c.retryCount = int(count)
 }
 
 func (c *NewOrder) OnCtx(ctx context.Context) {
-	orderResolve := resolves.NewOrderResolve(ctx)
+	orderResolve := resolves.NewOrderResolve(ctx, c.TablePrint)
 
 	if c.DefTime != "" {
 		orderResolve.SetDefTime(c.DefTime)
@@ -84,7 +92,7 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 }
 
 func (c *NewOrder) OnRetryIn(ctx context.Context) {
-	orderResolve := resolves.NewOrderResolve(ctx)
+	orderResolve := resolves.NewOrderResolve(ctx, c.TablePrint)
 
 	if c.DefTime != "" {
 		orderResolve.SetDefTime(c.DefTime)

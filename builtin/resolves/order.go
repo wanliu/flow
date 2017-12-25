@@ -33,6 +33,7 @@ type OrderResolve struct {
 	Canceled          bool
 	IsResolved        bool
 	IsFailed          bool
+	PrintTable        bool
 	OrderSyncQueue    string
 	// Current   Resolve
 
@@ -42,7 +43,7 @@ type OrderResolve struct {
 	BrainOrder *database.Order
 }
 
-func NewOrderResolve(ctx context.Context) *OrderResolve {
+func NewOrderResolve(ctx context.Context, printTable bool) *OrderResolve {
 	resolve := new(OrderResolve)
 	resolve.Touch()
 
@@ -59,6 +60,8 @@ func NewOrderResolve(ctx context.Context) *OrderResolve {
 		user := viewer.(*database.User)
 		resolve.User = user
 	}
+
+	resolve.PrintTable = printTable
 
 	return resolve
 }
@@ -228,7 +231,11 @@ func (r *OrderResolve) AnswerWithTable(ctx context.Context) (string, *context.Ta
 	if r.MismatchQuantity() {
 		return r.MismatchAnswer(), nil
 	} else if r.Fulfiled() {
-		return r.PostOrderAndAnswerWithTable(ctx)
+		if r.PrintTable {
+			return r.PostOrderAndAnswerWithTable(ctx)
+		} else {
+			return r.PostOrderAndAnswer(ctx), nil
+		}
 	} else {
 		return r.AnswerHead(ctx) + r.AnswerFooter(ctx, "", ""), nil
 	}
