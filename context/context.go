@@ -56,6 +56,7 @@ type Context interface {
 	PostTable(Table) error
 
 	Run()
+	RunCallback(handler ContextReplyHander)
 	Close()
 
 	Reset()
@@ -262,6 +263,27 @@ LOOP:
 		case table := <-ctx.sendTable:
 			ctx.counter--
 			err = ctx.Reply.Table(table, ctx)
+		case <-ctx.quit:
+			// ctx.waitingEnd()
+			break LOOP
+		}
+		ctx.doReplyError(err)
+	}
+}
+
+type ContextReplyHander func(txt *string, table *Table)
+
+func (ctx *ctxt) RunCallback(handler ContextReplyHander) {
+	var err error
+LOOP:
+	for {
+		select {
+		case txt := <-ctx.send:
+			ctx.counter--
+			handler(&txt, nil)
+		case table := <-ctx.sendTable:
+			ctx.counter--
+			handler(nil, table)
 		case <-ctx.quit:
 			// ctx.waitingEnd()
 			break LOOP
