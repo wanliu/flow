@@ -1,7 +1,7 @@
 package resolves
 
 import (
-	// "log"
+	"log"
 	// "strconv"
 	// "strings"
 	"time"
@@ -54,6 +54,7 @@ func (r *PatchOrderResolve) Patch(orderResolve *OrderResolve) {
 		r.Origin.Customer = r.Customer
 	}
 
+	log.Printf("New Synce Queue: %v, orign Synce Queue: %v", r.OrderSyncQueue, r.Origin.OrderSyncQueue)
 	if r.OrderSyncQueue != "" {
 		r.Origin.OrderSyncQueue = r.OrderSyncQueue
 	}
