@@ -33,10 +33,10 @@ func NewCustomerOrders() interface{} {
 }
 
 func (c *CustomerOrders) OnCtx(ctx context.Context) {
-	if context.GroupChat(ctx) {
-		log.Printf("不回应非开单相关的普通群聊")
-		return
-	}
+	// if context.GroupChat(ctx) {
+	// 	log.Printf("不回应非开单相关的普通群聊")
+	// 	return
+	// }
 
 	rsv := resolves.NewCusOrdersResolve(ctx, Per)
 
@@ -51,6 +51,11 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 func (c *CustomerOrders) OnPage(ctx context.Context) {
 	in := ctx.CtxValue(config.CtxKeyCusOrders)
 	if in == nil {
+		if context.GroupChat(ctx) {
+			log.Printf("不回应无context的非@翻页")
+			return
+		}
+
 		c.Out <- ReplyData{"当前没有正在进行的查询", ctx}
 	} else {
 		rsv := in.(*resolves.CustomerOrdersResolve)
