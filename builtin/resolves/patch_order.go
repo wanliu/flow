@@ -54,7 +54,7 @@ func (r *PatchOrderResolve) Patch(orderResolve *OrderResolve) {
 		r.Origin.Customer = r.Customer
 	}
 
-	if r.OrderSyncQueue != "" && r.Origin.OrderSyncQueue == "" {
+	if r.OrderSyncQueue != "" {
 		r.Origin.OrderSyncQueue = r.OrderSyncQueue
 	}
 
