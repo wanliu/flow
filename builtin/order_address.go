@@ -58,7 +58,7 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 			}
 
 			if customer != "" {
-				cOrder.Customer = customer
+				cOrder.ExtractedCustomer = customer
 			}
 
 			reply := "收到客户/地址信息：" + address + customer + "\n" + cOrder.Answer(ctx)
