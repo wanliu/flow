@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"log"
+	"strings"
 
 	"github.com/hysios/apiai-go"
 	. "github.com/wanliu/flow/context"
@@ -45,7 +46,8 @@ func (ic *IntentCheck) OnFlow(flow bool) {
 
 func (ic *IntentCheck) OnCtx(ctx Context) {
 	if res, ok := ctx.Value("Result").(apiai.Result); ok {
-		if res.Metadata.IntentName == ic._intent && res.Score >= ic._score {
+		// if res.Metadata.IntentName == ic._intent && res.Score >= ic._score {
+		if strings.HasPrefix(res.Metadata.IntentName, ic._intent) && res.Score >= ic._score {
 			ic.Out <- ctx
 		} else {
 			ic.Next <- ctx

@@ -691,7 +691,7 @@
       }
     },
     {
-      "data": "business.order.create.address",
+      "data": "business.order.address",
       "tgt": {
         "process": "AdressInt",
         "port": "Intent"
@@ -726,7 +726,7 @@
       }
     },
     {
-      "data": "business.order.create.cancel",
+      "data": "business.order.cancel",
       "tgt": {
         "process": "OrderCancelInt",
         "port": "Intent"

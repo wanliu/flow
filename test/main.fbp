@@ -95,7 +95,7 @@ true -> Flow CancelInt()
 'business.customer.orders.page' -> Intent CustomerOrdersPageInt()
 0.7 -> Score CustomerOrdersPageInt()
 
-'business.order.create.address' -> Intent AdressInt()
+'business.order.address' -> Intent AdressInt()
 0.1 -> Score AdressInt()
 
 0.7 -> ConfirmScore OrderAddress()
@@ -103,7 +103,7 @@ true -> Flow CancelInt()
 'business.order.current.display' -> Intent OrderPrinterInt()
 0.7 -> Score OrderPrinterInt()
 
-'business.order.create.cancel' -> Intent OrderCancelInt()
+'business.order.cancel' -> Intent OrderCancelInt()
 0.7 -> Score OrderCancelInt()
 
 'business.order.create' -> Intent OrderInt()
