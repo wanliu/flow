@@ -244,12 +244,15 @@ func (aa ApiAiOrder) ExtractProductItems(s string) []Item {
 		ps := reflect.ValueOf(prodItems)
 
 		for i := 0; i < ps.Len(); i++ {
-			var name, unit string
+			var name, unit, spec, taste string
 			var quantity int
 
 			p := ps.Index(i)
 			prodItem := p.Interface().(map[string]interface{})
 			name, _ = prodItem["product"].(string)
+			spec, _ = prodItem["spec"].(string)
+			taste, _ = prodItem["taste"].(string)
+
 			quanMap, _ := prodItem["quantity"].(map[string]interface{})
 			numberFloat, ok := quanMap["number"].(float64)
 			if ok {
@@ -262,6 +265,8 @@ func (aa ApiAiOrder) ExtractProductItems(s string) []Item {
 				Product:  name,
 				Quantity: quantity,
 				Unit:     unit,
+				Spec:     spec,
+				Taste:    taste,
 			}
 			result = append(result, item)
 		}

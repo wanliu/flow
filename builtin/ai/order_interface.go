@@ -10,6 +10,8 @@ type Item struct {
 	Price       float64
 	Unit        string
 	ResolveList []string
+	Spec        string
+	Taste       string
 }
 
 type AiOrder interface {
