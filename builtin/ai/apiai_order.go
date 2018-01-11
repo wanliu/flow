@@ -74,7 +74,7 @@ func (aa ApiAiOrder) Products() []Item {
 }
 
 func (aa ApiAiOrder) prodTastItems() []Item {
-	return aa.ExtractProducts("prodTasts")
+	return aa.ExtractProducts("prodTastes")
 }
 
 func (aa ApiAiOrder) Quantities() []Item {
@@ -341,7 +341,7 @@ func (aa ApiAiOrder) ExtractQuantities(t string) []Item {
 				result = append(result, item)
 			case map[string]interface{}:
 				// quanMap := q.(map[string]interface{})
-				log.Printf("quantity: %v\n", t)
+				log.Printf("quantity: %v\n", v)
 				qf, ok := v["number"].(float64)
 				if !ok {
 					qf, _ = v["quantity"].(float64)
