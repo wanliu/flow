@@ -27,7 +27,7 @@ func (aa ApiAiOrder) Mode() int {
 		mode = MODE_PRODUCT_ITEMS
 	}
 
-	if _, ok := aa.AiResult.Params["prodTasts"]; ok {
+	if _, ok := aa.AiResult.Params["prodTastes"]; ok {
 		mode = MODE_PROD_TASTES
 	}
 
