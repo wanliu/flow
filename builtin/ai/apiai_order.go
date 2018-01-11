@@ -10,15 +10,25 @@ import (
 	"github.com/hysios/apiai-go"
 )
 
+const (
+	MODE_PRODUCTS      = 1
+	MODE_PRODUCT_ITEMS = 2
+	MODE_PROD_TASTES   = 3
+)
+
 type ApiAiOrder struct {
 	AiResult apiai.Result
 }
 
 func (aa ApiAiOrder) Mode() int {
-	mode := 1
+	mode := MODE_PRODUCTS
 
 	if _, ok := aa.AiResult.Params["productItems"]; ok {
-		mode = 2
+		mode = MODE_PRODUCT_ITEMS
+	}
+
+	if _, ok := aa.AiResult.Params["prodTasts"]; ok {
+		mode = MODE_PROD_TASTES
 	}
 
 	return mode
@@ -33,14 +43,21 @@ func (aa ApiAiOrder) Query() string {
 }
 
 func (aa ApiAiOrder) Items() []Item {
-	if aa.Mode() == 2 {
+	if aa.Mode() == MODE_PRODUCT_ITEMS {
 		return aa.ExtractProductItems("productItems")
+	} else if aa.Mode() == MODE_PROD_TASTES {
+		products := aa.prodTastItems()
+		quantities := aa.Quantities()
+
+		return composeItems(products, quantities)
+	} else {
+		products := aa.Products()
+		quantities := aa.Quantities()
+
+		return composeItems(products, quantities)
 	}
 
-	products := aa.Products()
-	quantities := aa.Quantities()
-
-	return composeItems(products, quantities)
+	return make([]Item, 0)
 
 	// for i, q := range quantities {
 	// 	if len(products) >= i+1 {
@@ -56,12 +73,16 @@ func (aa ApiAiOrder) Products() []Item {
 	return aa.ExtractProducts("products")
 }
 
+func (aa ApiAiOrder) prodTastItems() []Item {
+	return aa.ExtractProducts("prodTasts")
+}
+
 func (aa ApiAiOrder) Quantities() []Item {
 	return aa.ExtractQuantities("quantity")
 }
 
 func (aa ApiAiOrder) GiftItems() []Item {
-	if aa.Mode() == 2 {
+	if aa.Mode() == MODE_PRODUCT_ITEMS {
 		return aa.ExtractProductItems("giftItems")
 	}
 
@@ -95,6 +116,10 @@ func composeItems(products []Item, quantities []Item) []Item {
 		if len(products) >= i+1 {
 			p := products[i]
 			item.Product = p.Product
+
+			if p.Taste != "" {
+				item.Taste = p.Taste
+			}
 		}
 
 		if len(quantities) >= i+1 {
@@ -226,10 +251,30 @@ func (aa ApiAiOrder) ExtractProducts(t string) []Item {
 		ps := reflect.ValueOf(products)
 
 		for i := 0; i < ps.Len(); i++ {
-			p := ps.Index(i)
-			name := p.Interface().(string)
-			item := Item{Product: name}
-			result = append(result, item)
+			p := ps.Index(i).Interface()
+
+			switch v := p.(type) {
+			case string:
+				// name := p.(string)
+				item := Item{Product: v}
+				result = append(result, item)
+			case map[string]interface{}:
+				// itemMap := p.(map[string]interface{})
+				name, _ := v["product"].(string)
+				taste, _ := v["taste"].(string)
+
+				if name != "" {
+					item := Item{
+						Product: name,
+					}
+
+					if taste != "" {
+						item.Taste = taste
+					}
+
+					result = append(result, item)
+				}
+			}
 		}
 	}
 
@@ -284,23 +329,28 @@ func (aa ApiAiOrder) ExtractQuantities(t string) []Item {
 		for i := 0; i < qs.Len(); i++ {
 			q := qs.Index(i).Interface()
 
-			switch t := q.(type) {
+			switch v := q.(type) {
 			case string:
-				qs := q.(string)
-				qi := extractQuantity(qs)
+				// qs := q.(string)
+				qi := extractQuantity(v)
 				item := Item{Quantity: qi}
 				result = append(result, item)
 			case float64:
-				qf := q.(float64)
-				item := Item{Quantity: int(qf)}
+				// qf := q.(float64)
+				item := Item{Quantity: int(v)}
 				result = append(result, item)
 			case map[string]interface{}:
+				// quanMap := q.(map[string]interface{})
 				log.Printf("quantity: %v\n", t)
-				qf := t["number"].(float64)
+				qf, ok := v["number"].(float64)
+				if !ok {
+					qf, _ = v["quantity"].(float64)
+				}
+
 				quantity := int(qf)
 				item := Item{Quantity: quantity}
 
-				if unit, ok := t["unit"].(string); ok {
+				if unit, ok := v["unit"].(string); ok {
 					unit = strings.Replace(unit, "龘", "", -1)
 					unit = strings.Replace(unit, " ", "", -1)
 					item.Unit = unit
