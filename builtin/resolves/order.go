@@ -129,7 +129,7 @@ func (r *OrderResolve) ExtractItems() {
 		name := strings.Replace(i.Product, "%", "%%", -1)
 		unit := strings.Replace(i.Unit, " ", "", -1)
 
-		if i.Taste != "" {
+		if i.Taste != "" || i.Spec != "" {
 			prod, _ := database.GetProductByNameTaste(name, i.Taste, i.Spec)
 			if prod != nil {
 				name = prod.Name
