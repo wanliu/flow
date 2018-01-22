@@ -45,11 +45,27 @@ func NewTextPreprocesor() interface{} {
 
 func (c *TextPreprocesor) OnIn(input string) {
 	output := atFilter(input)
+	output = replaceDeliver(output)
 	output = numberAfterLetter(output)
 	output = dateTransfer(output)
 	output = dictTransfer(output)
 	output = replaceUnit(output)
 	c.Out <- output
+}
+
+func replaceDeliver(s string) string {
+	r := regexp.MustCompile(`送[^，,]`)
+
+	is := r.FindStringIndex(s)
+
+	for len(is) == 2 {
+		i := (is[0] + is[1]) / 2
+		s = s[:i] + ", " + s[i:]
+
+		is = r.FindStringIndex(s)
+	}
+
+	return s
 }
 
 func numberAfterLetter(s string) string {
