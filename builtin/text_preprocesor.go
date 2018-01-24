@@ -54,13 +54,13 @@ func (c *TextPreprocesor) OnIn(input string) {
 }
 
 func replaceDeliver(s string) string {
-	r := regexp.MustCompile(`送[^，,]`)
+	r := regexp.MustCompile(`急送[^，,.。]`)
 
 	is := r.FindStringIndex(s)
 
 	for len(is) == 2 {
-		i := (is[0] + is[1]) / 2
-		s = s[:i] + ", " + s[i:]
+		b := is[0] + 6
+		s = s[:b] + "," + s[b:]
 
 		is = r.FindStringIndex(s)
 	}
