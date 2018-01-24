@@ -432,7 +432,7 @@ func (r OrderResolve) AnswerFooter(ctx context.Context, no, id interface{}) stri
 	if r.Fulfiled() {
 		desc = desc + r.AddressInfo()
 		desc = desc + "订单已经生成，订单号为：" + fmt.Sprint(no) + "\n"
-		desc = desc + "订单入口: http://jiejie.wanliu.biz/order/QueryDetail/" + fmt.Sprint(id) + "\n"
+		desc = desc + "订单入口: https://jiejie.io/order/QueryDetail/" + fmt.Sprint(id) + "\n"
 
 		if context.GroupChat(ctx) {
 			desc = desc + "你可以随时取消订单"

@@ -38,7 +38,7 @@ func (odr OrderDeleteResolve) Resolve(orderNo string, ctx context.Context) strin
 			odr.ClearUp(ctx)
 			return fmt.Sprintf("%v 号订单删除成功", orderNo)
 		} else {
-			return fmt.Sprintf("%v 号订单删除失败，请访问 http://jiejie.wanliu.biz/orders/%v 进行操作", orderNo, order.GlobelId())
+			return fmt.Sprintf("%v 号订单删除失败，请访问 https://jiejie.io/orders/%v 进行操作", orderNo, order.GlobelId())
 		}
 	}
 

@@ -52,7 +52,7 @@ func (c *OrderDelete) OnCtx(ctx context.Context) {
 				if err == nil {
 					reply = fmt.Sprintf("%v 号订单删除成功", orderNo)
 				} else {
-					reply = fmt.Sprintf("%v 号订单删除失败，请访问 http://jiejie.wanliu.biz/orders/%v 进行操作", orderNo, order.GlobelId())
+					reply = fmt.Sprintf("%v 号订单删除失败，请访问 https://jiejie.io/orders/%v 进行操作", orderNo, order.GlobelId())
 				}
 
 				c.Out <- ReplyData{reply, ctx}
