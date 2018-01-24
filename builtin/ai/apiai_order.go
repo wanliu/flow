@@ -215,7 +215,16 @@ func (aa ApiAiOrder) Count() int {
 
 func (aa ApiAiOrder) Duration() string {
 	if c, exist := aa.AiResult.Params["duration"]; exist {
-		return c.(string)
+		// return c.(string)
+		switch v := c.(type) {
+		case string:
+			return v
+			// case []interface{}:
+			// 	if len(v) > 0 {
+			// 		i := v[0]
+			// 		return i.(string)
+			// 	}
+		}
 	}
 
 	return ""
@@ -223,8 +232,11 @@ func (aa ApiAiOrder) Duration() string {
 
 func (aa ApiAiOrder) Time() time.Time {
 	if t, exist := aa.AiResult.Params["date"]; exist {
-		if aiTime, err := time.Parse("2006-01-02", t.(string)); err == nil {
-			return aiTime
+		switch v := t.(type) {
+		case string:
+			if aiTime, err := time.Parse("2006-01-02", v); err == nil {
+				return aiTime
+			}
 		}
 	}
 
@@ -237,7 +249,16 @@ func (aa ApiAiOrder) Fulfiled() bool {
 
 func (aa ApiAiOrder) Note() string {
 	if imp, exist := aa.AiResult.Params["important"]; exist {
-		return imp.(string)
+		// return imp.(string)
+		switch v := imp.(type) {
+		case string:
+			return v
+			// case []interface{}:
+			// 	if len(v) > 0 {
+			// 		i := v[0]
+			// 		return i.(string)
+			// 	}
+		}
 	}
 
 	return ""
