@@ -70,6 +70,12 @@ func (cc CustomerCreation) Confirm(ctx context.Context) string {
 				return fmt.Sprintf("添加了新的客户\"%v\", 当前没有正在进行中的订单", cc.Customer)
 			}
 
+			// dataReply := DataReply{
+			// 	Type:   "info",
+			// 	On:     "order",
+			// 	Action: "update",
+			// 	Data:   data,
+			// }
 			reply := fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, order.Answer(ctx))
 
 			if order.Resolved() {

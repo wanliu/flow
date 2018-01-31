@@ -22,7 +22,12 @@ type ctxt struct {
 	done   chan bool
 	rece   chan interface{}
 
+	// 0 for text
+	// 1 for text and data
+	postMode int
+
 	send      chan string
+	sendData  chan interface{}
 	sendTable chan *Table
 	quit      chan bool
 
@@ -51,6 +56,9 @@ type Context interface {
 	SetCtxValue(interface{}, interface{})
 	GlobalValue(interface{}) interface{}
 	SetGlobalValue(interface{}, interface{})
+
+	SetPostMode(int)
+	PostMode() int
 
 	Post(string, ...interface{}) error
 	PostTable(Table) error
@@ -86,6 +94,7 @@ func NewContext(args ...CtxOptFunc) (*ctxt, error) {
 		rece:      make(chan interface{}),
 		done:      make(chan bool),
 		send:      make(chan string),
+		sendData:  make(chan interface{}),
 		sendTable: make(chan *Table),
 		quit:      make(chan bool),
 		errHandle: opt.Error,
@@ -240,9 +249,32 @@ func (ctx *ctxt) Send(raw interface{}) {
 // 	return nil
 // }
 
+func (ctx *ctxt) SetPostMode(mode int) {
+	ctx.postMode = mode
+}
+
+func (ctx ctxt) PostMode() int {
+	return ctx.postMode
+}
+
 func (ctx *ctxt) Post(text string, args ...interface{}) error {
 	ctx.counter++
-	ctx.Stack.Root.send <- fmt.Sprintf(text, args...)
+
+	if 0 == ctx.PostMode() {
+		// ctx.Stack.Root.send <- fmt.Sprintf(text, args...)
+		ctx.Stack.Root.send <- text
+	} else {
+		r := map[string]interface{}{
+			"reply": text,
+		}
+
+		if len(args) > 0 {
+			r["data"] = args[0]
+		}
+
+		ctx.Stack.Root.sendData <- r
+	}
+
 	return nil
 }
 
@@ -260,6 +292,9 @@ LOOP:
 		case txt := <-ctx.send:
 			ctx.counter--
 			err = ctx.Reply.Text(txt, ctx)
+		case _ = <-ctx.sendData:
+			ctx.counter--
+			err = ctx.Reply.Text("unimplimented data channel", ctx)
 		case table := <-ctx.sendTable:
 			ctx.counter--
 			err = ctx.Reply.Table(table, ctx)
@@ -271,7 +306,7 @@ LOOP:
 	}
 }
 
-type ContextReplyHander func(txt *string, table *Table)
+type ContextReplyHander func(txt *string, table *Table, data interface{})
 
 func (ctx *ctxt) RunCallback(handler ContextReplyHander) {
 	var err error
@@ -280,10 +315,13 @@ LOOP:
 		select {
 		case txt := <-ctx.send:
 			ctx.counter--
-			handler(&txt, nil)
+			handler(&txt, nil, nil)
+		case data := <-ctx.sendData:
+			ctx.counter--
+			handler(nil, nil, data)
 		case table := <-ctx.sendTable:
 			ctx.counter--
-			handler(nil, table)
+			handler(nil, table, nil)
 		case <-ctx.quit:
 			// ctx.waitingEnd()
 			break LOOP

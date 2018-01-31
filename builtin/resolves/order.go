@@ -71,6 +71,41 @@ func (r *OrderResolve) Touch() {
 	r.UpdatedAt = time.Now()
 }
 
+func (r OrderResolve) ToDescSturct() interface{} {
+	result := map[string]interface{}{}
+
+	result["customer"] = r.Customer
+	result["time"] = r.Time
+	result["note"] = r.Note
+	result["storehouse"] = r.Storehouse
+	items := []map[string]interface{}{}
+
+	for _, item := range r.Products.Products {
+		i := map[string]interface{}{}
+		i["product"] = item.Name
+		i["quantity"] = item.Quantity
+		i["unit"] = item.Unit
+		items = append(items, i)
+	}
+	result["items"] = items
+
+	if len(r.Gifts.Products) > 0 {
+		gifts := []map[string]interface{}{}
+
+		for _, item := range r.Gifts.Products {
+			i := map[string]interface{}{}
+			i["product"] = item.Name
+			i["quantity"] = item.Quantity
+			i["unit"] = item.Unit
+			gifts = append(gifts, i)
+		}
+
+		result["gifts"] = gifts
+	}
+
+	return result
+}
+
 func (r OrderResolve) Modifable(expireMin int) bool {
 	return !r.Expired(expireMin) || r.Submited()
 }
@@ -223,13 +258,13 @@ func (r OrderResolve) EmptyProducts() bool {
 // [ 伊利金典纯牛奶 , 红谷粒多1*12瓶, 伊利安幕希酸奶原味 , 190QQ星儿童成长牛奶健固型, xxxxx]
 // 数量:
 // [ 16 提,  3 盒 , 3 提 ,  6 提 ]
-func (r *OrderResolve) Answer(ctx context.Context) string {
+func (r *OrderResolve) Answer(ctx context.Context) (string, interface{}) {
 	if r.MismatchQuantity() {
-		return r.MismatchAnswer()
+		return r.MismatchAnswer(), r.ToDescSturct()
 	} else if r.Fulfiled() {
-		return r.PostOrderAndAnswer(ctx)
+		return r.PostOrderAndAnswer(ctx), r.ToDescSturct()
 	} else {
-		return r.AnswerHead(ctx) + r.AnswerFooter(ctx, "", "")
+		return r.AnswerHead(ctx) + r.AnswerFooter(ctx, "", ""), r.ToDescSturct()
 	}
 }
 
