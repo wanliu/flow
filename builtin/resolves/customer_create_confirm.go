@@ -42,7 +42,7 @@ func (cc CustomerCreation) Cancel(ctx context.Context) string {
 		}
 
 		ctx.SetCtxValue(config.CtxKeyOrder, order)
-		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作", cc.Customer)
+		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作, 还缺少客户信息", cc.Customer)
 	} else {
 		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作, 当前没有正在进行中的订单", cc.Customer)
 	}
