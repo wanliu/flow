@@ -57,6 +57,7 @@ type Context interface {
 
 	Run()
 	RunCallback(handler ContextReplyHander)
+	RunCallbackOnce(handler ContextReplyHander)
 	Close()
 
 	Reset()
