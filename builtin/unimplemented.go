@@ -31,6 +31,9 @@ func (order *Unimplemented) OnCtx(ctx context.Context) {
 		output = r
 	}
 
-	replyData := ReplyData{output, ctx}
+	replyData := ReplyData{
+		Reply: output,
+		Ctx:   ctx,
+	}
 	order.Out <- replyData
 }

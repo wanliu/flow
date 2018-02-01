@@ -7,4 +7,5 @@ import (
 type ReplyData struct {
 	Reply string
 	Ctx   context.Context
+	Data  interface{}
 }

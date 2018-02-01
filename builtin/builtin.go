@@ -20,7 +20,7 @@ func ComponentList() map[string]func() interface{} {
 	_components["Stringifier"] = NewStringifier
 	_components["IntentCheck"] = NewIntentCheck
 	_components["CtxReset"] = NewCtxReset
-	_components["TryGetProducts"] = NewTryGetProducts
+	// _components["TryGetProducts"] = NewTryGetProducts
 	_components["MyInput"] = NewMyInput
 	_components["QuerySave"] = NewQuerySave
 	_components["ContextManager"] = NewContextManager
@@ -119,12 +119,12 @@ func ComponentInfos() map[string]Component {
 		Constructor: NewCtxReset,
 	}
 
-	result["TryGetProducts"] = Component{
-		Name:        "TryGetProducts",
-		Description: "Try to query products data from Entities of Luis Query Result",
-		Icon:        "product-hunt",
-		Constructor: NewTryGetProducts,
-	}
+	// result["TryGetProducts"] = Component{
+	// 	Name:        "TryGetProducts",
+	// 	Description: "Try to query products data from Entities of Luis Query Result",
+	// 	Icon:        "product-hunt",
+	// 	Constructor: NewTryGetProducts,
+	// }
 
 	result["MyInput"] = Component{
 		Name:        "MyInput",

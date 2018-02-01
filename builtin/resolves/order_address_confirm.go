@@ -81,7 +81,7 @@ func (ac AddressConfirm) Cancel(ctx context.Context) string {
 	return ""
 }
 
-func (ac AddressConfirm) Confirm(ctx context.Context) string {
+func (ac AddressConfirm) Confirm(ctx context.Context) (string, interface{}) {
 	oIn := ctx.CtxValue(config.CtxKeyOrder)
 	// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
@@ -89,7 +89,7 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 		order := oIn.(OrderResolve)
 
 		if order.Expired(config.SesssionExpiredMinutes) {
-			return "当前没有正在进行中的订单"
+			return "当前没有正在进行中的订单", nil
 		}
 
 		// cConfirm := confirm.(AddressConfirm)
@@ -99,7 +99,8 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 				order.ExtractedCustomer = ac.Values[0]
 				order.CheckExtractedCustomer()
 
-				reply := fmt.Sprintf("已经确认\"%v\"为收货客户\n%v", ac.Values[0], order.Answer(ctx))
+				reply, data := order.Answer(ctx)
+				reply = fmt.Sprintf("已经确认\"%v\"为收货客户\n%v", ac.Values[0], reply)
 
 				if order.Resolved() {
 					ctx.SetCtxValue(config.CtxKeyOrder, nil)
@@ -110,7 +111,7 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 					ctx.SetCtxValue(config.CtxKeyOrder, order)
 				}
 
-				return reply
+				return reply, data
 
 			} else {
 				// ctx.SetCtxValue(config.CtxKeyConfirm, nil)
@@ -118,8 +119,8 @@ func (ac AddressConfirm) Confirm(ctx context.Context) string {
 			}
 		}
 	} else {
-		return "当前没有正在进行中的订单"
+		return "当前没有正在进行中的订单", nil
 	}
 
-	return "确认操作已经过期"
+	return "确认操作已经过期", nil
 }

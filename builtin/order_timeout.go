@@ -44,7 +44,7 @@ func (c *OrderTimeout) OnCtx(ctx Context) {
 			cOrder := order.(OrderResolve)
 			if cOrder.Expired(expiredMins) {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
-				c.Out <- ReplyData{"由于长时间未操作完成，当前订单已经失效", ctx}
+				c.Out <- ReplyData{"由于长时间未操作完成，当前订单已经失效", ctx, nil}
 			}
 		}
 	}()

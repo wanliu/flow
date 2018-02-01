@@ -37,8 +37,9 @@ func (c *OrderCustomer) OnCtx(ctx context.Context) {
 		cOrder.ExtractedCustomer = customer
 		cOrder.CheckExtractedCustomer()
 
-		reply := "收到客户信息：" + customer + "\n" + cOrder.Answer(ctx)
-		c.Out <- ReplyData{reply, ctx}
+		reply, data := cOrder.Answer(ctx)
+		reply = "收到客户信息：" + customer + "\n" + reply
+		c.Out <- ReplyData{reply, ctx, data}
 
 		if cOrder.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyOrder, nil)
@@ -52,6 +53,6 @@ func (c *OrderCustomer) OnCtx(ctx context.Context) {
 			return
 		}
 
-		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx}
+		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx, nil}
 	}
 }

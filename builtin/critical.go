@@ -27,6 +27,6 @@ func (order *Critical) OnCtx(ctx context.Context) {
 	// entities := ctx.Value("Result").(ResultParams).Entities
 	output := "对不起，辜负了您的期望，请给我们时间，我们会改进的"
 
-	replyData := ReplyData{output, ctx}
+	replyData := ReplyData{output, ctx, nil}
 	order.Out <- replyData
 }

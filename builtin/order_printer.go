@@ -30,16 +30,16 @@ func (s *OrderPrinter) OnCtx(ctx context.Context) {
 	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
 	if nil == currentOrder {
-		s.Out <- ReplyData{"当前没有正在进行中的订单", ctx}
+		s.Out <- ReplyData{"当前没有正在进行中的订单", ctx, nil}
 	} else {
 		curOrder := currentOrder.(OrderResolve)
 
 		if curOrder.Expired(config.SesssionExpiredMinutes) {
-			s.Out <- ReplyData{"当前没有正在进行中的订单", ctx}
+			s.Out <- ReplyData{"当前没有正在进行中的订单", ctx, nil}
 		} else {
-			orderDetail := "-----------订单详情-------------\n"
-			orderDetail = orderDetail + curOrder.AnswerBody()
-			s.Out <- ReplyData{orderDetail, ctx}
+			// orderDetail := "-----------订单详情-------------\n"
+			// orderDetail = orderDetail + curOrder.AnswerBody()
+			s.Out <- ReplyData{"订单详情", ctx, curOrder.ToDescSturct()}
 		}
 	}
 }

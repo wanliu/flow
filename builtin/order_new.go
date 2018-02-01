@@ -59,11 +59,14 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			}
 
 			output = "没有相关的产品"
-			replyData := ReplyData{output, ctx}
+			replyData := ReplyData{
+				Reply: output,
+				Ctx:   ctx,
+			}
 			c.Out <- replyData
 		}
 	} else {
-		output = orderResolve.Answer(ctx)
+		reply, data := orderResolve.Answer(ctx)
 
 		if orderResolve.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyLastOrder, *orderResolve)
@@ -78,7 +81,11 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 
 		c.Timeout <- ctx
 
-		replyData := ReplyData{output, ctx}
+		replyData := ReplyData{
+			Reply: reply,
+			Ctx:   ctx,
+			Data:  data,
+		}
 		c.Out <- replyData
 	}
 }
@@ -89,8 +96,6 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 	if c.DefTime != "" {
 		orderResolve.SetDefTime(c.DefTime)
 	}
-
-	output := ""
 
 	if orderResolve.EmptyProducts() {
 		retriedCount := 1
@@ -106,9 +111,12 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 				return
 			}
 
-			output = "没有相关的产品"
+			output := "没有相关的产品"
 
-			replyData := ReplyData{output, ctx}
+			replyData := ReplyData{
+				Reply: output,
+				Ctx:   ctx,
+			}
 			c.Out <- replyData
 		} else {
 			retriedCount++
@@ -118,7 +126,7 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 			c.RetryOut <- ctx
 		}
 	} else {
-		output = orderResolve.Answer(ctx)
+		reply, data := orderResolve.Answer(ctx)
 
 		if orderResolve.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyLastOrder, *orderResolve)
@@ -134,19 +142,27 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 		// c.Notice <- ctx
 		c.Timeout <- ctx
 
-		replyData := ReplyData{output, ctx}
+		replyData := ReplyData{
+			Reply: reply,
+			Ctx:   ctx,
+			Data:  data,
+		}
 		c.Out <- replyData
 	}
 
 }
 
 func (c *NewOrder) GroupAnswer(ctx context.Context, orderResolve *resolves.OrderResolve) {
-	output := orderResolve.Answer(ctx)
+	reply, data := orderResolve.Answer(ctx)
 
 	if orderResolve.Fulfiled() {
-		replyData := ReplyData{output, ctx}
+		replyData := ReplyData{
+			Reply: reply,
+			Ctx:   ctx,
+			Data:  data,
+		}
 		c.Out <- replyData
 	} else {
-		log.Printf("群聊开单失败, 取消回复。失败原因：%v", output)
+		log.Printf("群聊开单失败, 取消回复。失败原因：%v", reply)
 	}
 }

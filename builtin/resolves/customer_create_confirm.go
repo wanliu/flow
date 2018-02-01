@@ -42,7 +42,7 @@ func (cc CustomerCreation) Cancel(ctx context.Context) string {
 		}
 
 		ctx.SetCtxValue(config.CtxKeyOrder, order)
-		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作\n%v", cc.Customer, order.Answer(ctx))
+		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作", cc.Customer)
 	} else {
 		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作, 当前没有正在进行中的订单", cc.Customer)
 	}
@@ -50,7 +50,7 @@ func (cc CustomerCreation) Cancel(ctx context.Context) string {
 	return ""
 }
 
-func (cc CustomerCreation) Confirm(ctx context.Context) string {
+func (cc CustomerCreation) Confirm(ctx context.Context) (string, interface{}) {
 	person := database.People{
 		Name: cc.Customer,
 	}
@@ -67,7 +67,7 @@ func (cc CustomerCreation) Confirm(ctx context.Context) string {
 			order.Customer = person.Name
 
 			if order.Expired(config.SesssionExpiredMinutes) {
-				return fmt.Sprintf("添加了新的客户\"%v\", 当前没有正在进行中的订单", cc.Customer)
+				return fmt.Sprintf("添加了新的客户\"%v\", 当前没有正在进行中的订单", cc.Customer), nil
 			}
 
 			// dataReply := DataReply{
@@ -76,7 +76,8 @@ func (cc CustomerCreation) Confirm(ctx context.Context) string {
 			// 	Action: "update",
 			// 	Data:   data,
 			// }
-			reply := fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, order.Answer(ctx))
+			reply, data := order.Answer(ctx)
+			reply = fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, reply)
 
 			if order.Resolved() {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
@@ -87,11 +88,11 @@ func (cc CustomerCreation) Confirm(ctx context.Context) string {
 				ctx.SetCtxValue(config.CtxKeyOrder, order)
 			}
 
-			return reply
+			return reply, data
 		} else {
-			return fmt.Sprintf("添加了新的客户\"%v\", 当前没有正在进行中的订单", cc.Customer)
+			return fmt.Sprintf("添加了新的客户\"%v\", 当前没有正在进行中的订单", cc.Customer), nil
 		}
 	} else {
-		return fmt.Sprintf("添加新的客户\"%v\"失败，%v", cc.Customer, err.Error())
+		return fmt.Sprintf("添加新的客户\"%v\"失败，%v", cc.Customer, err.Error()), nil
 	}
 }

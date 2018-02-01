@@ -20,6 +20,7 @@ func NewPatchOrder() interface{} {
 func (order *PatchOrder) OnCtx(ctx Context) {
 	patchResolve := NewPatchOrderResolve(ctx)
 
+	var data interface{}
 	output := ""
 
 	if patchResolve.EmptyProducts() {
@@ -28,7 +29,7 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 		curResolve := ctx.CtxValue(config.CtxKeyOrder).(OrderResolve)
 		patchResolve.Patch(&curResolve)
 
-		output = curResolve.Answer(ctx)
+		output, data = curResolve.Answer(ctx)
 
 		if curResolve.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyOrder, nil)
@@ -41,6 +42,10 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 
 	}
 
-	replyData := ReplyData{output, ctx}
+	replyData := ReplyData{
+		Reply: output,
+		Ctx:   ctx,
+		Data:  data,
+	}
 	order.Out <- replyData
 }

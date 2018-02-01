@@ -15,7 +15,7 @@ import (
 type Data interface {
 	Notice(ctx context.Context) string
 	Cancel(ctx context.Context) string
-	Confirm(ctx context.Context) string
+	Confirm(ctx context.Context) (string, interface{})
 	SetUp(ctx context.Context)
 	ClearUp(ctx context.Context)
 }

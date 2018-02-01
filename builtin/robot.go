@@ -98,6 +98,9 @@ func (order *Robot) OnCtx(ctx Context) {
 		output = "我是服务大家的机器人小花"
 	}
 
-	replyData := ReplyData{output, ctx}
+	replyData := ReplyData{
+		Reply: output,
+		Ctx:   ctx,
+	}
 	order.Out <- replyData
 }
