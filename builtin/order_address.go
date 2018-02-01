@@ -60,10 +60,17 @@ func (c *OrderAddress) OnCtx(ctx context.Context) {
 
 			if customer != "" {
 				cOrder.ExtractedCustomer = customer
+				cOrder.CheckExtractedCustomer()
 			}
 
-			reply, data := cOrder.Answer(ctx)
+			reply, d := cOrder.Answer(ctx)
 			reply = fmt.Sprintf("收到客户/地址信息：%v%v\n%v", address, customer, reply)
+			data := map[string]interface{}{
+				"type":   "info",
+				"on":     "order",
+				"action": "update",
+				"data":   d,
+			}
 			c.Out <- ReplyData{reply, ctx, data}
 
 			if cOrder.Resolved() {

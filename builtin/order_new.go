@@ -66,7 +66,7 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			c.Out <- replyData
 		}
 	} else {
-		reply, data := orderResolve.Answer(ctx)
+		reply, d := orderResolve.Answer(ctx)
 
 		if orderResolve.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyLastOrder, *orderResolve)
@@ -80,6 +80,13 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 		}
 
 		c.Timeout <- ctx
+
+		data := map[string]interface{}{
+			"type":   "info",
+			"on":     "order",
+			"action": "create",
+			"data":   d,
+		}
 
 		replyData := ReplyData{
 			Reply: reply,
@@ -126,7 +133,7 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 			c.RetryOut <- ctx
 		}
 	} else {
-		reply, data := orderResolve.Answer(ctx)
+		reply, d := orderResolve.Answer(ctx)
 
 		if orderResolve.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyLastOrder, *orderResolve)
@@ -142,6 +149,13 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 		// c.Notice <- ctx
 		c.Timeout <- ctx
 
+		data := map[string]interface{}{
+			"type":   "info",
+			"on":     "order",
+			"action": "create",
+			"data":   d,
+		}
+
 		replyData := ReplyData{
 			Reply: reply,
 			Ctx:   ctx,
@@ -153,7 +167,14 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 }
 
 func (c *NewOrder) GroupAnswer(ctx context.Context, orderResolve *resolves.OrderResolve) {
-	reply, data := orderResolve.Answer(ctx)
+	reply, d := orderResolve.Answer(ctx)
+
+	data := map[string]interface{}{
+		"type":   "info",
+		"on":     "order",
+		"action": "create",
+		"data":   d,
+	}
 
 	if orderResolve.Fulfiled() {
 		replyData := ReplyData{

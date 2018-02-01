@@ -77,6 +77,7 @@ func (cc CustomerCreation) Confirm(ctx context.Context) (string, interface{}) {
 			// 	Data:   data,
 			// }
 			reply, data := order.Answer(ctx)
+
 			reply = fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, reply)
 
 			if order.Resolved() {

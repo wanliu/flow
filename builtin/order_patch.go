@@ -29,7 +29,15 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 		curResolve := ctx.CtxValue(config.CtxKeyOrder).(OrderResolve)
 		patchResolve.Patch(&curResolve)
 
-		output, data = curResolve.Answer(ctx)
+		var d interface{}
+
+		output, d = curResolve.Answer(ctx)
+		data = map[string]interface{}{
+			"type":   "info",
+			"on":     "order",
+			"action": "update",
+			"data":   d,
+		}
 
 		if curResolve.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyOrder, nil)

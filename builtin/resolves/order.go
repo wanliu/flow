@@ -80,27 +80,55 @@ func (r OrderResolve) ToDescSturct() interface{} {
 	result["storehouse"] = r.Storehouse
 	items := []map[string]interface{}{}
 
-	for _, item := range r.Products.Products {
-		i := map[string]interface{}{}
-		i["product"] = item.Name
-		i["quantity"] = item.Quantity
-		i["unit"] = item.Unit
-		items = append(items, i)
-	}
-	result["items"] = items
+	if r.IsResolved && r.BrainOrder != nil {
+		for _, item := range r.BrainOrder.OrderItems {
+			i := map[string]interface{}{}
+			i["product"] = item.ProductName
+			i["quantity"] = item.Quantity
+			i["unit"] = item.Unit
+			items = append(items, i)
+		}
+		result["items"] = items
 
-	if len(r.Gifts.Products) > 0 {
-		gifts := []map[string]interface{}{}
+		if len(r.BrainOrder.GiftItems) > 0 {
+			gifts := []map[string]interface{}{}
 
-		for _, item := range r.Gifts.Products {
+			for _, item := range r.BrainOrder.GiftItems {
+				i := map[string]interface{}{}
+				i["product"] = item.ProductName
+				i["quantity"] = item.Quantity
+				i["unit"] = item.Unit
+				gifts = append(gifts, i)
+			}
+
+			result["gifts"] = gifts
+		}
+
+		result["time"] = r.BrainOrder.DeliveryTime.Format("2006年01月02日")
+		result["url"] = "https://jiejie.io/order/QueryDetail/" + fmt.Sprint(r.BrainOrder.GlobelId())
+	} else {
+		for _, item := range r.Products.Products {
 			i := map[string]interface{}{}
 			i["product"] = item.Name
 			i["quantity"] = item.Quantity
 			i["unit"] = item.Unit
-			gifts = append(gifts, i)
+			items = append(items, i)
 		}
+		result["items"] = items
 
-		result["gifts"] = gifts
+		if len(r.Gifts.Products) > 0 {
+			gifts := []map[string]interface{}{}
+
+			for _, item := range r.Gifts.Products {
+				i := map[string]interface{}{}
+				i["product"] = item.Name
+				i["quantity"] = item.Quantity
+				i["unit"] = item.Unit
+				gifts = append(gifts, i)
+			}
+
+			result["gifts"] = gifts
+		}
 	}
 
 	return result
@@ -260,9 +288,10 @@ func (r OrderResolve) EmptyProducts() bool {
 // [ 16 提,  3 盒 , 3 提 ,  6 提 ]
 func (r *OrderResolve) Answer(ctx context.Context) (string, interface{}) {
 	if r.MismatchQuantity() {
-		return r.MismatchAnswer(), r.ToDescSturct()
+		return r.MismatchAnswer(), nil
 	} else if r.Fulfiled() {
-		return r.PostOrderAndAnswer(ctx), r.ToDescSturct()
+		reply := r.PostOrderAndAnswer(ctx)
+		return reply, r.ToDescSturct()
 	} else {
 		return r.AnswerHead(ctx) + r.AnswerFooter(ctx, "", ""), r.ToDescSturct()
 	}
@@ -362,7 +391,8 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 			r.IsResolved = true
 			r.BrainOrder = &order
 			r.Id = order.ID
-			return r.AnswerHead(ctx) + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			// return r.AnswerHead(ctx) + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			return r.AnswerHead(ctx)
 		}
 	} else {
 		// order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
@@ -375,7 +405,8 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 			r.IsResolved = true
 			r.BrainOrder = &order
 			r.Id = order.ID
-			return r.AnswerHead(ctx) + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			// return r.AnswerHead(ctx) + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			return r.AnswerHead(ctx)
 		}
 	}
 }
@@ -416,47 +447,47 @@ func (r OrderResolve) AnswerHead(ctx context.Context) string {
 func (r OrderResolve) AnswerBody() string {
 	desc := ""
 
-	if r.IsResolved && r.BrainOrder != nil {
-		for _, i := range r.BrainOrder.OrderItems {
-			desc = desc + fmt.Sprintf("%v %v %v\n", i.ProductName, i.Quantity, i.Unit)
-		}
+	// if r.IsResolved && r.BrainOrder != nil {
+	// 	for _, i := range r.BrainOrder.OrderItems {
+	// 		desc = desc + fmt.Sprintf("%v %v %v\n", i.ProductName, i.Quantity, i.Unit)
+	// 	}
 
-		if len(r.BrainOrder.GiftItems) > 0 {
-			desc = desc + "申请的赠品:\n"
+	// 	if len(r.BrainOrder.GiftItems) > 0 {
+	// 		desc = desc + "申请的赠品:\n"
 
-			for _, g := range r.BrainOrder.GiftItems {
-				desc = desc + fmt.Sprintf("%v %v %v\n", g.ProductName, g.Quantity, g.Unit)
-			}
-		}
+	// 		for _, g := range r.BrainOrder.GiftItems {
+	// 			desc = desc + fmt.Sprintf("%v %v %v\n", g.ProductName, g.Quantity, g.Unit)
+	// 		}
+	// 	}
 
-		desc = desc + fmt.Sprintf("时间:%v\n", r.BrainOrder.DeliveryTime.Format("2006年01月02日"))
+	// 	desc = desc + fmt.Sprintf("时间:%v\n", r.BrainOrder.DeliveryTime.Format("2006年01月02日"))
 
-		if r.BrainOrder.Note != "" {
-			desc = desc + "备注：" + r.BrainOrder.Note + "\n"
-		}
-	} else {
-		for _, p := range r.Products.Products {
-			// desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + p.Unit + "\n"
-			desc = desc + fmt.Sprintf("%v %v %v\n", p.Product, p.Quantity, p.Unit)
+	// 	if r.BrainOrder.Note != "" {
+	// 		desc = desc + "备注：" + r.BrainOrder.Note + "\n"
+	// 	}
+	// } else {
+	// 	for _, p := range r.Products.Products {
+	// 		// desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + p.Unit + "\n"
+	// 		desc = desc + fmt.Sprintf("%v %v %v\n", p.Product, p.Quantity, p.Unit)
 
-		}
+	// 	}
 
-		if len(r.Gifts.Products) > 0 {
-			desc = desc + "申请的赠品:\n"
+	// 	if len(r.Gifts.Products) > 0 {
+	// 		desc = desc + "申请的赠品:\n"
 
-			for _, g := range r.Gifts.Products {
-				// desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + g.Unit + "\n"
-				desc = desc + fmt.Sprintf("%v %v %v\n", g.Product, g.Quantity, g.Unit)
-			}
-		}
+	// 		for _, g := range r.Gifts.Products {
+	// 			// desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + g.Unit + "\n"
+	// 			desc = desc + fmt.Sprintf("%v %v %v\n", g.Product, g.Quantity, g.Unit)
+	// 		}
+	// 	}
 
-		// desc = desc + "时间:" + r.Time.Format("2006年01月02日") + "\n"
-		desc = desc + fmt.Sprintf("时间:%v\n", r.Time.Format("2006年01月02日"))
+	// 	// desc = desc + "时间:" + r.Time.Format("2006年01月02日") + "\n"
+	// 	desc = desc + fmt.Sprintf("时间:%v\n", r.Time.Format("2006年01月02日"))
 
-		if r.Note != "" {
-			desc = desc + "备注：" + r.Note + "\n"
-		}
-	}
+	// 	if r.Note != "" {
+	// 		desc = desc + "备注：" + r.Note + "\n"
+	// 	}
+	// }
 
 	return desc
 }
