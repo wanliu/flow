@@ -8,7 +8,9 @@ type ItemsResolve struct {
 }
 
 func (r *ItemsResolve) Add(pr ItemResolve) {
-	r.Products = append(r.Products, &pr)
+	if pr.CheckUnit() {
+		r.Products = append(r.Products, &pr)
+	}
 }
 
 func (r *ItemsResolve) Patch(isr ItemsResolve) {

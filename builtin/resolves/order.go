@@ -86,6 +86,7 @@ func (r OrderResolve) ToDescSturct() interface{} {
 			i["product"] = item.ProductName
 			i["quantity"] = item.Quantity
 			i["unit"] = item.Unit
+			i["price"] = item.Price
 			items = append(items, i)
 		}
 		result["items"] = items
@@ -112,6 +113,7 @@ func (r OrderResolve) ToDescSturct() interface{} {
 			i["product"] = item.Name
 			i["quantity"] = item.Quantity
 			i["unit"] = item.Unit
+			i["price"] = item.Price
 			items = append(items, i)
 		}
 		result["items"] = items
