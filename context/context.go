@@ -292,6 +292,20 @@ LOOP:
 	}
 }
 
+func (ctx *ctxt) RunCallbackOnce(handler ContextReplyHander) {
+	select {
+	case txt := <-ctx.send:
+		ctx.counter--
+		handler(&txt, nil)
+	case table := <-ctx.sendTable:
+		ctx.counter--
+		handler(nil, table)
+	case <-time.After(time.Second * 20):
+		txt := "请求超时，请稍候再试"
+		handler(&txt, nil)
+	}
+}
+
 func (ctx *ctxt) IsRunning() bool {
 	return ctx.isRunning
 }
