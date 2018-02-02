@@ -204,7 +204,7 @@ func (r *OrderResolve) ExtractItems() {
 			}
 		}
 
-		item := &ItemResolve{
+		item := ItemResolve{
 			Resolved: true,
 			Name:     name,
 			Price:    i.Price,
@@ -213,7 +213,8 @@ func (r *OrderResolve) ExtractItems() {
 			Unit:     unit,
 		}
 
-		r.Products.Products = append(r.Products.Products, item)
+		r.Products.Add(item)
+		// r.Products.Products = append(r.Products.Products, item)
 	}
 }
 
@@ -222,7 +223,7 @@ func (r *OrderResolve) ExtractGiftItems() {
 		name := strings.Replace(i.Product, "%", "%%", -1)
 		unit := strings.Replace(i.Unit, " ", "", -1)
 
-		item := &ItemResolve{
+		item := ItemResolve{
 			Resolved: true,
 			Name:     name,
 			Price:    i.Price,
@@ -231,7 +232,8 @@ func (r *OrderResolve) ExtractGiftItems() {
 			Unit:     unit,
 		}
 
-		r.Gifts.Products = append(r.Gifts.Products, item)
+		r.Gifts.Add(item)
+		// r.Gifts.Products = append(r.Gifts.Products, item)
 	}
 }
 
