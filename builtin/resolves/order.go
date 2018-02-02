@@ -105,6 +105,7 @@ func (r OrderResolve) ToDescSturct() interface{} {
 			result["gifts"] = gifts
 		}
 
+		result["no"] = r.BrainOrder.No
 		result["time"] = r.BrainOrder.DeliveryTime.Format("2006年01月02日")
 		result["url"] = "https://jiejie.io/order/QueryDetail/" + fmt.Sprint(r.BrainOrder.GlobelId())
 	} else {
