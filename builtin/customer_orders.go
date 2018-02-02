@@ -40,12 +40,19 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 
 	rsv := resolves.NewCusOrdersResolve(ctx, Per)
 
-	reply := rsv.Answer()
+	reply, d := rsv.Answer()
+
+	data := map[string]interface{}{
+		"type":   "info",
+		"on":     "customerOrders",
+		"action": "query",
+		"data":   d,
+	}
 
 	rsv.Setup(ctx)
 	c.ResetTick(rsv, ctx)
 
-	c.Out <- ReplyData{reply, ctx, nil}
+	c.Out <- ReplyData{reply, ctx, data}
 }
 
 func (c *CustomerOrders) OnPage(ctx context.Context) {
@@ -61,8 +68,15 @@ func (c *CustomerOrders) OnPage(ctx context.Context) {
 		rsv := in.(*resolves.CustomerOrdersResolve)
 
 		c.ResetTick(rsv, ctx)
-		reply := rsv.Answer()
-		c.Out <- ReplyData{reply, ctx, nil}
+		reply, d := rsv.Answer()
+		data := map[string]interface{}{
+			"type":   "info",
+			"on":     "customerOrders",
+			"action": "query",
+			"data":   d,
+		}
+
+		c.Out <- ReplyData{reply, ctx, data}
 
 		rsv.ClearIfDone(ctx)
 	}

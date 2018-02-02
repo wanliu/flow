@@ -71,7 +71,11 @@ func (r *OrderResolve) Touch() {
 	r.UpdatedAt = time.Now()
 }
 
-func (r OrderResolve) ToDescSturct() interface{} {
+func (r OrderResolve) ToDescStruct() interface{} {
+	if r.IsResolved && r.BrainOrder != nil {
+		return r.BrainOrder.ToDescStruct()
+	}
+
 	result := map[string]interface{}{}
 
 	result["customer"] = r.Customer
@@ -80,58 +84,28 @@ func (r OrderResolve) ToDescSturct() interface{} {
 	result["storehouse"] = r.Storehouse
 	items := []map[string]interface{}{}
 
-	if r.IsResolved && r.BrainOrder != nil {
-		for _, item := range r.BrainOrder.OrderItems {
-			i := map[string]interface{}{}
-			i["product"] = item.ProductName
-			i["quantity"] = item.Quantity
-			i["unit"] = item.Unit
-			i["price"] = item.Price
-			items = append(items, i)
-		}
-		result["items"] = items
+	for _, item := range r.Products.Products {
+		i := map[string]interface{}{}
+		i["product"] = item.Name
+		i["quantity"] = item.Quantity
+		i["unit"] = item.Unit
+		i["price"] = item.Price
+		items = append(items, i)
+	}
+	result["items"] = items
 
-		if len(r.BrainOrder.GiftItems) > 0 {
-			gifts := []map[string]interface{}{}
+	if len(r.Gifts.Products) > 0 {
+		gifts := []map[string]interface{}{}
 
-			for _, item := range r.BrainOrder.GiftItems {
-				i := map[string]interface{}{}
-				i["product"] = item.ProductName
-				i["quantity"] = item.Quantity
-				i["unit"] = item.Unit
-				gifts = append(gifts, i)
-			}
-
-			result["gifts"] = gifts
-		}
-
-		result["no"] = r.BrainOrder.No
-		result["time"] = r.BrainOrder.DeliveryTime.Format("2006年01月02日")
-		result["url"] = "https://jiejie.io/order/QueryDetail/" + fmt.Sprint(r.BrainOrder.GlobelId())
-	} else {
-		for _, item := range r.Products.Products {
+		for _, item := range r.Gifts.Products {
 			i := map[string]interface{}{}
 			i["product"] = item.Name
 			i["quantity"] = item.Quantity
 			i["unit"] = item.Unit
-			i["price"] = item.Price
-			items = append(items, i)
+			gifts = append(gifts, i)
 		}
-		result["items"] = items
 
-		if len(r.Gifts.Products) > 0 {
-			gifts := []map[string]interface{}{}
-
-			for _, item := range r.Gifts.Products {
-				i := map[string]interface{}{}
-				i["product"] = item.Name
-				i["quantity"] = item.Quantity
-				i["unit"] = item.Unit
-				gifts = append(gifts, i)
-			}
-
-			result["gifts"] = gifts
-		}
+		result["gifts"] = gifts
 	}
 
 	return result
@@ -296,9 +270,9 @@ func (r *OrderResolve) Answer(ctx context.Context) (string, interface{}) {
 		return r.MismatchAnswer(), nil
 	} else if r.Fulfiled() {
 		reply := r.PostOrderAndAnswer(ctx)
-		return reply, r.ToDescSturct()
+		return reply, r.ToDescStruct()
 	} else {
-		return r.AnswerHead(ctx) + r.AnswerFooter(ctx, "", ""), r.ToDescSturct()
+		return r.AnswerHead(ctx) + r.AnswerFooter(ctx, "", ""), r.ToDescStruct()
 	}
 }
 

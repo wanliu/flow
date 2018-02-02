@@ -39,7 +39,7 @@ func (s *OrderPrinter) OnCtx(ctx context.Context) {
 		} else {
 			// orderDetail := "-----------订单详情-------------\n"
 			// orderDetail = orderDetail + curOrder.AnswerBody()
-			s.Out <- ReplyData{"订单详情", ctx, curOrder.ToDescSturct()}
+			s.Out <- ReplyData{"订单详情", ctx, curOrder.ToDescStruct()}
 		}
 	}
 }
