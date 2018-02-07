@@ -53,7 +53,7 @@ NewOrder() RetryOut -> RetryIn Ai()
 Ai() RetryOut -> RetryIn NewOrder()
 NewOrder() Out -> In Reply()
 NewOrder() Timeout -> Ctx OrderTimeout()
-OrderTimeout() Out -> In Reply()
+# OrderTimeout() Out -> In Reply()
 PatchOrder() Out -> In Reply()
 
 OrderInt() Next -> Ctx Unimplemented(Unimplemented)

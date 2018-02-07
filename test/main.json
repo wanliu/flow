@@ -494,16 +494,6 @@
     },
     {
       "src": {
-        "process": "OrderTimeout",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
         "process": "PatchOrder",
         "port": "Out"
       },
