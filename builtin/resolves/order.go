@@ -260,6 +260,10 @@ func (r OrderResolve) EmptyProducts() bool {
 	return r.Products.Empty()
 }
 
+func (r OrderResolve) EmptyGifts() bool {
+	return r.Gifts.Empty()
+}
+
 // 商品与数量不匹配, 识别为:
 // 商品:
 // [ 伊利金典纯牛奶 , 红谷粒多1*12瓶, 伊利安幕希酸奶原味 , 190QQ星儿童成长牛奶健固型, xxxxx]
