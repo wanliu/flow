@@ -143,5 +143,17 @@ func replaceUnit(s string) string {
 		}
 	}
 
+	// 在单位后面加逗号
+	r := regexp.MustCompile(`[件提条瓶排箱桶支袋个][^，,.。]`)
+
+	is := r.FindStringIndex(s)
+
+	for len(is) == 2 {
+		b := is[0] + 3
+		s = s[:b] + "," + s[b:]
+
+		is = r.FindStringIndex(s)
+	}
+
 	return s
 }
