@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/hysios/apiai-go"
 	"github.com/oleiade/lane"
@@ -111,7 +112,10 @@ func (c *ApiAi) SendCtxQuery() {
 		txt := c.TxtQueue.Dequeue().(string)
 		ctx := c.CtxQueue.Dequeue().(context.Context)
 
+		tBegin := time.Now()
 		res := c.SendQuery(txt)
+		tEnd := time.Now()
+		log.Printf("ApiAi request cost time %v", tEnd.Sub(tBegin))
 
 		ctx.SetValue(config.CtxkeyResult, res)
 

@@ -1,4 +1,20 @@
 {
+  "inports": {
+    "Text": {
+      "process": "TextProc",
+      "port": "In"
+    },
+    "Ctx": {
+      "process": "Ai",
+      "port": "Ctx"
+    },
+    "Voice": {
+      "process": "Voice",
+      "port": "In"
+    }
+  },
+  "outports": {},
+  "groups": [],
   "processes": {
     "TextProc": {
       "component": "TextPreprocesor"
@@ -611,16 +627,6 @@
       }
     },
     {
-      "src": {
-        "process": "true",
-        "port": "OUT"
-      },
-      "tgt": {
-        "process": "CancelInt",
-        "port": "Flow"
-      }
-    },
-    {
       "data": 0.5,
       "tgt": {
         "process": "CancelInt",
@@ -747,26 +753,12 @@
       }
     },
     {
-      "data": 0.7,
+      "data": 0.4,
       "tgt": {
         "process": "OrderInt",
         "port": "Score"
       }
     }
   ],
-  "inports": {
-    "Text": {
-      "process": "TextProc",
-      "port": "In"
-    },
-    "Ctx": {
-      "process": "Ai",
-      "port": "Ctx"
-    },
-    "Voice": {
-      "process": "Voice",
-      "port": "In"
-    }
-  },
   "caseSensitive": true
 }
