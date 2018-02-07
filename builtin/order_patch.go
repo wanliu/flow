@@ -22,7 +22,7 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 
 	output := ""
 
-	if patchResolve.EmptyProducts() {
+	if patchResolve.EmptyProducts() && patchResolve.EmptyGifts() {
 		output = "没有相关的产品"
 	} else {
 		curResolve := ctx.CtxValue(config.CtxKeyOrder).(OrderResolve)
