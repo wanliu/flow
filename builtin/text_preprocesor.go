@@ -28,6 +28,7 @@ var REPLACE_DICT map[string]string = map[string]string{
 	"190QQ": "一九零QQ",
 	"200Q":  "二百Q",
 	"1l":    "一L",
+	"毫升":    "ml",
 }
 
 type TextPreprocesor struct {
