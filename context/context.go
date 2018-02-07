@@ -335,13 +335,16 @@ func (ctx *ctxt) RunCallbackOnce(handler ContextReplyHander) {
 	select {
 	case txt := <-ctx.send:
 		ctx.counter--
-		handler(&txt, nil)
+		handler(&txt, nil, nil)
 	case table := <-ctx.sendTable:
 		ctx.counter--
-		handler(nil, table)
+		handler(nil, table, nil)
+	case data := <-ctx.sendData:
+		ctx.counter--
+		handler(nil, nil, data)
 	case <-time.After(time.Second * 20):
 		txt := "请求超时，请稍候再试"
-		handler(&txt, nil)
+		handler(&txt, nil, nil)
 	}
 }
 
