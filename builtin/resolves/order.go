@@ -72,6 +72,10 @@ func (r *OrderResolve) Touch() {
 }
 
 func (r OrderResolve) ToDescStruct() interface{} {
+	if r.IsFailed {
+		return nil
+	}
+
 	if r.IsResolved && r.BrainOrder != nil {
 		return r.BrainOrder.ToDescStruct()
 	}
