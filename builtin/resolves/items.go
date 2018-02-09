@@ -9,6 +9,13 @@ type ItemsResolve struct {
 
 func (r *ItemsResolve) Add(pr ItemResolve) {
 	if pr.CheckUnit() {
+		for _, p := range r.Products {
+			if pr.Product == p.Product {
+				p.Quantity = p.Quantity + pr.Quantity
+				return
+			}
+		}
+
 		r.Products = append(r.Products, &pr)
 	}
 }
