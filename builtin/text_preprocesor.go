@@ -36,6 +36,7 @@ var REPLACE_DICT map[string]string = map[string]string{
 	"二百四":   "240",
 	"二百五":   "250",
 	"一千":    "1000",
+	"题":     "提",
 }
 
 type TextPreprocesor struct {
