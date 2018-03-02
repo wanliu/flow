@@ -36,7 +36,7 @@ type ApiAi struct {
 	TxtQueue *lane.Queue
 
 	Echo      <-chan bool
-	In        <-chan string
+	In        <-chan context.Request
 	Token     <-chan string
 	SessionId <-chan string
 	ProxyUrl  <-chan string

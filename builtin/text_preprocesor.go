@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wanliu/flow/context"
+
 	flow "github.com/wanliu/goflow"
 )
 
@@ -45,22 +47,47 @@ type TextPreprocesor struct {
 
 	MultiField
 
-	Out chan<- string
-	In  <-chan string
+	Out   chan<- context.Request
+	In    <-chan interface{}
+	Reply chan<- ReplyData
 }
 
 func NewTextPreprocesor() interface{} {
 	return new(TextPreprocesor)
 }
 
-func (c *TextPreprocesor) OnIn(input string) {
-	output := atFilter(input)
+func (c *TextPreprocesor) OnIn(input interface{}) {
+	var (
+		text      string
+		requestId string
+	)
+
+	switch v := input.(type) {
+	case string:
+		text = v
+	case map[string]string:
+		text = v["text"]
+		requestId = v["requestId"]
+	default:
+		log.Printf("无效的text输入类型，必须是string或者map[string]string")
+
+		c.Reply <- ReplyData{
+			Reply: "无效的text输入类型，必须是string或者map[string]string",
+		}
+
+		return
+	}
+
+	output := atFilter(text)
 	output = replaceDeliver(output)
 	output = numberAfterLetter(output)
 	output = dateTransfer(output)
 	output = dictTransfer(output)
 	output = replaceUnit(output)
-	c.Out <- output
+	c.Out <- context.Request{
+		Text:      output,
+		RequestId: requestId,
+	}
 }
 
 func replaceDeliver(s string) string {
