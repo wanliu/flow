@@ -3,8 +3,8 @@ package builtin
 import (
 	"time"
 
-	. "github.com/wanliu/flow/builtin/resolves"
-	. "github.com/wanliu/flow/context"
+	"github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/context"
 
 	config "github.com/wanliu/flow/builtin/config"
 )
@@ -14,7 +14,7 @@ type OrderTimeout struct {
 
 	mins int
 
-	Ctx <-chan Context
+	Ctx <-chan context.Request
 	// Mins <-chan float64
 	Out chan<- ReplyData
 }
@@ -27,8 +27,10 @@ func NewOrderTimeout() interface{} {
 // 	c.mins = int(t)
 // }
 
-func (c *OrderTimeout) OnCtx(ctx Context) {
+func (c *OrderTimeout) OnCtx(req context.Request) {
 	go func() {
+		ctx := req.Ctx
+
 		expiredMins := config.SesssionExpiredMinutes
 		settedMins := ctx.CtxValue(config.CtxKeyExpiredMinutes)
 
@@ -41,7 +43,7 @@ func (c *OrderTimeout) OnCtx(ctx Context) {
 		order := ctx.CtxValue(config.CtxKeyOrder)
 
 		if order != nil {
-			cOrder := order.(OrderResolve)
+			cOrder := order.(resolves.OrderResolve)
 			if cOrder.Expired(expiredMins) {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
 				c.Out <- ReplyData{"由于长时间未操作完成，当前订单已经失效", ctx, nil}

@@ -15,10 +15,10 @@ type Order struct {
 	expMins        float64
 	OrderSyncQueue string
 
-	Ctx           <-chan context.Context
+	Ctx           <-chan context.Request
 	ExpireMinutes <-chan float64
-	New           chan<- context.Context
-	Patch         chan<- context.Context
+	New           chan<- context.Request
+	Patch         chan<- context.Request
 	Out           chan<- ReplyData
 	SyncQueue     <-chan string
 }
@@ -31,7 +31,9 @@ func (c *Order) OnSyncQueue(queue string) {
 	c.OrderSyncQueue = queue
 }
 
-func (c *Order) OnCtx(ctx context.Context) {
+func (c *Order) OnCtx(req context.Request) {
+	ctx := req.Ctx
+
 	if c.OrderSyncQueue != "" {
 		ctx.SetValue(config.CtxKeySyncQueue, c.OrderSyncQueue)
 	}
@@ -41,7 +43,7 @@ func (c *Order) OnCtx(ctx context.Context) {
 	}
 
 	if context.GroupChat(ctx) {
-		c.New <- ctx
+		c.New <- req
 		return
 	}
 
@@ -57,12 +59,12 @@ func (c *Order) OnCtx(ctx context.Context) {
 		}
 
 		if cOrder.Modifable(exMin) {
-			c.Patch <- ctx
+			c.Patch <- req
 		} else {
-			c.New <- ctx
+			c.New <- req
 		}
 	} else {
-		c.New <- ctx
+		c.New <- req
 	}
 }
 

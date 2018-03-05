@@ -17,9 +17,9 @@ type Confirm struct {
 
 	ExpMins <-chan float64
 
-	Confirm <-chan context.Context
-	Cancel  <-chan context.Context
-	Expire  <-chan context.Context
+	Confirm <-chan context.Request
+	Cancel  <-chan context.Request
+	Expire  <-chan context.Request
 
 	Out chan<- ReplyData
 }
@@ -32,11 +32,13 @@ func (c *Confirm) OnExpMins(mins float64) {
 	c.expMins = mins
 }
 
-func (c Confirm) OnExpire(ctx context.Context) {
+func (c Confirm) OnExpire(req context.Request) {
+	ctx := req.Ctx
 	ctx.SetCtxValue(config.CtxKeyConfirm, nil)
 }
 
-func (c *Confirm) OnConfirm(ctx context.Context) {
+func (c *Confirm) OnConfirm(req context.Request) {
+	ctx := req.Ctx
 	cIn := ctx.CtxValue(config.CtxKeyConfirm)
 
 	if cIn != nil {
@@ -55,7 +57,8 @@ func (c *Confirm) OnConfirm(ctx context.Context) {
 	}
 }
 
-func (c *Confirm) OnCancel(ctx context.Context) {
+func (c *Confirm) OnCancel(req context.Request) {
+	ctx := req.Ctx
 	cIn := ctx.CtxValue(config.CtxKeyConfirm)
 
 	if cIn != nil {

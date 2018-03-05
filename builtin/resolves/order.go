@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hysios/apiai-go"
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/brain_data/wrapper"
 	"github.com/wanliu/flow/builtin/ai"
@@ -42,11 +41,13 @@ type OrderResolve struct {
 	BrainOrder *database.Order
 }
 
-func NewOrderResolve(ctx context.Context) *OrderResolve {
+func NewOrderResolve(req context.Request) *OrderResolve {
+	ctx := req.Ctx
+
 	resolve := new(OrderResolve)
 	resolve.Touch()
 
-	aiResult := ctx.Value(config.ValueKeyResult).(apiai.Result)
+	aiResult := req.ApiAiResult
 
 	resolve.AiParams = ai.ApiAiOrder{AiResult: aiResult}
 	resolve.ExtractFromParams()

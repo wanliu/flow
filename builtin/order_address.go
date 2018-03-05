@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hysios/apiai-go"
+	// "github.com/hysios/apiai-go"
 	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
@@ -18,7 +18,7 @@ type OrderAddress struct {
 	expMins      float64
 	confirmScore float64
 
-	Ctx          <-chan context.Context
+	Ctx          <-chan context.Request
 	ConfirmScore <-chan float64
 	Out          chan<- ReplyData
 }
@@ -31,16 +31,18 @@ func (c *OrderAddress) OnConfirmScore(score float64) {
 	c.confirmScore = score
 }
 
-func (c *OrderAddress) OnCtx(ctx context.Context) {
+func (c *OrderAddress) OnCtx(req context.Request) {
 	// if context.GroupChat(ctx) {
 	// 	log.Printf("不回应非开单相关的普通群聊")
 	// 	return
 	// }
 
+	ctx := req.Ctx
 	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
 	if nil != currentOrder {
-		aiResult := ctx.Value(config.ValueKeyResult).(apiai.Result)
+		aiResult := req.ApiAiResult
+
 		cOrder := currentOrder.(resolves.OrderResolve)
 
 		if cOrder.Expired(config.SesssionExpiredMinutes) {

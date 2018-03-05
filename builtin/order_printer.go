@@ -17,11 +17,13 @@ func NewOrderPrinter() interface{} {
 type OrderPrinter struct {
 	flow.Component
 
-	Ctx <-chan context.Context
+	Ctx <-chan context.Request
 	Out chan<- ReplyData
 }
 
-func (s *OrderPrinter) OnCtx(ctx context.Context) {
+func (s *OrderPrinter) OnCtx(req context.Request) {
+	ctx := req.Ctx
+
 	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return

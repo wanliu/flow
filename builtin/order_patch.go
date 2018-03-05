@@ -2,14 +2,14 @@ package builtin
 
 import (
 	"github.com/wanliu/flow/builtin/config"
-	. "github.com/wanliu/flow/builtin/resolves"
-	. "github.com/wanliu/flow/context"
+	"github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/context"
 )
 
 type PatchOrder struct {
 	TryGetEntities
 	DefTime string
-	Ctx     <-chan Context
+	Ctx     <-chan context.Request
 	Out     chan<- ReplyData
 }
 
@@ -17,8 +17,9 @@ func NewPatchOrder() interface{} {
 	return new(PatchOrder)
 }
 
-func (order *PatchOrder) OnCtx(ctx Context) {
-	patchResolve := NewPatchOrderResolve(ctx)
+func (order *PatchOrder) OnCtx(req context.Request) {
+	ctx := req.Ctx
+	patchResolve := resolves.NewPatchOrderResolve(req)
 
 	var data interface{}
 	output := ""
@@ -26,7 +27,7 @@ func (order *PatchOrder) OnCtx(ctx Context) {
 	if patchResolve.EmptyProducts() && patchResolve.EmptyGifts() {
 		output = "没有相关的产品"
 	} else {
-		curResolve := ctx.CtxValue(config.CtxKeyOrder).(OrderResolve)
+		curResolve := ctx.CtxValue(config.CtxKeyOrder).(resolves.OrderResolve)
 		patchResolve.Patch(&curResolve)
 
 		var d interface{}

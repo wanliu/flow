@@ -6,7 +6,7 @@ import (
 	// "time"
 
 	// "github.com/wanliu/flow/builtin/config"
-	"github.com/hysios/apiai-go"
+	// "github.com/hysios/apiai-go"
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/resolves"
 
@@ -22,17 +22,18 @@ func NewOrderDelete() interface{} {
 type OrderDelete struct {
 	flow.Component
 
-	Ctx <-chan context.Context
+	Ctx <-chan context.Request
 	Out chan<- ReplyData
 }
 
-func (c *OrderDelete) OnCtx(ctx context.Context) {
+func (c *OrderDelete) OnCtx(req context.Request) {
 	// if context.GroupChat(ctx) {
 	// 	log.Printf("不回应非开单相关的普通群聊")
 	// 	return
 	// }
 
-	aiResult := ctx.Value("Result").(apiai.Result)
+	ctx := req.Ctx
+	aiResult := req.ApiAiResult
 
 	if numInt, exist := aiResult.Params["order-numder"]; exist {
 		orderNo := numInt.(string)

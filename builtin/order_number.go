@@ -20,11 +20,12 @@ func NewOrderNumber() interface{} {
 type OrderNumber struct {
 	flow.Component
 
-	Ctx <-chan context.Context
+	Ctx <-chan context.Request
 	Out chan<- ReplyData
 }
 
-func (c *OrderNumber) OnCtx(ctx context.Context) {
+func (c *OrderNumber) OnCtx(req context.Request) {
+	ctx := req.Ctx
 	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return

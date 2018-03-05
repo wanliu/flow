@@ -14,14 +14,14 @@ type NewOrder struct {
 	DefTime    string
 	retryCount int
 
-	Ctx     <-chan context.Context
+	Ctx     <-chan context.Request
 	Deftime <-chan string
 	Out     chan<- ReplyData
-	Notice  chan<- context.Context
-	Timeout chan<- context.Context
+	Notice  chan<- context.Request
+	Timeout chan<- context.Request
 
-	RetryOut chan<- context.Context
-	RetryIn  <-chan context.Context
+	RetryOut chan<- context.Request
+	RetryIn  <-chan context.Request
 
 	RetryCount <-chan float64
 }
@@ -39,8 +39,9 @@ func (c *NewOrder) OnRetryCount(count float64) {
 	c.retryCount = int(count)
 }
 
-func (c *NewOrder) OnCtx(ctx context.Context) {
-	orderResolve := resolves.NewOrderResolve(ctx)
+func (c *NewOrder) OnCtx(req context.Request) {
+	ctx := req.Ctx
+	orderResolve := resolves.NewOrderResolve(req)
 
 	if c.DefTime != "" {
 		orderResolve.SetDefTime(c.DefTime)
@@ -51,7 +52,7 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 	if orderResolve.EmptyProducts() {
 		if c.retryCount > 0 {
 			log.Printf("重新获取开单产品，第1次，共%v次", c.retryCount)
-			c.RetryOut <- ctx
+			c.RetryOut <- req
 		} else {
 			if context.GroupChat(ctx) {
 				c.GroupAnswer(ctx, orderResolve)
@@ -79,7 +80,7 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 			ctx.SetCtxValue(config.CtxKeyOrder, *orderResolve)
 		}
 
-		c.Timeout <- ctx
+		c.Timeout <- req
 
 		data := map[string]interface{}{
 			"type":   "info",
@@ -97,8 +98,9 @@ func (c *NewOrder) OnCtx(ctx context.Context) {
 	}
 }
 
-func (c *NewOrder) OnRetryIn(ctx context.Context) {
-	orderResolve := resolves.NewOrderResolve(ctx)
+func (c *NewOrder) OnRetryIn(req context.Request) {
+	ctx := req.Ctx
+	orderResolve := resolves.NewOrderResolve(req)
 
 	if c.DefTime != "" {
 		orderResolve.SetDefTime(c.DefTime)
@@ -130,7 +132,7 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 			log.Printf("重新获取开单产品，第%v次，共%v次", retriedCount, c.retryCount)
 
 			ctx.SetValue(config.CtxKeyRetriedCount, retriedCount)
-			c.RetryOut <- ctx
+			c.RetryOut <- req
 		}
 	} else {
 		reply, d := orderResolve.Answer(ctx)
@@ -147,7 +149,7 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 		}
 
 		// c.Notice <- ctx
-		c.Timeout <- ctx
+		c.Timeout <- req
 
 		data := map[string]interface{}{
 			"type":   "info",

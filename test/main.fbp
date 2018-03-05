@@ -1,11 +1,12 @@
-INPORT=TextProc.In:Text
-INPORT=Ai.Ctx:Ctx
+INPORT=TextProc.In:Request
 INPORT=Voice.In:Voice
+# INPORT=Ai.Ctx:Ctx
 
 TextProc(TextPreprocesor) Out -> In Ai(ApiAi)
-Ai() Out -> Ctx CM(ContextManager)
+# Ai() Out -> Ctx CM(ContextManager)
 
-CM() Process -> Ctx OrderTouch(OrderTouch)
+# CM() Process -> Ctx OrderTouch(OrderTouch)
+Ai() Out -> Ctx OrderTouch(OrderTouch)
 OrderTouch() Timeout -> Ctx OrderTimeout(OrderTimeout)
 
 OrderTouch() Next -> Ctx ConfirmInt(IntentCheck)

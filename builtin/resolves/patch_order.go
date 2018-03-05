@@ -6,11 +6,10 @@ import (
 	// "strings"
 	"time"
 
-	"github.com/hysios/apiai-go"
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/builtin/config"
-	. "github.com/wanliu/flow/context"
+	"github.com/wanliu/flow/context"
 )
 
 type PatchOrderResolve struct {
@@ -19,10 +18,11 @@ type PatchOrderResolve struct {
 	OriginUpdatedAt time.Time
 }
 
-func NewPatchOrderResolve(ctx Context) *PatchOrderResolve {
+func NewPatchOrderResolve(req context.Request) *PatchOrderResolve {
+	ctx := req.Ctx
 	resolve := new(PatchOrderResolve)
 
-	aiResult := ctx.Value("Result").(apiai.Result)
+	aiResult := req.ApiAiResult
 
 	resolve.AiParams = ai.ApiAiOrder{AiResult: aiResult}
 	resolve.ExtractFromParams()

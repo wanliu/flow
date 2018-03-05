@@ -33,14 +33,13 @@ type CustomerOrdersResolve struct {
 	LastActiveTime *time.Time
 }
 
-func NewCusOrdersResolve(ctx context.Context, perPage int) *CustomerOrdersResolve {
+func NewCusOrdersResolve(aiResult apiai.Result, perPage int) *CustomerOrdersResolve {
 	var product string
 
 	if perPage <= 0 {
 		perPage = 5
 	}
 
-	aiResult := ctx.Value("Result").(apiai.Result)
 	aiParams := ai.ApiAiOrder{AiResult: aiResult}
 
 	customerName := aiParams.Customer()

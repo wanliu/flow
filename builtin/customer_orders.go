@@ -21,8 +21,8 @@ type CustomerOrders struct {
 
 	expireMins int
 
-	Ctx       <-chan context.Context
-	Page      <-chan context.Context
+	Ctx       <-chan context.Request
+	Page      <-chan context.Request
 	ExpireMin <-chan interface{}
 
 	Out chan<- ReplyData
@@ -32,13 +32,16 @@ func NewCustomerOrders() interface{} {
 	return new(CustomerOrders)
 }
 
-func (c *CustomerOrders) OnCtx(ctx context.Context) {
+func (c *CustomerOrders) OnCtx(req context.Request) {
 	// if context.GroupChat(ctx) {
 	// 	log.Printf("不回应非开单相关的普通群聊")
 	// 	return
 	// }
 
-	rsv := resolves.NewCusOrdersResolve(ctx, Per)
+	ctx := req.Ctx
+	apiResult := req.ApiAiResult
+
+	rsv := resolves.NewCusOrdersResolve(apiResult, Per)
 
 	reply, d := rsv.Answer()
 
@@ -55,7 +58,9 @@ func (c *CustomerOrders) OnCtx(ctx context.Context) {
 	c.Out <- ReplyData{reply, ctx, data}
 }
 
-func (c *CustomerOrders) OnPage(ctx context.Context) {
+func (c *CustomerOrders) OnPage(req context.Request) {
+	ctx := req.Ctx
+
 	in := ctx.CtxValue(config.CtxKeyCusOrders)
 	if in == nil {
 		if context.GroupChat(ctx) {

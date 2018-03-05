@@ -48,7 +48,7 @@ type TextPreprocesor struct {
 	MultiField
 
 	Out   chan<- context.Request
-	In    <-chan interface{}
+	In    <-chan context.Request
 	Reply chan<- ReplyData
 }
 
@@ -56,27 +56,8 @@ func NewTextPreprocesor() interface{} {
 	return new(TextPreprocesor)
 }
 
-func (c *TextPreprocesor) OnIn(input interface{}) {
-	var (
-		text      string
-		requestId string
-	)
-
-	switch v := input.(type) {
-	case string:
-		text = v
-	case map[string]string:
-		text = v["text"]
-		requestId = v["requestId"]
-	default:
-		log.Printf("无效的text输入类型，必须是string或者map[string]string")
-
-		c.Reply <- ReplyData{
-			Reply: "无效的text输入类型，必须是string或者map[string]string",
-		}
-
-		return
-	}
+func (c *TextPreprocesor) OnIn(req context.Request) {
+	text := req.Text
 
 	output := atFilter(text)
 	output = replaceDeliver(output)
@@ -84,10 +65,10 @@ func (c *TextPreprocesor) OnIn(input interface{}) {
 	output = dateTransfer(output)
 	output = dictTransfer(output)
 	output = replaceUnit(output)
-	c.Out <- context.Request{
-		Text:      output,
-		RequestId: requestId,
-	}
+
+	req.Text = output
+
+	c.Out <- req
 }
 
 func replaceDeliver(s string) string {

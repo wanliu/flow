@@ -4,7 +4,7 @@ import (
 	"github.com/hysios/apiai-go"
 )
 
-type GraghRequest struct {
+type Request struct {
 	Ctx         Context
 	RequestId   string
 	Text        string

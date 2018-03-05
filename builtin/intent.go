@@ -1,18 +1,19 @@
 package builtin
 
 import (
-	"log"
+	// "log"
 	"strings"
 
-	"github.com/hysios/apiai-go"
-	. "github.com/wanliu/flow/context"
+	// "github.com/hysios/apiai-go"
+	"github.com/wanliu/flow/context"
+
 	flow "github.com/wanliu/goflow"
 )
 
 type IntentCheck struct {
 	flow.Component
-	Ctx <-chan Context
-	// Query  <-chan ResultParams
+	Ctx <-chan context.Request
+
 	_intent string
 	_score  float64
 	// _flow   bool
@@ -21,11 +22,11 @@ type IntentCheck struct {
 	Score  <-chan float64
 	// Flow   <-chan bool
 
-	Out  chan<- Context
-	Next chan<- Context
+	Out  chan<- context.Request
+	Next chan<- context.Request
 
 	// 即使意图和得分不满足，也向这个端口发送ｃｔｘ，列如使确认信息失效这种情况
-	FlowOut chan<- Context
+	FlowOut chan<- context.Request
 }
 
 func NewIntentCheck() interface{} {
@@ -44,22 +45,19 @@ func (ic *IntentCheck) OnFlow(flow bool) {
 	// ic._flow = flow
 }
 
-func (ic *IntentCheck) OnCtx(ctx Context) {
-	if res, ok := ctx.Value("Result").(apiai.Result); ok {
-		// if res.Metadata.IntentName == ic._intent && res.Score >= ic._score {
-		if strings.HasPrefix(res.Metadata.IntentName, ic._intent) && res.Score >= ic._score {
-			ic.Out <- ctx
-		} else {
-			ic.Next <- ctx
+func (ic *IntentCheck) OnCtx(req context.Request) {
+	res := req.ApiAiResult
 
-			// log.Printf("...detect flow: %v", ic._flow)
-			// if ic._flow {
-			// log.Printf("...sending flow")
-
-			ic.FlowOut <- ctx
-			// }
-		}
+	if strings.HasPrefix(res.Metadata.IntentName, ic._intent) && res.Score >= ic._score {
+		ic.Out <- req
 	} else {
-		log.Printf("无效的 Context Value Result")
+		ic.Next <- req
+
+		// log.Printf("...detect flow: %v", ic._flow)
+		// if ic._flow {
+		// log.Printf("...sending flow")
+
+		ic.FlowOut <- req
+		// }
 	}
 }

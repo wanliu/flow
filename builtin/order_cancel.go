@@ -20,16 +20,17 @@ func NewOrderCancel() interface{} {
 type OrderCancel struct {
 	flow.Component
 
-	Ctx <-chan context.Context
+	Ctx <-chan context.Request
 	Out chan<- ReplyData
 }
 
-func (c *OrderCancel) OnCtx(ctx context.Context) {
+func (c *OrderCancel) OnCtx(req context.Request) {
 	// if context.GroupChat(ctx) {
 	// 	log.Printf("不回应非开单相关的普通群聊")
 	// 	return
 	// }
 
+	ctx := req.Ctx
 	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
 	if nil == currentOrder {

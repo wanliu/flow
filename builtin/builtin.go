@@ -19,11 +19,8 @@ func ComponentList() map[string]func() interface{} {
 	_components["LuisAnalyze"] = NewLuisAnalyze
 	_components["Stringifier"] = NewStringifier
 	_components["IntentCheck"] = NewIntentCheck
-	_components["CtxReset"] = NewCtxReset
-	// _components["TryGetProducts"] = NewTryGetProducts
 	_components["MyInput"] = NewMyInput
 	_components["QuerySave"] = NewQuerySave
-	_components["ContextManager"] = NewContextManager
 	_components["Final"] = NewFinal
 	_components["Order"] = GetOrder
 	_components["NewOrder"] = NewNewOrder
@@ -112,20 +109,6 @@ func ComponentInfos() map[string]Component {
 		Constructor: NewIntentCheck,
 	}
 
-	result["CtxReset"] = Component{
-		Name:        "CtxReset",
-		Description: "Reset Context to initial status",
-		Icon:        "refresh",
-		Constructor: NewCtxReset,
-	}
-
-	// result["TryGetProducts"] = Component{
-	// 	Name:        "TryGetProducts",
-	// 	Description: "Try to query products data from Entities of Luis Query Result",
-	// 	Icon:        "product-hunt",
-	// 	Constructor: NewTryGetProducts,
-	// }
-
 	result["MyInput"] = Component{
 		Name:        "MyInput",
 		Description: "Input with stdin stream",
@@ -137,13 +120,6 @@ func ComponentInfos() map[string]Component {
 		Name:        "QuerySave",
 		Description: "Merge Context with Value",
 		Icon:        "save",
-		Constructor: NewQuerySave,
-	}
-
-	result["ContextManager"] = Component{
-		Name:        "ContextManager",
-		Description: "Context Manager must be use in Context Component",
-		Icon:        "server",
 		Constructor: NewQuerySave,
 	}
 
