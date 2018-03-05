@@ -1,12 +1,8 @@
 {
   "inports": {
-    "Text": {
+    "Request": {
       "process": "TextProc",
       "port": "In"
-    },
-    "Ctx": {
-      "process": "Ai",
-      "port": "Ctx"
     },
     "Voice": {
       "process": "Voice",
@@ -21,9 +17,6 @@
     },
     "Ai": {
       "component": "ApiAi"
-    },
-    "CM": {
-      "component": "ContextManager"
     },
     "OrderTouch": {
       "component": "OrderTouch"
@@ -116,16 +109,6 @@
       "src": {
         "process": "Ai",
         "port": "Out"
-      },
-      "tgt": {
-        "process": "CM",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "CM",
-        "port": "Process"
       },
       "tgt": {
         "process": "OrderTouch",
