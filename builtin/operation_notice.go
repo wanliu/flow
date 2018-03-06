@@ -14,7 +14,7 @@ import (
 
 type OperationNotice struct {
 	flow.Component
-	Ctx <-chan context.Context
+	Ctx <-chan context.Request
 	Out chan<- ReplyData
 }
 
@@ -22,7 +22,9 @@ func NewOperationNotice() interface{} {
 	return new(OperationNotice)
 }
 
-func (s OperationNotice) OnCtx(ctx context.Context) {
+func (s OperationNotice) OnCtx(req context.Request) {
+	ctx := req.Ctx
+
 	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return

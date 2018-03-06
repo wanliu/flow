@@ -16,7 +16,7 @@ type OrderCustomer struct {
 
 	expMins float64
 
-	Ctx <-chan context.Context
+	Ctx <-chan context.Request
 	Out chan<- ReplyData
 }
 
@@ -24,7 +24,9 @@ func NewOrderCustomer() interface{} {
 	return new(OrderCustomer)
 }
 
-func (c *OrderCustomer) OnCtx(ctx context.Context) {
+func (c *OrderCustomer) OnCtx(req context.Request) {
+	ctx := req.Ctx
+
 	currentOrder := ctx.Value(config.CtxKeyOrder)
 
 	if nil != currentOrder {

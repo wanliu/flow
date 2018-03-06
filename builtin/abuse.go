@@ -8,7 +8,7 @@ import (
 
 type Abuse struct {
 	TryGetEntities
-	Ctx  <-chan context.Context
+	Ctx  <-chan context.Request
 	Type <-chan string
 	Out  chan<- ReplyData
 }
@@ -18,7 +18,9 @@ func NewAbuse() interface{} {
 }
 
 // entity: 贬低
-func (order *Abuse) OnCtx(ctx context.Context) {
+func (order *Abuse) OnCtx(req context.Request) {
+	ctx := req.Ctx
+
 	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
 		return
