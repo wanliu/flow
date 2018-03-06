@@ -31,7 +31,9 @@ type Final struct {
 }
 
 func (s *Final) OnIn(req context.Request) {
-	req.Ctx.Post(req.Res.Reply, req.Res.Data, req)
+	ctx := req.Ctx
+	req.Ctx = nil
+	ctx.Post(req.Res.Reply, req.Res.Data, req)
 }
 
 func (s *Final) OnDelayMin(min float64) {
