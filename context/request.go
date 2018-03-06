@@ -6,7 +6,7 @@ import (
 
 type Request struct {
 	Ctx         Context
-	RequestId   string
+	Id          string
 	Text        string
 	ApiAiResult apiai.Result
 }
