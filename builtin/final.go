@@ -5,7 +5,7 @@ import (
 	// "log"
 	"math/rand"
 	// "strconv"
-	"sync"
+	// "sync"
 	"time"
 
 	"github.com/wanliu/flow/context"
@@ -18,11 +18,9 @@ func NewFinal() interface{} {
 }
 
 type Final struct {
-	sync.RWMutex
+	// sync.RWMutex
 
 	flow.Component
-
-	// ReplyQueue *lane.Queue
 
 	delayMin int
 	delayMax int
@@ -32,18 +30,8 @@ type Final struct {
 	DelayMax <-chan float64
 }
 
-// func (s *Final) Init() {
-// 	s.ReplyQueue = lane.NewQueue()
-// }
-
 func (s *Final) OnIn(req context.Request) {
-	// // s.Lock()
-	// s.ReplyQueue.Enqueue(req)
-	// s.Unlock()
-
-	// s.SendReply()
-
-	req.Ctx.Post(req.Res.Reply, req.Res.Data)
+	req.Ctx.Post(req.Res.Reply, req.Res.Data, req)
 }
 
 func (s *Final) OnDelayMin(min float64) {
@@ -67,19 +55,3 @@ func (s Final) DelayRange() int {
 		}
 	}
 }
-
-// func (s *Final) SendReply() {
-// 	// secs := s.DelayRange()
-// 	// secs := 3
-
-// 	s.RLock()
-// 	for s.ReplyQueue.Head() != nil {
-// 		data := s.ReplyQueue.Dequeue().(context.Request)
-
-// 		// log.Printf("[Delay]Delay reply for " + strconv.Itoa(secs) + " seconds.")
-// 		// time.Sleep(time.Second * time.Duration(secs))
-
-// 		data.Ctx.Post(data.Reply, data.Data)
-// 	}
-// 	s.RUnlock()
-// }

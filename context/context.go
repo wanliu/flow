@@ -273,6 +273,10 @@ func (ctx *ctxt) Post(text string, args ...interface{}) error {
 			r["data"] = args[0]
 		}
 
+		if len(args) > 1 {
+			r["req"] = args[1]
+		}
+
 		ctx.Stack.Root.sendData <- r
 	}
 
