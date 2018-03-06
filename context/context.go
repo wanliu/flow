@@ -318,7 +318,7 @@ LOOP:
 	}
 }
 
-type ContextReplyHander func(txt *string, table *Table, data interface{}, req *Request)
+type ContextReplyHander func(txt *string, table *Table, data *ResReply)
 
 func (ctx *ctxt) RunCallback(handler ContextReplyHander) {
 	var err error
@@ -327,13 +327,13 @@ LOOP:
 		select {
 		case txt := <-ctx.send:
 			ctx.counter--
-			handler(&txt, nil, nil, nil)
+			handler(&txt, nil, nil)
 		case data := <-ctx.sendData:
 			ctx.counter--
-			handler(nil, nil, data.Data, data.Req)
+			handler(nil, nil, &data)
 		case table := <-ctx.sendTable:
 			ctx.counter--
-			handler(nil, table, nil, nil)
+			handler(nil, table, nil)
 		case <-ctx.quit:
 			// ctx.waitingEnd()
 			break LOOP
@@ -346,16 +346,16 @@ func (ctx *ctxt) RunCallbackOnce(handler ContextReplyHander) {
 	select {
 	case txt := <-ctx.send:
 		ctx.counter--
-		handler(&txt, nil, nil, nil)
+		handler(&txt, nil, nil)
 	case table := <-ctx.sendTable:
 		ctx.counter--
-		handler(nil, table, nil, nil)
+		handler(nil, table, nil)
 	case data := <-ctx.sendData:
 		ctx.counter--
-		handler(nil, nil, data.Data, data.Req)
+		handler(nil, nil, &data)
 	case <-time.After(time.Second * 20):
 		txt := "请求超时，请稍候再试"
-		handler(&txt, nil, nil, nil)
+		handler(&txt, nil, nil)
 	}
 }
 
