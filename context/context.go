@@ -27,7 +27,7 @@ type ctxt struct {
 	postMode int
 
 	send      chan string
-	sendData  chan interface{}
+	sendData  chan ResReply
 	sendTable chan *Table
 	quit      chan bool
 
@@ -95,7 +95,7 @@ func NewContext(args ...CtxOptFunc) (*ctxt, error) {
 		rece:      make(chan interface{}),
 		done:      make(chan bool),
 		send:      make(chan string),
-		sendData:  make(chan interface{}),
+		sendData:  make(chan ResReply),
 		sendTable: make(chan *Table),
 		quit:      make(chan bool),
 		errHandle: opt.Error,
@@ -273,11 +273,18 @@ func (ctx *ctxt) Post(text string, args ...interface{}) error {
 			r["data"] = args[0]
 		}
 
-		if len(args) > 1 {
-			r["req"] = args[1]
+		reply := ResReply{
+			Data: r,
 		}
 
-		ctx.Stack.Root.sendData <- r
+		if len(args) > 1 {
+			switch req := args[1].(type) {
+			case Request:
+				reply.Req = &req
+			}
+		}
+
+		ctx.Stack.Root.sendData <- reply
 	}
 
 	return nil
@@ -311,7 +318,7 @@ LOOP:
 	}
 }
 
-type ContextReplyHander func(txt *string, table *Table, data interface{})
+type ContextReplyHander func(txt *string, table *Table, data interface{}, req *Request)
 
 func (ctx *ctxt) RunCallback(handler ContextReplyHander) {
 	var err error
@@ -320,13 +327,13 @@ LOOP:
 		select {
 		case txt := <-ctx.send:
 			ctx.counter--
-			handler(&txt, nil, nil)
+			handler(&txt, nil, nil, nil)
 		case data := <-ctx.sendData:
 			ctx.counter--
-			handler(nil, nil, data)
+			handler(nil, nil, data.Data, data.Req)
 		case table := <-ctx.sendTable:
 			ctx.counter--
-			handler(nil, table, nil)
+			handler(nil, table, nil, nil)
 		case <-ctx.quit:
 			// ctx.waitingEnd()
 			break LOOP
@@ -339,16 +346,16 @@ func (ctx *ctxt) RunCallbackOnce(handler ContextReplyHander) {
 	select {
 	case txt := <-ctx.send:
 		ctx.counter--
-		handler(&txt, nil, nil)
+		handler(&txt, nil, nil, nil)
 	case table := <-ctx.sendTable:
 		ctx.counter--
-		handler(nil, table, nil)
+		handler(nil, table, nil, nil)
 	case data := <-ctx.sendData:
 		ctx.counter--
-		handler(nil, nil, data)
+		handler(nil, nil, data.Data, data.Req)
 	case <-time.After(time.Second * 20):
 		txt := "请求超时，请稍候再试"
-		handler(&txt, nil, nil)
+		handler(&txt, nil, nil, nil)
 	}
 }
 

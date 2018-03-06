@@ -16,6 +16,11 @@ type Response struct {
 	Data  interface{}
 }
 
+type ResReply struct {
+	Data interface{}
+	Req  *Request
+}
+
 type Request struct {
 	Ctx         Context
 	Id          string
