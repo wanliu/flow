@@ -11,7 +11,7 @@ type Unimplemented struct {
 	TryGetEntities
 	Ctx  <-chan context.Request
 	Type <-chan string
-	Out  chan<- ReplyData
+	Out  chan<- context.Request
 }
 
 func NewUnimplemented() interface{} {
@@ -33,9 +33,9 @@ func (order *Unimplemented) OnCtx(req context.Request) {
 		output = r
 	}
 
-	replyData := ReplyData{
+	req.Res = context.Response{
 		Reply: output,
 		Ctx:   ctx,
 	}
-	order.Out <- replyData
+	order.Out <- req
 }

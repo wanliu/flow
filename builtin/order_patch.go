@@ -10,7 +10,7 @@ type PatchOrder struct {
 	TryGetEntities
 	DefTime string
 	Ctx     <-chan context.Request
-	Out     chan<- ReplyData
+	Out     chan<- context.Request
 }
 
 func NewPatchOrder() interface{} {
@@ -51,10 +51,10 @@ func (order *PatchOrder) OnCtx(req context.Request) {
 
 	}
 
-	replyData := ReplyData{
+	req.Res = context.Response{
 		Reply: output,
 		Ctx:   ctx,
 		Data:  data,
 	}
-	order.Out <- replyData
+	order.Out <- req
 }

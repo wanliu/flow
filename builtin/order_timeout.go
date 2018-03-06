@@ -16,7 +16,7 @@ type OrderTimeout struct {
 
 	Ctx <-chan context.Request
 	// Mins <-chan float64
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func NewOrderTimeout() interface{} {
@@ -46,7 +46,8 @@ func (c *OrderTimeout) OnCtx(req context.Request) {
 			cOrder := order.(resolves.OrderResolve)
 			if cOrder.Expired(expiredMins) {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
-				c.Out <- ReplyData{"由于长时间未操作完成，当前订单已经失效", ctx, nil}
+				req.Res = context.Response{"由于长时间未操作完成，当前订单已经失效", ctx, nil}
+				c.Out <- req
 			}
 		}
 	}()

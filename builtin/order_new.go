@@ -16,7 +16,7 @@ type NewOrder struct {
 
 	Ctx     <-chan context.Request
 	Deftime <-chan string
-	Out     chan<- ReplyData
+	Out     chan<- context.Request
 	Notice  chan<- context.Request
 	Timeout chan<- context.Request
 
@@ -55,16 +55,16 @@ func (c *NewOrder) OnCtx(req context.Request) {
 			c.RetryOut <- req
 		} else {
 			if context.GroupChat(ctx) {
-				c.GroupAnswer(ctx, orderResolve)
+				c.GroupAnswer(req, orderResolve)
 				return
 			}
 
 			output = "没有相关的产品"
-			replyData := ReplyData{
+			req.Res = context.Response{
 				Reply: output,
 				Ctx:   ctx,
 			}
-			c.Out <- replyData
+			c.Out <- req
 		}
 	} else {
 		reply, d := orderResolve.Answer(ctx)
@@ -89,12 +89,12 @@ func (c *NewOrder) OnCtx(req context.Request) {
 			"data":   d,
 		}
 
-		replyData := ReplyData{
+		req.Res = context.Response{
 			Reply: reply,
 			Ctx:   ctx,
 			Data:  data,
 		}
-		c.Out <- replyData
+		c.Out <- req
 	}
 }
 
@@ -116,17 +116,17 @@ func (c *NewOrder) OnRetryIn(req context.Request) {
 
 		if retriedCount >= c.retryCount {
 			if context.GroupChat(ctx) {
-				c.GroupAnswer(ctx, orderResolve)
+				c.GroupAnswer(req, orderResolve)
 				return
 			}
 
 			output := "没有相关的产品"
 
-			replyData := ReplyData{
+			req.Res = context.Response{
 				Reply: output,
 				Ctx:   ctx,
 			}
-			c.Out <- replyData
+			c.Out <- req
 		} else {
 			retriedCount++
 			log.Printf("重新获取开单产品，第%v次，共%v次", retriedCount, c.retryCount)
@@ -158,17 +158,18 @@ func (c *NewOrder) OnRetryIn(req context.Request) {
 			"data":   d,
 		}
 
-		replyData := ReplyData{
+		req.Res = context.Response{
 			Reply: reply,
 			Ctx:   ctx,
 			Data:  data,
 		}
-		c.Out <- replyData
+		c.Out <- req
 	}
 
 }
 
-func (c *NewOrder) GroupAnswer(ctx context.Context, orderResolve *resolves.OrderResolve) {
+func (c *NewOrder) GroupAnswer(req context.Request, orderResolve *resolves.OrderResolve) {
+	ctx := req.Ctx
 	reply, d := orderResolve.Answer(ctx)
 
 	data := map[string]interface{}{
@@ -179,12 +180,12 @@ func (c *NewOrder) GroupAnswer(ctx context.Context, orderResolve *resolves.Order
 	}
 
 	if orderResolve.Fulfiled() {
-		replyData := ReplyData{
+		req.Res = context.Response{
 			Reply: reply,
 			Ctx:   ctx,
 			Data:  data,
 		}
-		c.Out <- replyData
+		c.Out <- req
 	} else {
 		log.Printf("群聊开单失败, 取消回复。失败原因：%v", reply)
 	}

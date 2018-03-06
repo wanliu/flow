@@ -10,7 +10,7 @@ type Abuse struct {
 	TryGetEntities
 	Ctx  <-chan context.Request
 	Type <-chan string
-	Out  chan<- ReplyData
+	Out  chan<- context.Request
 }
 
 func NewAbuse() interface{} {
@@ -28,6 +28,6 @@ func (order *Abuse) OnCtx(req context.Request) {
 	// entities := ctx.Value("Result").(ResultParams).Entities
 	output := "请不要脏话哦"
 
-	replyData := ReplyData{output, ctx, nil}
-	order.Out <- replyData
+	req.Res = context.Response{output, ctx, nil}
+	order.Out <- req
 }

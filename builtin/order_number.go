@@ -21,7 +21,7 @@ type OrderNumber struct {
 	flow.Component
 
 	Ctx <-chan context.Request
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func (c *OrderNumber) OnCtx(req context.Request) {
@@ -40,17 +40,20 @@ func (c *OrderNumber) OnCtx(req context.Request) {
 		if resolveInt != nil {
 			resolve := resolveInt.(resolves.OrderNumberResolve)
 			reply := resolve.Resolve(orderNo, ctx)
-			c.Out <- ReplyData{reply, ctx, nil}
+			req.Res = context.Response{reply, ctx, nil}
+			c.Out <- req
 		} else {
 			// if context.GroupChat(ctx) {
 			// 	log.Printf("不回应非开单相关的普通群聊")
 			// 	return
 			// }
 
-			c.Out <- ReplyData{"接收到订单号输入，但是没有对应的操作哦", ctx, nil}
+			req.Res = context.Response{"接收到订单号输入，但是没有对应的操作哦", ctx, nil}
+			c.Out <- req
 		}
 
 	} else {
-		c.Out <- ReplyData{"无效的订单号输入", ctx, nil}
+		req.Res = context.Response{"无效的订单号输入", ctx, nil}
+		c.Out <- req
 	}
 }

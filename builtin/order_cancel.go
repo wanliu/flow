@@ -21,7 +21,7 @@ type OrderCancel struct {
 	flow.Component
 
 	Ctx <-chan context.Request
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func (c *OrderCancel) OnCtx(req context.Request) {
@@ -51,7 +51,8 @@ func (c *OrderCancel) OnCtx(req context.Request) {
 						deleteComfirm.SetUp(ctx)
 
 						notice := deleteComfirm.Notice(ctx)
-						c.Out <- ReplyData{notice, ctx, nil}
+						req.Res = context.Response{notice, ctx, nil}
+						c.Out <- req
 						return
 					}
 				}
@@ -61,26 +62,31 @@ func (c *OrderCancel) OnCtx(req context.Request) {
 		// 暂时不在群聊中提供根据订单号删除订单的功能,只能删除最近订单
 		if context.GroupChat(ctx) {
 			// log.Printf("不回应非开单相关的普通群聊")
-			c.Out <- ReplyData{"当前没有可以取消的订单", ctx, nil}
+			req.Res = context.Response{"当前没有可以取消的订单", ctx, nil}
+			c.Out <- req
 			return
 		}
 
 		deleteResolve := resolves.OrderDeleteResolve{}
 		deleteResolve.SetUp(ctx)
 
-		c.Out <- ReplyData{deleteResolve.Hint(), ctx, nil}
+		req.Res = context.Response{deleteResolve.Hint(), ctx, nil}
+		c.Out <- req
 	} else {
 		curOrder := currentOrder.(resolves.OrderResolve)
 
 		if curOrder.Cancelable() {
 			if curOrder.Cancel() {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
-				c.Out <- ReplyData{"当前订单取消成功", ctx, nil}
+				req.Res = context.Response{"当前订单取消成功", ctx, nil}
+				c.Out <- req
 			} else {
-				c.Out <- ReplyData{"很抱歉，订单取消失败！请联系客服处理", ctx, nil}
+				req.Res = context.Response{"很抱歉，订单取消失败！请联系客服处理", ctx, nil}
+				c.Out <- req
 			}
 		} else {
-			c.Out <- ReplyData{"没有可以取消的订单", ctx, nil}
+			req.Res = context.Response{"没有可以取消的订单", ctx, nil}
+			c.Out <- req
 		}
 	}
 }

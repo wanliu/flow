@@ -17,7 +17,7 @@ type OrderCustomer struct {
 	expMins float64
 
 	Ctx <-chan context.Request
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func NewOrderCustomer() interface{} {
@@ -48,7 +48,8 @@ func (c *OrderCustomer) OnCtx(req context.Request) {
 			"data":   d,
 		}
 
-		c.Out <- ReplyData{reply, ctx, data}
+		req.Res = context.Response{reply, ctx, data}
+		c.Out <- req
 
 		if cOrder.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyOrder, nil)
@@ -62,6 +63,7 @@ func (c *OrderCustomer) OnCtx(req context.Request) {
 			return
 		}
 
-		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx, nil}
+		req.Res = context.Response{"客户输入无效，当前没有正在进行中的订单", ctx, nil}
+		c.Out <- req
 	}
 }

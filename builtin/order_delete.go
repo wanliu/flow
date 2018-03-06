@@ -23,7 +23,7 @@ type OrderDelete struct {
 	flow.Component
 
 	Ctx <-chan context.Request
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func (c *OrderDelete) OnCtx(req context.Request) {
@@ -38,14 +38,15 @@ func (c *OrderDelete) OnCtx(req context.Request) {
 	if numInt, exist := aiResult.Params["order-numder"]; exist {
 		orderNo := numInt.(string)
 		if orderNo == "" {
-			c.setupResolve(ctx)
+			c.setupResolve(req)
 		} else {
 
 			order, err := database.GetOrderByNo(orderNo)
 
 			if err != nil {
 				reply := fmt.Sprintf("找不到订单号为 %v 的订单", orderNo)
-				c.Out <- ReplyData{reply, ctx, nil}
+				req.Res = context.Response{reply, ctx, nil}
+				c.Out <- req
 			} else {
 				reply := ""
 
@@ -56,17 +57,21 @@ func (c *OrderDelete) OnCtx(req context.Request) {
 					reply = fmt.Sprintf("%v 号订单删除失败，请访问 https://jiejie.io/orders/%v 进行操作", orderNo, order.GlobelId())
 				}
 
-				c.Out <- ReplyData{reply, ctx, nil}
+				req.Res = context.Response{reply, ctx, nil}
+				c.Out <- req
 			}
 		}
 	} else {
-		c.setupResolve(ctx)
+		c.setupResolve(req)
 	}
 }
 
-func (c *OrderDelete) setupResolve(ctx context.Context) {
+func (c *OrderDelete) setupResolve(req context.Request) {
+	ctx := req.Ctx
+
 	deleteResolve := resolves.OrderDeleteResolve{}
 	deleteResolve.SetUp(ctx)
 
-	c.Out <- ReplyData{deleteResolve.Hint(), ctx, nil}
+	req.Res = context.Response{deleteResolve.Hint(), ctx, nil}
+	c.Out <- req
 }

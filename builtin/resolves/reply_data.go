@@ -1,8 +1,8 @@
 package resolves
 
-type DataReply struct {
-	Type   string
-	On     string
-	Action string
-	Data   interface{}
-}
+// type DataReply struct {
+// 	Type   string
+// 	On     string
+// 	Action string
+// 	Data   interface{}
+// }

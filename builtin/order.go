@@ -19,7 +19,7 @@ type Order struct {
 	ExpireMinutes <-chan float64
 	New           chan<- context.Request
 	Patch         chan<- context.Request
-	Out           chan<- ReplyData
+	Out           chan<- context.Request
 	SyncQueue     <-chan string
 }
 

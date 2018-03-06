@@ -25,7 +25,7 @@ type CustomerOrders struct {
 	Page      <-chan context.Request
 	ExpireMin <-chan interface{}
 
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func NewCustomerOrders() interface{} {
@@ -55,7 +55,8 @@ func (c *CustomerOrders) OnCtx(req context.Request) {
 	rsv.Setup(ctx)
 	c.ResetTick(rsv, ctx)
 
-	c.Out <- ReplyData{reply, ctx, data}
+	req.Res = context.Response{reply, ctx, data}
+	c.Out <- req
 }
 
 func (c *CustomerOrders) OnPage(req context.Request) {
@@ -68,7 +69,8 @@ func (c *CustomerOrders) OnPage(req context.Request) {
 			return
 		}
 
-		c.Out <- ReplyData{"当前没有正在进行的查询", ctx, nil}
+		req.Res = context.Response{"当前没有正在进行的查询", ctx, nil}
+		c.Out <- req
 	} else {
 		rsv := in.(*resolves.CustomerOrdersResolve)
 
@@ -81,7 +83,8 @@ func (c *CustomerOrders) OnPage(req context.Request) {
 			"data":   d,
 		}
 
-		c.Out <- ReplyData{reply, ctx, data}
+		req.Res = context.Response{reply, ctx, data}
+		c.Out <- req
 
 		rsv.ClearIfDone(ctx)
 	}

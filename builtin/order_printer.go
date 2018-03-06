@@ -18,7 +18,7 @@ type OrderPrinter struct {
 	flow.Component
 
 	Ctx <-chan context.Request
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func (s *OrderPrinter) OnCtx(req context.Request) {
@@ -32,16 +32,19 @@ func (s *OrderPrinter) OnCtx(req context.Request) {
 	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
 	if nil == currentOrder {
-		s.Out <- ReplyData{"当前没有正在进行中的订单", ctx, nil}
+		req.Res = context.Response{"当前没有正在进行中的订单", ctx, nil}
+		s.Out <- req
 	} else {
 		curOrder := currentOrder.(OrderResolve)
 
 		if curOrder.Expired(config.SesssionExpiredMinutes) {
-			s.Out <- ReplyData{"当前没有正在进行中的订单", ctx, nil}
+			req.Res = context.Response{"当前没有正在进行中的订单", ctx, nil}
+			s.Out <- req
 		} else {
 			// orderDetail := "-----------订单详情-------------\n"
 			// orderDetail = orderDetail + curOrder.AnswerBody()
-			s.Out <- ReplyData{"订单详情", ctx, curOrder.ToDescStruct()}
+			req.Res = context.Response{"订单详情", ctx, curOrder.ToDescStruct()}
+			s.Out <- req
 		}
 	}
 }

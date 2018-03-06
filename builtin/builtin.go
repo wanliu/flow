@@ -25,14 +25,9 @@ func ComponentList() map[string]func() interface{} {
 	_components["Order"] = GetOrder
 	_components["NewOrder"] = NewNewOrder
 	_components["PatchOrder"] = NewPatchOrder
-	_components["Praise"] = NewPraise
 	_components["Unimplemented"] = NewUnimplemented
 	_components["Critical"] = NewCritical
 	_components["Abuse"] = NewAbuse
-	_components["Greet"] = NewGreet
-	_components["StockQuery"] = NewStockQuery
-	_components["PriceQuery"] = NewPriceQuery
-	_components["Robot"] = NewRobot
 	_components["ApiAi"] = NewApiAi
 	_components["OperationNotice"] = NewOperationNotice
 	_components["OrderPrinter"] = NewOrderPrinter
@@ -151,13 +146,6 @@ func ComponentInfos() map[string]Component {
 		Constructor: NewPatchOrder,
 	}
 
-	result["Praise"] = Component{
-		Name:        "Praise",
-		Description: "Praise Component",
-		Icon:        "",
-		Constructor: NewPraise,
-	}
-
 	result["Unimplemented"] = Component{
 		Name:        "Unimplemented",
 		Description: "Unimplemented Component",
@@ -177,34 +165,6 @@ func ComponentInfos() map[string]Component {
 		Description: "Abuse Component",
 		Icon:        "",
 		Constructor: NewAbuse,
-	}
-
-	result["Greet"] = Component{
-		Name:        "Greet",
-		Description: "Greet Component",
-		Icon:        "",
-		Constructor: NewGreet,
-	}
-
-	result["StockQuery"] = Component{
-		Name:        "StockQuery",
-		Description: "StockQuery Component",
-		Icon:        "",
-		Constructor: NewStockQuery,
-	}
-
-	result["PriceQuery"] = Component{
-		Name:        "PriceQuery",
-		Description: "PriceQuery Component",
-		Icon:        "",
-		Constructor: NewPriceQuery,
-	}
-
-	result["Robot"] = Component{
-		Name:        "Robot",
-		Description: "Robot Component",
-		Icon:        "",
-		Constructor: NewRobot,
 	}
 
 	result["ApiAi"] = Component{

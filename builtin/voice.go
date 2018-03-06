@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"github.com/wanliu/flow/context"
 	flow "github.com/wanliu/goflow"
 )
 
@@ -15,7 +16,7 @@ type Voice struct {
 
 	Token <-chan string
 	In    <-chan string
-	Out   chan<- ReplyData
+	Out   chan<- context.Request
 }
 
 // NOOP

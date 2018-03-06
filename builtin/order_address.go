@@ -20,7 +20,7 @@ type OrderAddress struct {
 
 	Ctx          <-chan context.Request
 	ConfirmScore <-chan float64
-	Out          chan<- ReplyData
+	Out          chan<- context.Request
 }
 
 func NewOrderAddress() interface{} {
@@ -46,7 +46,8 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 		cOrder := currentOrder.(resolves.OrderResolve)
 
 		if cOrder.Expired(config.SesssionExpiredMinutes) {
-			c.Out <- ReplyData{"会话已经过时，当前没有正在进行中的订单", ctx, nil}
+			req.Res = context.Response{"会话已经过时，当前没有正在进行中的订单", ctx, nil}
+			c.Out <- req
 			return
 		}
 
@@ -73,7 +74,8 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 				"action": "update",
 				"data":   d,
 			}
-			c.Out <- ReplyData{reply, ctx, data}
+			req.Res = context.Response{reply, ctx, data}
+			c.Out <- req
 
 			if cOrder.Resolved() {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
@@ -99,7 +101,8 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 
 			reply := "收到您的回复:" + query + "\n"
 			reply = reply + addressConfirm.Notice(ctx)
-			c.Out <- ReplyData{reply, ctx, nil}
+			req.Res = context.Response{reply, ctx, nil}
+			c.Out <- req
 		}
 	} else {
 		if context.GroupChat(ctx) {
@@ -107,6 +110,7 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 			return
 		}
 
-		c.Out <- ReplyData{"客户输入无效，当前没有正在进行中的订单", ctx, nil}
+		req.Res = context.Response{"客户输入无效，当前没有正在进行中的订单", ctx, nil}
+		c.Out <- req
 	}
 }

@@ -49,7 +49,7 @@ type TextPreprocesor struct {
 
 	Out   chan<- context.Request
 	In    <-chan context.Request
-	Reply chan<- ReplyData
+	Reply chan<- context.Request
 }
 
 func NewTextPreprocesor() interface{} {

@@ -1,12 +1,14 @@
 package builtin
 
 import (
-	"github.com/oleiade/lane"
+	// "github.com/oleiade/lane"
 	// "log"
 	"math/rand"
 	// "strconv"
 	"sync"
 	"time"
+
+	"github.com/wanliu/flow/context"
 
 	flow "github.com/wanliu/goflow"
 )
@@ -20,26 +22,28 @@ type Final struct {
 
 	flow.Component
 
-	ReplyQueue *lane.Queue
+	// ReplyQueue *lane.Queue
 
 	delayMin int
 	delayMax int
 
-	In       <-chan ReplyData
+	In       <-chan context.Request
 	DelayMin <-chan float64
 	DelayMax <-chan float64
 }
 
-func (s *Final) Init() {
-	s.ReplyQueue = lane.NewQueue()
-}
+// func (s *Final) Init() {
+// 	s.ReplyQueue = lane.NewQueue()
+// }
 
-func (s *Final) OnIn(data ReplyData) {
-	s.Lock()
-	s.ReplyQueue.Enqueue(data)
-	s.Unlock()
+func (s *Final) OnIn(req context.Request) {
+	// // s.Lock()
+	// s.ReplyQueue.Enqueue(req)
+	// s.Unlock()
 
-	s.SendReply()
+	// s.SendReply()
+
+	req.Ctx.Post(req.Res.Reply, req.Res.Data)
 }
 
 func (s *Final) OnDelayMin(min float64) {
@@ -64,18 +68,18 @@ func (s Final) DelayRange() int {
 	}
 }
 
-func (s *Final) SendReply() {
-	// secs := s.DelayRange()
-	// secs := 3
+// func (s *Final) SendReply() {
+// 	// secs := s.DelayRange()
+// 	// secs := 3
 
-	s.RLock()
-	for s.ReplyQueue.Head() != nil {
-		data := s.ReplyQueue.Dequeue().(ReplyData)
+// 	s.RLock()
+// 	for s.ReplyQueue.Head() != nil {
+// 		data := s.ReplyQueue.Dequeue().(context.Request)
 
-		// log.Printf("[Delay]Delay reply for " + strconv.Itoa(secs) + " seconds.")
-		// time.Sleep(time.Second * time.Duration(secs))
+// 		// log.Printf("[Delay]Delay reply for " + strconv.Itoa(secs) + " seconds.")
+// 		// time.Sleep(time.Second * time.Duration(secs))
 
-		data.Ctx.Post(data.Reply, data.Data)
-	}
-	s.RUnlock()
-}
+// 		data.Ctx.Post(data.Reply, data.Data)
+// 	}
+// 	s.RUnlock()
+// }

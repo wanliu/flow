@@ -10,7 +10,7 @@ type Critical struct {
 	TryGetEntities
 	Ctx  <-chan context.Request
 	Type <-chan string
-	Out  chan<- ReplyData
+	Out  chan<- context.Request
 }
 
 func NewCritical() interface{} {
@@ -29,6 +29,6 @@ func (order *Critical) OnCtx(req context.Request) {
 	// entities := ctx.Value("Result").(ResultParams).Entities
 	output := "对不起，辜负了您的期望，请给我们时间，我们会改进的"
 
-	replyData := ReplyData{output, ctx, nil}
-	order.Out <- replyData
+	req.Res = context.Response{output, ctx, nil}
+	order.Out <- req
 }

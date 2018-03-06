@@ -20,8 +20,7 @@ type Confirm struct {
 	Confirm <-chan context.Request
 	Cancel  <-chan context.Request
 	Expire  <-chan context.Request
-
-	Out chan<- ReplyData
+	Out     chan<- context.Request
 }
 
 func NewConfirm() interface{} {
@@ -44,7 +43,8 @@ func (c *Confirm) OnConfirm(req context.Request) {
 	if cIn != nil {
 		cfm := cIn.(resolves.Data)
 		reply, data := cfm.Confirm(ctx)
-		c.Out <- ReplyData{reply, ctx, data}
+		req.Res = context.Response{reply, ctx, data}
+		c.Out <- req
 	} else {
 		// 群聊无待确认项目时，不回应
 		// if context.GroupChat(ctx) {
@@ -52,8 +52,8 @@ func (c *Confirm) OnConfirm(req context.Request) {
 		// 	return
 		// }
 
-		reply := ReplyData{"确认操作已经过期", ctx, nil}
-		c.Out <- reply
+		req.Res = context.Response{"确认操作已经过期", ctx, nil}
+		c.Out <- req
 	}
 }
 
@@ -64,7 +64,8 @@ func (c *Confirm) OnCancel(req context.Request) {
 	if cIn != nil {
 		cfm := cIn.(resolves.Data)
 		reply := cfm.Cancel(ctx)
-		c.Out <- ReplyData{reply, ctx, nil}
+		req.Res = context.Response{reply, ctx, nil}
+		c.Out <- req
 	} else {
 		// 群聊无待确认项目时，不回应
 		// if context.GroupChat(ctx) {
@@ -72,7 +73,7 @@ func (c *Confirm) OnCancel(req context.Request) {
 		// 	return
 		// }
 
-		reply := ReplyData{"确认操作已经过期", ctx, nil}
-		c.Out <- reply
+		req.Res = context.Response{"确认操作已经过期", ctx, nil}
+		c.Out <- req
 	}
 }

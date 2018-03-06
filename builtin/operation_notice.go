@@ -15,7 +15,7 @@ import (
 type OperationNotice struct {
 	flow.Component
 	Ctx <-chan context.Request
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func NewOperationNotice() interface{} {
@@ -42,7 +42,8 @@ func (s OperationNotice) OnCtx(req context.Request) {
 				expMins = ctx.CtxValue(CtxKeyExpiredMinutes).(int)
 			}
 
-			s.Out <- ReplyData{"你可以继续提交产品到订单，也可以立刻取消当前任务（" + strconv.Itoa(expMins) + "分钟以内）", ctx, nil}
+			req.Res = context.Response{"你可以继续提交产品到订单，也可以立刻取消当前任务（" + strconv.Itoa(expMins) + "分钟以内）", ctx, nil}
+			s.Out <- req
 		}
 	}
 }
