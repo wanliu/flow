@@ -37,7 +37,7 @@ func (s *Final) OnIn(req context.Request) {
 	}
 	// ctx := req.Ctx
 	// req.Ctx = nil
-	req.ctx.Post(req.Res.Reply, req.Res.Data, newReq)
+	req.Ctx.Post(req.Res.Reply, req.Res.Data, newReq)
 }
 
 func (s *Final) OnDelayMin(min float64) {
