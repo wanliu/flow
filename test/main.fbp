@@ -86,7 +86,8 @@ Voice(Voice) Out -> In Reply()
 # true -> Flow CancelInt()
 0.5 -> Score CancelInt()
 
-'deleteOrderItem' -> Intent OrderItemDeleteInt()
+'deleteOrderItem' -> Command OrderItemDeleteInt()
+'business.order.item.delete' -> Intent OrderItemDeleteInt()
 
 'business.order.delete' -> Intent OrderDeleteInt()
 0.7 -> Score OrderDeleteInt()

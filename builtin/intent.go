@@ -14,12 +14,14 @@ type IntentCheck struct {
 	flow.Component
 	Ctx <-chan context.Request
 
-	_intent string
-	_score  float64
+	_intent  string
+	_score   float64
+	_command string
 	// _flow   bool
 
-	Intent <-chan string
-	Score  <-chan float64
+	Command <-chan string
+	Intent  <-chan string
+	Score   <-chan float64
 	// Flow   <-chan bool
 
 	Out  chan<- context.Request
@@ -37,6 +39,10 @@ func (ic *IntentCheck) OnIntent(intent string) {
 	ic._intent = intent
 }
 
+func (ic *IntentCheck) OnCommand(command string) {
+	ic._command = command
+}
+
 func (ic *IntentCheck) OnScore(score float64) {
 	ic._score = score
 }
@@ -49,7 +55,7 @@ func (ic *IntentCheck) OnCtx(req context.Request) {
 	cmd := req.Command
 
 	if cmd != nil {
-		if cmd.Action == ic._intent {
+		if cmd.Action == ic._command {
 			ic.Out <- req
 		} else {
 			ic.Next <- req

@@ -2,7 +2,9 @@ package builtin
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
@@ -37,13 +39,14 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 
 		cmd := req.Command
 		if cmd != nil {
+			// delete by command
 			data := cmd.Data
 			if itemName, ok := data["itemName"].(string); ok {
-				products := cOrder.Products
+				itemsResolve := cOrder.Products
 
-				removed := products.Remove(itemName)
+				removed := itemsResolve.Remove(itemName)
 				if removed {
-					cOrder.Products = products
+					cOrder.Products = itemsResolve
 					ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
 
 					_, d := cOrder.Answer(ctx)
@@ -65,6 +68,54 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 				}
 			} else {
 				req.Res = context.Response{"无效的删除操作", ctx, nil}
+				c.Out <- req
+			}
+		} else {
+			// delete by intent
+			aiResult := req.ApiAiResult
+
+			aiExtract := ai.ApiAiOrder{AiResult: aiResult}
+			deletedItems := []string{}
+			products := []string{}
+			itemsResolve := cOrder.Products
+
+			for _, product := range aiExtract.Products() {
+				name := product.Product
+				products = append(products, name)
+
+				removed := itemsResolve.Remove(name)
+				if removed {
+					deletedItems = append(deletedItems, name)
+				}
+			}
+
+			if len(deletedItems) > 0 {
+				cOrder.Products = itemsResolve
+				_, d := cOrder.Answer(ctx)
+
+				data := map[string]interface{}{
+					"type":   "info",
+					"on":     "order",
+					"action": "update",
+					"data":   d,
+				}
+				ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
+
+				reply := fmt.Sprintf("已经删除%v", strings.Join(deletedItems, ","))
+				req.Res = context.Response{reply, ctx, data}
+				c.Out <- req
+			} else {
+				_, d := cOrder.Answer(ctx)
+
+				data := map[string]interface{}{
+					"type":   "info",
+					"on":     "order",
+					"action": "update",
+					"data":   d,
+				}
+
+				reply := fmt.Sprintf("无效的操作，%v不存在", strings.Join(products, ","))
+				req.Res = context.Response{reply, ctx, data}
 				c.Out <- req
 			}
 		}

@@ -646,6 +646,13 @@
       "data": "deleteOrderItem",
       "tgt": {
         "process": "OrderItemDeleteInt",
+        "port": "Command"
+      }
+    },
+    {
+      "data": "business.order.item.delete",
+      "tgt": {
+        "process": "OrderItemDeleteInt",
         "port": "Intent"
       }
     },
