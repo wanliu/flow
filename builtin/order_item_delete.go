@@ -52,6 +52,7 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 
 					reply := fmt.Sprintf("已经删除%v", itemName)
 					req.Res = context.Response{reply, ctx, data}
+					c.Out <- req
 				} else {
 					reply := fmt.Sprintf("无效的操作，%v不存在", itemName)
 					req.Res = context.Response{reply, ctx, nil}
@@ -60,7 +61,6 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 			} else {
 				req.Res = context.Response{"无效的删除操作", ctx, nil}
 				c.Out <- req
-				return
 			}
 		}
 	} else {
