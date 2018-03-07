@@ -70,7 +70,7 @@ Voice(Voice) Out -> In Reply()
 
 '123456789' -> SessionId Ai()
 'http://127.0.0.1:8123' -> ProxyUrl Ai()
-'9e48732878a34e7d960cb4a29ac0f72a' -> Token Ai()
+'a0af4ac753c94dff983523714468d4e8' -> Token Ai()
 1 -> RetryCount Ai()
 
 5 -> ExpireMinutes OpenOrder()
