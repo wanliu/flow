@@ -18,8 +18,20 @@ func NewUnimplemented() interface{} {
 	return new(Unimplemented)
 }
 
-func (order *Unimplemented) OnCtx(req context.Request) {
+func (c *Unimplemented) OnCtx(req context.Request) {
 	ctx := req.Ctx
+
+	if req.IsCommand() {
+		output := "指令无法识别"
+
+		req.Res = context.Response{
+			Reply: output,
+			Ctx:   ctx,
+		}
+
+		c.Out <- req
+		return
+	}
 
 	if context.GroupChat(ctx) {
 		log.Printf("不回应非开单相关的普通群聊")
@@ -37,5 +49,5 @@ func (order *Unimplemented) OnCtx(req context.Request) {
 		Reply: output,
 		Ctx:   ctx,
 	}
-	order.Out <- req
+	c.Out <- req
 }
