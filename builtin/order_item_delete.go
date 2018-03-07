@@ -39,8 +39,13 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 		if cmd != nil {
 			data := cmd.Data
 			if itemName, ok := data["itemName"].(string); ok {
-				removed := cOrder.Products.Remove(itemName)
+				products := cOrder.Products
+
+				removed := products.Remove(itemName)
 				if removed {
+					cOrder.Products = products
+					ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
+
 					_, d := cOrder.Answer(ctx)
 
 					data := map[string]interface{}{
