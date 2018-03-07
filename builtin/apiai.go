@@ -54,6 +54,11 @@ func (c *ApiAi) Init() {
 }
 
 func (c *ApiAi) OnIn(req context.Request) {
+	if req.IsCommand() {
+		c.Out <- req
+		return
+	}
+
 	text := req.Text
 	res := c.SendQuery(text)
 

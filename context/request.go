@@ -22,12 +22,10 @@ type ResReply struct {
 }
 
 // {
-// 	On: "orderItem",
-// 	Action: "delete/quantity",
+// 	Action: "deleteOrderItem",
 // 	Data: map[string]interface{}{"itemName":"伊利纯牛奶"},
 // }
 type RequestCommand struct {
-	On     string
 	Action string
 	Data   map[string]interface{}
 }
@@ -39,4 +37,12 @@ type Request struct {
 	ApiAiResult apiai.Result
 	Res         Response
 	Command     *RequestCommand
+}
+
+func (req Request) IsCommand() bool {
+	if req.Command != nil {
+		return true
+	}
+
+	return false
 }

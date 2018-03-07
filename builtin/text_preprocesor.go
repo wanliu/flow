@@ -57,6 +57,11 @@ func NewTextPreprocesor() interface{} {
 }
 
 func (c *TextPreprocesor) OnIn(req context.Request) {
+	if req.IsCommand() {
+		c.Out <- req
+		return
+	}
+
 	text := req.Text
 
 	output := atFilter(text)
