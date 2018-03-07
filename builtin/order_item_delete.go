@@ -49,7 +49,7 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 					cOrder.Products = itemsResolve
 					ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
 
-					_, d := cOrder.Answer(ctx)
+					answer, d := cOrder.Answer(ctx)
 
 					data := map[string]interface{}{
 						"type":   "info",
@@ -58,7 +58,7 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 						"data":   d,
 					}
 
-					reply := fmt.Sprintf("已经删除%v", itemName)
+					reply := fmt.Sprintf("已经删除%v, %v", itemName, answer)
 					req.Res = context.Response{reply, ctx, data}
 					c.Out <- req
 				} else {
@@ -91,7 +91,7 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 
 			if len(deletedItems) > 0 {
 				cOrder.Products = itemsResolve
-				_, d := cOrder.Answer(ctx)
+				answer, d := cOrder.Answer(ctx)
 
 				data := map[string]interface{}{
 					"type":   "info",
@@ -101,7 +101,7 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 				}
 				ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
 
-				reply := fmt.Sprintf("已经删除%v", strings.Join(deletedItems, ","))
+				reply := fmt.Sprintf("已经删除%v, %v", strings.Join(deletedItems, ","), answer)
 				req.Res = context.Response{reply, ctx, data}
 				c.Out <- req
 			} else {
