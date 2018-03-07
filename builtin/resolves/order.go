@@ -501,7 +501,9 @@ func (r OrderResolve) AnswerFooter(ctx context.Context, no, id interface{}) stri
 
 			desc = desc + fmt.Sprintf("\"%v\"为无效的客户，%v\n", r.ExtractedCustomer, confirm.Notice(ctx))
 			// desc = desc + fmt.Sprintf("\"%v\"为无效的客户，还缺少客户信息\n", r.ExtractedCustomer)
-		} else {
+		} else if len(r.Products.Products) == 0 {
+			desc = desc + "商品列表为空,请添加商品\n"
+		} else if r.Customer == "" {
 			desc = desc + "还缺少客户信息\n"
 		}
 	}
