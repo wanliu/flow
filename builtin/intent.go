@@ -46,6 +46,18 @@ func (ic *IntentCheck) OnFlow(flow bool) {
 }
 
 func (ic *IntentCheck) OnCtx(req context.Request) {
+	cmd := req.Command
+
+	if cmd != nil {
+		if cmd.Action == ic._intent {
+			ic.Out <- req
+		} else {
+			ic.Next <- req
+		}
+
+		return
+	}
+
 	res := req.ApiAiResult
 
 	if strings.HasPrefix(res.Metadata.IntentName, ic._intent) && res.Score >= ic._score {

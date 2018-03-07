@@ -9,7 +9,7 @@ import (
 	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
 
-	config "github.com/wanliu/flow/builtin/config"
+	"github.com/wanliu/flow/builtin/config"
 )
 
 type OrderAddress struct {

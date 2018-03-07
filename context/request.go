@@ -21,10 +21,22 @@ type ResReply struct {
 	Req  *Request
 }
 
+// {
+// 	On: "orderItem",
+// 	Action: "delete/quantity",
+// 	Data: map[string]interface{}{"itemName":"伊利纯牛奶"},
+// }
+type RequestCommand struct {
+	On     string
+	Action string
+	Data   map[string]interface{}
+}
+
 type Request struct {
 	Ctx         Context
 	Id          string
 	Text        string
 	ApiAiResult apiai.Result
 	Res         Response
+	Command     *RequestCommand
 }
