@@ -21,7 +21,11 @@ CancelInt() Next -> Ctx OrderItemDeleteInt(IntentCheck)
 OrderItemDeleteInt() Out -> Ctx OrderItemDelete(OrderItemDelete)
 OrderItemDelete() Out -> In Reply()
 
-OrderItemDeleteInt() Next -> Ctx OrderDeleteInt(IntentCheck)
+OrderItemDeleteInt() Next -> Ctx OrderGiftDeleteInt(IntentCheck)
+OrderGiftDeleteInt() Out -> Ctx OrderGiftDelete(OrderGiftDelete)
+OrderGiftDelete() Out -> In Reply()
+
+OrderGiftDeleteInt() Next -> Ctx OrderDeleteInt(IntentCheck)
 OrderDeleteInt() Out -> Ctx OrderDelete(OrderDelete)
 OrderDelete() Out -> In Reply()
 
@@ -88,6 +92,11 @@ Voice(Voice) Out -> In Reply()
 
 'deleteOrderItem' -> Command OrderItemDeleteInt()
 'business.order.item.delete' -> Intent OrderItemDeleteInt()
+0.5 -> Score OrderItemDeleteInt()
+
+'deleteOrderGift' -> Command OrderGiftDeleteInt()
+'business.order.gift.delete' -> Intent OrderGiftDeleteInt()
+0.5 -> Score OrderGiftDeleteInt()
 
 'business.order.delete' -> Intent OrderDeleteInt()
 0.7 -> Score OrderDeleteInt()

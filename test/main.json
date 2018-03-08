@@ -42,6 +42,12 @@
     "OrderItemDelete": {
       "component": "OrderItemDelete"
     },
+    "OrderGiftDeleteInt": {
+      "component": "IntentCheck"
+    },
+    "OrderGiftDelete": {
+      "component": "OrderGiftDelete"
+    },
     "OrderDeleteInt": {
       "component": "IntentCheck"
     },
@@ -224,6 +230,36 @@
     {
       "src": {
         "process": "OrderItemDeleteInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderGiftDeleteInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderGiftDeleteInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderGiftDelete",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderGiftDelete",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderGiftDeleteInt",
         "port": "Next"
       },
       "tgt": {
@@ -654,6 +690,34 @@
       "tgt": {
         "process": "OrderItemDeleteInt",
         "port": "Intent"
+      }
+    },
+    {
+      "data": 0.5,
+      "tgt": {
+        "process": "OrderItemDeleteInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "deleteOrderGift",
+      "tgt": {
+        "process": "OrderGiftDeleteInt",
+        "port": "Command"
+      }
+    },
+    {
+      "data": "business.order.gift.delete",
+      "tgt": {
+        "process": "OrderGiftDeleteInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.5,
+      "tgt": {
+        "process": "OrderGiftDeleteInt",
+        "port": "Score"
       }
     },
     {
