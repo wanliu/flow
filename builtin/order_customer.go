@@ -35,7 +35,7 @@ func (c *OrderCustomer) OnCtx(req context.Request) {
 		params := ai.ApiAiOrder{AiResult: aiResult}
 		customer := params.Customer()
 
-		cOrder := currentOrder.(OrderResolve)
+		cOrder := currentOrder.(*OrderResolve)
 		cOrder.ExtractedCustomer = customer
 		cOrder.CheckExtractedCustomer()
 

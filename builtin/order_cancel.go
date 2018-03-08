@@ -37,7 +37,7 @@ func (c *OrderCancel) OnCtx(req context.Request) {
 		preOrderInt := ctx.CtxValue(config.CtxKeyLastOrder)
 
 		if preOrderInt != nil {
-			preOrder := preOrderInt.(resolves.OrderResolve)
+			preOrder := preOrderInt.(*resolves.OrderResolve)
 
 			eTime := time.Now().Add(-config.PreModifSecs * time.Second)
 			if preOrder.UpdatedAt.After(eTime) || preOrder.UpdatedAt.Equal(eTime) {
@@ -73,7 +73,7 @@ func (c *OrderCancel) OnCtx(req context.Request) {
 		req.Res = context.Response{deleteResolve.Hint(), ctx, nil}
 		c.Out <- req
 	} else {
-		curOrder := currentOrder.(resolves.OrderResolve)
+		curOrder := currentOrder.(*resolves.OrderResolve)
 
 		if curOrder.Cancelable() {
 			if curOrder.Cancel() {

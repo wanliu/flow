@@ -33,7 +33,7 @@ func (s OperationNotice) OnCtx(req context.Request) {
 	currentOrder := ctx.CtxValue(CtxKeyOrder)
 
 	if nil != currentOrder {
-		cOrder := currentOrder.(OrderResolve)
+		cOrder := currentOrder.(*OrderResolve)
 
 		if !cOrder.Fulfiled() {
 			expMins := SesssionExpiredMinutes

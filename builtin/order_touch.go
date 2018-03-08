@@ -28,10 +28,10 @@ func (c *OrderTouch) OnCtx(req context.Request) {
 	order := ctx.CtxValue(config.CtxKeyOrder)
 
 	if order != nil {
-		cOrder := order.(resolves.OrderResolve)
+		cOrder := order.(*resolves.OrderResolve)
 		log.Printf("[Update] Current order touched.")
 		cOrder.Touch()
-		ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
+		// ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
 
 		c.Timeout <- req
 	}

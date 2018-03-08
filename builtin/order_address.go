@@ -43,7 +43,7 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 	if nil != currentOrder {
 		aiResult := req.ApiAiResult
 
-		cOrder := currentOrder.(resolves.OrderResolve)
+		cOrder := currentOrder.(*resolves.OrderResolve)
 
 		if cOrder.Expired(config.SesssionExpiredMinutes) {
 			req.Res = context.Response{"会话已经过时，当前没有正在进行中的订单", ctx, nil}

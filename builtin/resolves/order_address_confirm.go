@@ -25,7 +25,7 @@ func (ac AddressConfirm) Notice(ctx context.Context) string {
 	// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
 	if oIn != nil {
-		order := oIn.(OrderResolve)
+		order := oIn.(*OrderResolve)
 
 		if order.Expired(config.SesssionExpiredMinutes) {
 			return "当前没有正在进行中的订单"
@@ -53,7 +53,7 @@ func (ac AddressConfirm) Cancel(ctx context.Context) string {
 	// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
 	if oIn != nil {
-		order := oIn.(OrderResolve)
+		order := oIn.(*OrderResolve)
 
 		if order.Expired(config.SesssionExpiredMinutes) {
 			return "当前没有正在进行中的订单"
@@ -86,7 +86,7 @@ func (ac AddressConfirm) Confirm(ctx context.Context) (string, interface{}) {
 	// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
 	if oIn != nil {
-		order := oIn.(OrderResolve)
+		order := oIn.(*OrderResolve)
 
 		if order.Expired(config.SesssionExpiredMinutes) {
 			return "当前没有正在进行中的订单", nil
@@ -107,8 +107,6 @@ func (ac AddressConfirm) Confirm(ctx context.Context) (string, interface{}) {
 					ctx.SetCtxValue(config.CtxKeyLastOrder, order)
 				} else if order.Failed() {
 					ctx.SetCtxValue(config.CtxKeyOrder, nil)
-				} else {
-					ctx.SetCtxValue(config.CtxKeyOrder, order)
 				}
 
 				return reply, data

@@ -27,8 +27,8 @@ func (order *PatchOrder) OnCtx(req context.Request) {
 	if patchResolve.EmptyProducts() && patchResolve.EmptyGifts() {
 		output = "没有相关的产品"
 	} else {
-		curResolve := ctx.CtxValue(config.CtxKeyOrder).(resolves.OrderResolve)
-		patchResolve.Patch(&curResolve)
+		curResolve := ctx.CtxValue(config.CtxKeyOrder).(*resolves.OrderResolve)
+		patchResolve.Patch(curResolve)
 
 		var d interface{}
 
@@ -45,8 +45,6 @@ func (order *PatchOrder) OnCtx(req context.Request) {
 			ctx.SetCtxValue(config.CtxKeyLastOrder, curResolve)
 		} else if curResolve.Failed() {
 			ctx.SetCtxValue(config.CtxKeyOrder, nil)
-		} else {
-			ctx.SetCtxValue(config.CtxKeyOrder, curResolve)
 		}
 
 	}

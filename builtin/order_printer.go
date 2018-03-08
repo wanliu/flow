@@ -35,7 +35,7 @@ func (s *OrderPrinter) OnCtx(req context.Request) {
 		req.Res = context.Response{"当前没有正在进行中的订单", ctx, nil}
 		s.Out <- req
 	} else {
-		curOrder := currentOrder.(OrderResolve)
+		curOrder := currentOrder.(*OrderResolve)
 
 		if curOrder.Expired(config.SesssionExpiredMinutes) {
 			req.Res = context.Response{"当前没有正在进行中的订单", ctx, nil}

@@ -29,7 +29,7 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 
 	if nil != currentOrder {
 
-		cOrder := currentOrder.(resolves.OrderResolve)
+		cOrder := currentOrder.(*resolves.OrderResolve)
 
 		if cOrder.Expired(config.SesssionExpiredMinutes) {
 			req.Res = context.Response{"会话已经过时，当前没有正在进行中的订单", ctx, nil}
@@ -47,7 +47,7 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 				removed := itemsResolve.Remove(itemName)
 				if removed {
 					cOrder.Products = itemsResolve
-					ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
+					// ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
 
 					answer, d := cOrder.Answer(ctx)
 
@@ -99,7 +99,7 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 					"action": "update",
 					"data":   d,
 				}
-				ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
+				// ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
 
 				reply := fmt.Sprintf("已经删除%v, %v", strings.Join(deletedItems, ","), answer)
 				req.Res = context.Response{reply, ctx, data}

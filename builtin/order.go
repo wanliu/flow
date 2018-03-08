@@ -50,7 +50,7 @@ func (c *Order) OnCtx(req context.Request) {
 	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 
 	if nil != currentOrder {
-		cOrder := currentOrder.(resolves.OrderResolve)
+		cOrder := currentOrder.(*resolves.OrderResolve)
 
 		exMin := config.SesssionExpiredMinutes
 

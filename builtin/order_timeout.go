@@ -43,7 +43,7 @@ func (c *OrderTimeout) OnCtx(req context.Request) {
 		order := ctx.CtxValue(config.CtxKeyOrder)
 
 		if order != nil {
-			cOrder := order.(resolves.OrderResolve)
+			cOrder := order.(*resolves.OrderResolve)
 			if cOrder.Expired(expiredMins) {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
 

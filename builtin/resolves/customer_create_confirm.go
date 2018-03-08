@@ -34,14 +34,14 @@ func (cc CustomerCreation) Cancel(ctx context.Context) string {
 	// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
 	if oInt != nil {
-		order := oInt.(OrderResolve)
+		order := oInt.(*OrderResolve)
 		order.ExtractedCustomer = ""
 
 		if order.Expired(config.SesssionExpiredMinutes) {
 			return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作", cc.Customer)
 		}
 
-		ctx.SetCtxValue(config.CtxKeyOrder, order)
+		// ctx.SetCtxValue(config.CtxKeyOrder, order)
 		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作, 还缺少客户信息", cc.Customer)
 	} else {
 		return fmt.Sprintf("已经取消添加\"%v\"为新客户的操作, 当前没有正在进行中的订单", cc.Customer)
@@ -62,7 +62,7 @@ func (cc CustomerCreation) Confirm(ctx context.Context) (string, interface{}) {
 		// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
 		if oInt != nil {
-			order := oInt.(OrderResolve)
+			order := oInt.(*OrderResolve)
 
 			order.Customer = person.Name
 
@@ -85,8 +85,6 @@ func (cc CustomerCreation) Confirm(ctx context.Context) (string, interface{}) {
 				ctx.SetCtxValue(config.CtxKeyLastOrder, order)
 			} else if order.Failed() {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
-			} else {
-				ctx.SetCtxValue(config.CtxKeyOrder, order)
 			}
 
 			return reply, data
