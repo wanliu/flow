@@ -47,18 +47,17 @@ func (c *Order) OnCtx(req context.Request) {
 		return
 	}
 
-	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
+	// currentOrder := ctx.CtxValue(config.CtxKeyOrder)
+	orderRsv := resolves.GetCtxOrder(ctx)
 
-	if nil != currentOrder {
-		cOrder := currentOrder.(*resolves.OrderResolve)
-
+	if nil != orderRsv {
 		exMin := config.SesssionExpiredMinutes
 
 		if c.expMins != 0 {
 			exMin = int(c.expMins)
 		}
 
-		if cOrder.Modifable(exMin) {
+		if orderRsv.Modifable(exMin) {
 			c.Patch <- req
 		} else {
 			c.New <- req

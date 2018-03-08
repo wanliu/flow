@@ -3,7 +3,7 @@ package builtin
 import (
 	"log"
 
-	"github.com/wanliu/flow/builtin/config"
+	// "github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
 )
@@ -25,13 +25,13 @@ func NewOrderTouch() interface{} {
 func (c *OrderTouch) OnCtx(req context.Request) {
 	ctx := req.Ctx
 
-	order := ctx.CtxValue(config.CtxKeyOrder)
+	// order := ctx.CtxValue(config.CtxKeyOrder)
+	orderRsv := resolves.GetCtxOrder(ctx)
 
-	if order != nil {
-		cOrder := order.(*resolves.OrderResolve)
+	if orderRsv != nil {
 		log.Printf("[Update] Current order touched.")
-		cOrder.Touch()
-		// ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
+		orderRsv.Touch()
+		// ctx.SetCtxValue(config.CtxKeyOrder, orderRsv)
 
 		c.Timeout <- req
 	}

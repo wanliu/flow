@@ -31,19 +31,17 @@ func (c *OrderCancel) OnCtx(req context.Request) {
 	// }
 
 	ctx := req.Ctx
-	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
+	orderRsv := resolves.GetCtxOrder(ctx)
 
-	if nil == currentOrder {
-		preOrderInt := ctx.CtxValue(config.CtxKeyLastOrder)
+	if nil == orderRsv {
+		lastOrderRsv := resolves.GetCtxLastOrder(ctx)
 
-		if preOrderInt != nil {
-			preOrder := preOrderInt.(*resolves.OrderResolve)
-
+		if lastOrderRsv != nil {
 			eTime := time.Now().Add(-config.PreModifSecs * time.Second)
-			if preOrder.UpdatedAt.After(eTime) || preOrder.UpdatedAt.Equal(eTime) {
+			if lastOrderRsv.UpdatedAt.After(eTime) || lastOrderRsv.UpdatedAt.Equal(eTime) {
 
-				if preOrder.Id != 0 {
-					order, err := database.GetOrder(preOrder.Id)
+				if lastOrderRsv.Id != 0 {
+					order, err := database.GetOrder(lastOrderRsv.Id)
 					if err == nil {
 						orderNo := order.No
 						deleteComfirm := resolves.OrderDeleteConfirm{OrderNo: orderNo}
@@ -72,11 +70,9 @@ func (c *OrderCancel) OnCtx(req context.Request) {
 
 		req.Res = context.Response{deleteResolve.Hint(), ctx, nil}
 		c.Out <- req
-	} else {
-		curOrder := currentOrder.(*resolves.OrderResolve)
-
-		if curOrder.Cancelable() {
-			if curOrder.Cancel() {
+	} else if nil != orderRsv {
+		if orderRsv.Cancelable() {
+			if orderRsv.Cancel() {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
 				req.Res = context.Response{"当前订单取消成功", ctx, nil}
 				c.Out <- req

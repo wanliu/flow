@@ -40,11 +40,11 @@ func (c *OrderTimeout) OnCtx(req context.Request) {
 
 		time.Sleep(time.Duration(expiredMins) * time.Minute)
 
-		order := ctx.CtxValue(config.CtxKeyOrder)
+		// order := ctx.CtxValue(config.CtxKeyOrder)
+		orderRsv := resolves.GetCtxOrder(ctx)
 
-		if order != nil {
-			cOrder := order.(*resolves.OrderResolve)
-			if cOrder.Expired(expiredMins) {
+		if orderRsv != nil {
+			if orderRsv.Expired(expiredMins) {
 				ctx.SetCtxValue(config.CtxKeyOrder, nil)
 
 				// 订单延迟为自发消息，没有原始request对象

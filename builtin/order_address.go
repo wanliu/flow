@@ -38,14 +38,13 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 	// }
 
 	ctx := req.Ctx
-	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
+	// currentOrder := ctx.CtxValue(config.CtxKeyOrder)
+	orderRsv := resolves.GetCtxOrder(ctx)
 
-	if nil != currentOrder {
+	if nil != orderRsv {
 		aiResult := req.ApiAiResult
 
-		cOrder := currentOrder.(*resolves.OrderResolve)
-
-		if cOrder.Expired(config.SesssionExpiredMinutes) {
+		if orderRsv.Expired(config.SesssionExpiredMinutes) {
 			req.Res = context.Response{"会话已经过时，当前没有正在进行中的订单", ctx, nil}
 			c.Out <- req
 			return
@@ -58,15 +57,15 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 			customer := params.Customer()
 
 			if address != "" {
-				cOrder.Address = address
+				orderRsv.Address = address
 			}
 
 			if customer != "" {
-				cOrder.ExtractedCustomer = customer
-				cOrder.CheckExtractedCustomer()
+				orderRsv.ExtractedCustomer = customer
+				orderRsv.CheckExtractedCustomer()
 			}
 
-			reply, d := cOrder.Answer(ctx)
+			reply, d := orderRsv.Answer(ctx)
 			reply = fmt.Sprintf("收到客户/地址信息：%v%v\n%v", address, customer, reply)
 			data := map[string]interface{}{
 				"type":   "info",
@@ -77,11 +76,16 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 			req.Res = context.Response{reply, ctx, data}
 			c.Out <- req
 
-			if cOrder.Resolved() {
-				ctx.SetCtxValue(config.CtxKeyOrder, nil)
-				ctx.SetCtxValue(config.CtxKeyLastOrder, cOrder)
-			} else if cOrder.Failed() {
-				ctx.SetCtxValue(config.CtxKeyOrder, nil)
+			if orderRsv.Resolved() {
+				// ctx.SetCtxValue(config.CtxKeyOrder, nil)
+				// ctx.SetCtxValue(config.CtxKeyLastOrder, orderRsv)
+
+				resolves.ClearCtxOrder(ctx)
+				resolves.SetCtxLastOrder(ctx, orderRsv)
+			} else if orderRsv.Failed() {
+				// ctx.SetCtxValue(config.CtxKeyOrder, nil)
+
+				resolves.ClearCtxOrder(ctx)
 			}
 		} else {
 			var values []string

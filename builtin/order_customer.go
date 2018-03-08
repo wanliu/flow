@@ -8,7 +8,7 @@ import (
 	"github.com/wanliu/flow/context"
 
 	"github.com/wanliu/flow/builtin/config"
-	. "github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/builtin/resolves"
 )
 
 type OrderCustomer struct {
@@ -26,20 +26,18 @@ func NewOrderCustomer() interface{} {
 
 func (c *OrderCustomer) OnCtx(req context.Request) {
 	ctx := req.Ctx
+	orderRsv := resolves.GetCtxOrder(ctx)
 
-	currentOrder := ctx.Value(config.CtxKeyOrder)
-
-	if nil != currentOrder {
+	if nil != orderRsv {
 		aiResult := ctx.Value("Result").(apiai.Result)
 
 		params := ai.ApiAiOrder{AiResult: aiResult}
 		customer := params.Customer()
 
-		cOrder := currentOrder.(*OrderResolve)
-		cOrder.ExtractedCustomer = customer
-		cOrder.CheckExtractedCustomer()
+		orderRsv.ExtractedCustomer = customer
+		orderRsv.CheckExtractedCustomer()
 
-		reply, d := cOrder.Answer(ctx)
+		reply, d := orderRsv.Answer(ctx)
 		reply = "收到客户信息：" + customer + "\n" + reply
 		data := map[string]interface{}{
 			"type":   "info",
@@ -51,10 +49,10 @@ func (c *OrderCustomer) OnCtx(req context.Request) {
 		req.Res = context.Response{reply, ctx, data}
 		c.Out <- req
 
-		if cOrder.Resolved() {
+		if orderRsv.Resolved() {
 			ctx.SetCtxValue(config.CtxKeyOrder, nil)
-			ctx.SetCtxValue(config.CtxKeyLastOrder, cOrder)
-		} else if cOrder.Failed() {
+			ctx.SetCtxValue(config.CtxKeyLastOrder, orderRsv)
+		} else if orderRsv.Failed() {
 			ctx.SetCtxValue(config.CtxKeyOrder, nil)
 		}
 	} else {

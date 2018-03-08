@@ -4,8 +4,8 @@ import (
 	"log"
 	"strconv"
 
-	. "github.com/wanliu/flow/builtin/config"
-	. "github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/builtin/config"
+	"github.com/wanliu/flow/builtin/resolves"
 
 	"github.com/wanliu/flow/context"
 
@@ -30,16 +30,15 @@ func (s OperationNotice) OnCtx(req context.Request) {
 		return
 	}
 
-	currentOrder := ctx.CtxValue(CtxKeyOrder)
+	// currentOrder := ctx.CtxValue(CtxKeyOrder)
+	orderRsv := resolves.GetCtxOrder(ctx)
 
-	if nil != currentOrder {
-		cOrder := currentOrder.(*OrderResolve)
+	if nil != orderRsv {
+		if !orderRsv.Fulfiled() {
+			expMins := config.SesssionExpiredMinutes
 
-		if !cOrder.Fulfiled() {
-			expMins := SesssionExpiredMinutes
-
-			if nil != ctx.CtxValue(CtxKeyExpiredMinutes) {
-				expMins = ctx.CtxValue(CtxKeyExpiredMinutes).(int)
+			if nil != ctx.CtxValue(config.CtxKeyExpiredMinutes) {
+				expMins = ctx.CtxValue(config.CtxKeyExpiredMinutes).(int)
 			}
 
 			req.Res = context.Response{"你可以继续提交产品到订单，也可以立刻取消当前任务（" + strconv.Itoa(expMins) + "分钟以内）", ctx, nil}

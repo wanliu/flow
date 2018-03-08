@@ -3,7 +3,7 @@ package builtin
 import (
 	"log"
 
-	. "github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/builtin/resolves"
 	"github.com/wanliu/flow/context"
 
 	config "github.com/wanliu/flow/builtin/config"
@@ -29,21 +29,20 @@ func (s *OrderPrinter) OnCtx(req context.Request) {
 		return
 	}
 
-	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
+	// currentOrder := ctx.CtxValue(config.CtxKeyOrder)
+	orderRsv := resolves.GetCtxOrder(ctx)
 
-	if nil == currentOrder {
+	if nil == orderRsv {
 		req.Res = context.Response{"当前没有正在进行中的订单", ctx, nil}
 		s.Out <- req
 	} else {
-		curOrder := currentOrder.(*OrderResolve)
-
-		if curOrder.Expired(config.SesssionExpiredMinutes) {
+		if orderRsv.Expired(config.SesssionExpiredMinutes) {
 			req.Res = context.Response{"当前没有正在进行中的订单", ctx, nil}
 			s.Out <- req
 		} else {
 			// orderDetail := "-----------订单详情-------------\n"
-			// orderDetail = orderDetail + curOrder.AnswerBody()
-			req.Res = context.Response{"订单详情", ctx, curOrder.ToDescStruct()}
+			// orderDetail = orderDetail + orderRsv.AnswerBody()
+			req.Res = context.Response{"订单详情", ctx, orderRsv.ToDescStruct()}
 			s.Out <- req
 		}
 	}

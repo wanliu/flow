@@ -41,21 +41,21 @@ func (c *NewOrder) OnRetryCount(count float64) {
 
 func (c *NewOrder) OnCtx(req context.Request) {
 	ctx := req.Ctx
-	orderResolve := resolves.NewOrderResolve(req)
+	orderRsv := resolves.NewOrderResolve(req)
 
 	if c.DefTime != "" {
-		orderResolve.SetDefTime(c.DefTime)
+		orderRsv.SetDefTime(c.DefTime)
 	}
 
 	output := ""
 
-	if orderResolve.EmptyProducts() {
+	if orderRsv.EmptyProducts() {
 		if c.retryCount > 0 {
 			log.Printf("重新获取开单产品，第1次，共%v次", c.retryCount)
 			c.RetryOut <- req
 		} else {
 			if context.GroupChat(ctx) {
-				c.GroupAnswer(req, orderResolve)
+				c.GroupAnswer(req, orderRsv)
 				return
 			}
 
@@ -67,17 +67,25 @@ func (c *NewOrder) OnCtx(req context.Request) {
 			c.Out <- req
 		}
 	} else {
-		reply, d := orderResolve.Answer(ctx)
+		reply, d := orderRsv.Answer(ctx)
 
-		if orderResolve.Resolved() {
-			ctx.SetCtxValue(config.CtxKeyLastOrder, &orderResolve)
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
-		} else if orderResolve.Failed() {
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
-		} else if orderResolve.MismatchQuantity() {
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+		if orderRsv.Resolved() {
+			// ctx.SetCtxValue(config.CtxKeyLastOrder, &orderRsv)
+			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
+
+			resolves.SetCtxLastOrder(ctx, orderRsv)
+		} else if orderRsv.Failed() {
+			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
+
+			resolves.ClearCtxOrder(ctx)
+		} else if orderRsv.MismatchQuantity() {
+			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
+
+			resolves.ClearCtxOrder(ctx)
 		} else {
-			ctx.SetCtxValue(config.CtxKeyOrder, &orderResolve)
+			// ctx.SetCtxValue(config.CtxKeyOrder, orderRsv)
+
+			resolves.SetCtxOrder(ctx, orderRsv)
 		}
 
 		c.Timeout <- req
@@ -100,13 +108,13 @@ func (c *NewOrder) OnCtx(req context.Request) {
 
 func (c *NewOrder) OnRetryIn(req context.Request) {
 	ctx := req.Ctx
-	orderResolve := resolves.NewOrderResolve(req)
+	orderRsv := resolves.NewOrderResolve(req)
 
 	if c.DefTime != "" {
-		orderResolve.SetDefTime(c.DefTime)
+		orderRsv.SetDefTime(c.DefTime)
 	}
 
-	if orderResolve.EmptyProducts() {
+	if orderRsv.EmptyProducts() {
 		retriedCount := 1
 		retriedCountInt := ctx.Value(config.CtxKeyRetriedCount)
 
@@ -116,7 +124,7 @@ func (c *NewOrder) OnRetryIn(req context.Request) {
 
 		if retriedCount >= c.retryCount {
 			if context.GroupChat(ctx) {
-				c.GroupAnswer(req, orderResolve)
+				c.GroupAnswer(req, orderRsv)
 				return
 			}
 
@@ -135,17 +143,26 @@ func (c *NewOrder) OnRetryIn(req context.Request) {
 			c.RetryOut <- req
 		}
 	} else {
-		reply, d := orderResolve.Answer(ctx)
+		reply, d := orderRsv.Answer(ctx)
 
-		if orderResolve.Resolved() {
-			ctx.SetCtxValue(config.CtxKeyLastOrder, &orderResolve)
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
-		} else if orderResolve.Failed() {
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
-		} else if orderResolve.MismatchQuantity() {
-			ctx.SetCtxValue(config.CtxKeyOrder, nil)
+		if orderRsv.Resolved() {
+			// ctx.SetCtxValue(config.CtxKeyLastOrder, &orderRsv)
+			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
+
+			resolves.SetCtxLastOrder(ctx, orderRsv)
+			resolves.ClearCtxOrder(ctx)
+		} else if orderRsv.Failed() {
+			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
+
+			resolves.ClearCtxOrder(ctx)
+		} else if orderRsv.MismatchQuantity() {
+			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
+
+			resolves.ClearCtxOrder(ctx)
 		} else {
-			ctx.SetCtxValue(config.CtxKeyOrder, &orderResolve)
+			// ctx.SetCtxValue(config.CtxKeyOrder, &orderRsv)
+
+			resolves.SetCtxOrder(ctx, orderRsv)
 		}
 
 		// c.Notice <- ctx
@@ -168,9 +185,9 @@ func (c *NewOrder) OnRetryIn(req context.Request) {
 
 }
 
-func (c *NewOrder) GroupAnswer(req context.Request, orderResolve *resolves.OrderResolve) {
+func (c *NewOrder) GroupAnswer(req context.Request, orderRsv *resolves.OrderResolve) {
 	ctx := req.Ctx
-	reply, d := orderResolve.Answer(ctx)
+	reply, d := orderRsv.Answer(ctx)
 
 	data := map[string]interface{}{
 		"type":   "info",
@@ -179,7 +196,7 @@ func (c *NewOrder) GroupAnswer(req context.Request, orderResolve *resolves.Order
 		"data":   d,
 	}
 
-	if orderResolve.Fulfiled() {
+	if orderRsv.Fulfiled() {
 		req.Res = context.Response{
 			Reply: reply,
 			Ctx:   ctx,

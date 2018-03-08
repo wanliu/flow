@@ -25,13 +25,10 @@ func NewOrderItemDelete() interface{} {
 
 func (c *OrderItemDelete) OnCtx(req context.Request) {
 	ctx := req.Ctx
-	currentOrder := ctx.CtxValue(config.CtxKeyOrder)
+	orderRsv := resolves.GetCtxOrder(ctx)
 
-	if nil != currentOrder {
-
-		cOrder := currentOrder.(*resolves.OrderResolve)
-
-		if cOrder.Expired(config.SesssionExpiredMinutes) {
+	if nil != orderRsv {
+		if orderRsv.Expired(config.SesssionExpiredMinutes) {
 			req.Res = context.Response{"会话已经过时，当前没有正在进行中的订单", ctx, nil}
 			c.Out <- req
 			return
@@ -42,14 +39,14 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 			// delete by command
 			data := cmd.Data
 			if itemName, ok := data["itemName"].(string); ok {
-				itemsResolve := cOrder.Products
+				itemsResolve := orderRsv.Products
 
 				removed := itemsResolve.Remove(itemName)
 				if removed {
-					cOrder.Products = itemsResolve
-					// ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
+					orderRsv.Products = itemsResolve
+					// ctx.SetCtxValue(config.CtxKeyOrder, orderRsv)
 
-					answer, d := cOrder.Answer(ctx)
+					answer, d := orderRsv.Answer(ctx)
 
 					data := map[string]interface{}{
 						"type":   "info",
@@ -77,7 +74,7 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 			aiExtract := ai.ApiAiOrder{AiResult: aiResult}
 			deletedItems := []string{}
 			products := []string{}
-			itemsResolve := cOrder.Products
+			itemsResolve := orderRsv.Products
 
 			for _, product := range aiExtract.Products() {
 				name := product.Product
@@ -90,8 +87,8 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 			}
 
 			if len(deletedItems) > 0 {
-				cOrder.Products = itemsResolve
-				answer, d := cOrder.Answer(ctx)
+				orderRsv.Products = itemsResolve
+				answer, d := orderRsv.Answer(ctx)
 
 				data := map[string]interface{}{
 					"type":   "info",
@@ -99,13 +96,13 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 					"action": "update",
 					"data":   d,
 				}
-				// ctx.SetCtxValue(config.CtxKeyOrder, cOrder)
+				// ctx.SetCtxValue(config.CtxKeyOrder, orderRsv)
 
 				reply := fmt.Sprintf("已经删除%v, %v", strings.Join(deletedItems, ","), answer)
 				req.Res = context.Response{reply, ctx, data}
 				c.Out <- req
 			} else {
-				_, d := cOrder.Answer(ctx)
+				_, d := orderRsv.Answer(ctx)
 
 				data := map[string]interface{}{
 					"type":   "info",
