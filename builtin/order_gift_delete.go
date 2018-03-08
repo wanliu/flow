@@ -75,7 +75,7 @@ func (c *OrderGiftDelete) OnCtx(req context.Request) {
 			products := []string{}
 			giftsResolve := orderRsv.Gifts
 
-			for _, product := range aiExtract.Products() {
+			for _, product := range aiExtract.GiftProducts() {
 				name := product.Product
 				products = append(products, name)
 
