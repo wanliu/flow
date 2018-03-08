@@ -44,7 +44,6 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 				removed := itemsResolve.Remove(itemName)
 				if removed {
 					orderRsv.Products = itemsResolve
-					// ctx.SetCtxValue(config.CtxKeyOrder, orderRsv)
 
 					answer, d := orderRsv.Answer(ctx)
 
@@ -96,7 +95,6 @@ func (c *OrderItemDelete) OnCtx(req context.Request) {
 					"action": "update",
 					"data":   d,
 				}
-				// ctx.SetCtxValue(config.CtxKeyOrder, orderRsv)
 
 				reply := fmt.Sprintf("已经删除%v, %v", strings.Join(deletedItems, ","), answer)
 				req.Res = context.Response{reply, ctx, data}

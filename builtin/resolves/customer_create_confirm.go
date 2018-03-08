@@ -75,14 +75,9 @@ func (cc CustomerCreation) Confirm(ctx context.Context) (string, interface{}) {
 			reply = fmt.Sprintf("添加了新的客户\"%v\"\n%v", cc.Customer, reply)
 
 			if orderRsv.Resolved() {
-				// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-				// ctx.SetCtxValue(config.CtxKeyLastOrder, orderRsv)
-
 				ClearCtxOrder(ctx)
 				SetCtxLastOrder(ctx, orderRsv)
 			} else if orderRsv.Failed() {
-				// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 				ClearCtxOrder(ctx)
 			}
 

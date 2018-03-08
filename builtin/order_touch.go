@@ -24,15 +24,11 @@ func NewOrderTouch() interface{} {
 
 func (c *OrderTouch) OnCtx(req context.Request) {
 	ctx := req.Ctx
-
-	// order := ctx.CtxValue(config.CtxKeyOrder)
 	orderRsv := resolves.GetCtxOrder(ctx)
 
 	if orderRsv != nil {
 		log.Printf("[Update] Current order touched.")
 		orderRsv.Touch()
-		// ctx.SetCtxValue(config.CtxKeyOrder, orderRsv)
-
 		c.Timeout <- req
 	}
 

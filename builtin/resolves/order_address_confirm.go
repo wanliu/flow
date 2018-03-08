@@ -21,7 +21,6 @@ func (ac AddressConfirm) ClearUp(ctx context.Context) {
 }
 
 func (ac AddressConfirm) Notice(ctx context.Context) string {
-	// oIn := ctx.CtxValue(config.CtxKeyOrder)
 	// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
 	orderRsv := GetCtxOrder(ctx)
@@ -49,7 +48,6 @@ func (ac AddressConfirm) Notice(ctx context.Context) string {
 }
 
 func (ac AddressConfirm) Cancel(ctx context.Context) string {
-	// oIn := ctx.CtxValue(config.CtxKeyOrder)
 	// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 	orderRsv := GetCtxOrder(ctx)
 
@@ -81,7 +79,6 @@ func (ac AddressConfirm) Cancel(ctx context.Context) string {
 }
 
 func (ac AddressConfirm) Confirm(ctx context.Context) (string, interface{}) {
-	// oIn := ctx.CtxValue(config.CtxKeyOrder)
 	// confirm := ctx.CtxValue(config.CtxKeyConfirm)
 
 	orderRsv := GetCtxOrder(ctx)
@@ -103,14 +100,9 @@ func (ac AddressConfirm) Confirm(ctx context.Context) (string, interface{}) {
 				reply = fmt.Sprintf("已经确认\"%v\"为收货客户\n%v", ac.Values[0], reply)
 
 				if orderRsv.Resolved() {
-					// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-					// ctx.SetCtxValue(config.CtxKeyLastOrder, orderRsv)
-
 					ClearCtxOrder(ctx)
 					SetCtxLastOrder(ctx, orderRsv)
 				} else if orderRsv.Failed() {
-					// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 					ClearCtxOrder(ctx)
 				}
 

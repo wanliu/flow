@@ -70,21 +70,13 @@ func (c *NewOrder) OnCtx(req context.Request) {
 		reply, d := orderRsv.Answer(ctx)
 
 		if orderRsv.Resolved() {
-			// ctx.SetCtxValue(config.CtxKeyLastOrder, &orderRsv)
-			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 			resolves.SetCtxLastOrder(ctx, orderRsv)
+			resolves.ClearCtxOrder(ctx)
 		} else if orderRsv.Failed() {
-			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 			resolves.ClearCtxOrder(ctx)
 		} else if orderRsv.MismatchQuantity() {
-			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 			resolves.ClearCtxOrder(ctx)
 		} else {
-			// ctx.SetCtxValue(config.CtxKeyOrder, orderRsv)
-
 			resolves.SetCtxOrder(ctx, orderRsv)
 		}
 
@@ -146,22 +138,13 @@ func (c *NewOrder) OnRetryIn(req context.Request) {
 		reply, d := orderRsv.Answer(ctx)
 
 		if orderRsv.Resolved() {
-			// ctx.SetCtxValue(config.CtxKeyLastOrder, &orderRsv)
-			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 			resolves.SetCtxLastOrder(ctx, orderRsv)
 			resolves.ClearCtxOrder(ctx)
 		} else if orderRsv.Failed() {
-			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 			resolves.ClearCtxOrder(ctx)
 		} else if orderRsv.MismatchQuantity() {
-			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 			resolves.ClearCtxOrder(ctx)
 		} else {
-			// ctx.SetCtxValue(config.CtxKeyOrder, &orderRsv)
-
 			resolves.SetCtxOrder(ctx, orderRsv)
 		}
 

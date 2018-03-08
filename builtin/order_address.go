@@ -38,7 +38,6 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 	// }
 
 	ctx := req.Ctx
-	// currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 	orderRsv := resolves.GetCtxOrder(ctx)
 
 	if nil != orderRsv {
@@ -77,14 +76,9 @@ func (c *OrderAddress) OnCtx(req context.Request) {
 			c.Out <- req
 
 			if orderRsv.Resolved() {
-				// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-				// ctx.SetCtxValue(config.CtxKeyLastOrder, orderRsv)
-
 				resolves.ClearCtxOrder(ctx)
 				resolves.SetCtxLastOrder(ctx, orderRsv)
 			} else if orderRsv.Failed() {
-				// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 				resolves.ClearCtxOrder(ctx)
 			}
 		} else {

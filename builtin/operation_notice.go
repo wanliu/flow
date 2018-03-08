@@ -30,7 +30,6 @@ func (s OperationNotice) OnCtx(req context.Request) {
 		return
 	}
 
-	// currentOrder := ctx.CtxValue(CtxKeyOrder)
 	orderRsv := resolves.GetCtxOrder(ctx)
 
 	if nil != orderRsv {

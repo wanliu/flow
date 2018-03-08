@@ -73,7 +73,7 @@ func (c *OrderCancel) OnCtx(req context.Request) {
 	} else if nil != orderRsv {
 		if orderRsv.Cancelable() {
 			if orderRsv.Cancel() {
-				ctx.SetCtxValue(config.CtxKeyOrder, nil)
+				resolves.ClearCtxOrder(ctx)
 				req.Res = context.Response{"当前订单取消成功", ctx, nil}
 				c.Out <- req
 			} else {

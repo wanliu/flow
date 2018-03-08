@@ -27,7 +27,6 @@ func (order *PatchOrder) OnCtx(req context.Request) {
 	if patchResolve.EmptyProducts() && patchResolve.EmptyGifts() {
 		output = "没有相关的产品"
 	} else {
-		// orderRsv := ctx.CtxValue(config.CtxKeyOrder).(*resolves.OrderResolve)
 		orderRsv := resolves.GetCtxOrder(ctx)
 		patchResolve.Patch(orderRsv)
 
@@ -42,14 +41,9 @@ func (order *PatchOrder) OnCtx(req context.Request) {
 		}
 
 		if orderRsv.Resolved() {
-			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-			// ctx.SetCtxValue(config.CtxKeyLastOrder, orderRsv)
-
 			resolves.ClearCtxOrder(ctx)
 			resolves.SetCtxLastOrder(ctx, orderRsv)
 		} else if orderRsv.Failed() {
-			// ctx.SetCtxValue(config.CtxKeyOrder, nil)
-
 			resolves.ClearCtxOrder(ctx)
 		}
 

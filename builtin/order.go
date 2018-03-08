@@ -47,7 +47,6 @@ func (c *Order) OnCtx(req context.Request) {
 		return
 	}
 
-	// currentOrder := ctx.CtxValue(config.CtxKeyOrder)
 	orderRsv := resolves.GetCtxOrder(ctx)
 
 	if nil != orderRsv {
