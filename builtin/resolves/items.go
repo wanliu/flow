@@ -1,6 +1,8 @@
 package resolves
 
-import ()
+import (
+	"fmt"
+)
 
 type ItemsResolve struct {
 	Products []*ItemResolve
@@ -83,4 +85,29 @@ func (r ItemsResolve) Empty() bool {
 	}
 
 	return true
+}
+
+func (r *ItemsResolve) ChangeUint(itemName, unit string) error {
+	var item ItemResolve
+
+	for _, p := range r.Products {
+		if p.Product == itemName {
+			item = p
+			break
+		}
+	}
+
+	newItem := ItemResolve{
+		Product:  item.Product,
+		Quantity: item.Quantity,
+		Unit:     unit,
+	}
+
+	if newItem.ValidUnit() {
+		item.Unit = unit
+		item.CheckUnit()
+		return nil
+	}
+
+	return fmt.Errorf("%v不能以为%v单位出售", itemName, unit)
 }

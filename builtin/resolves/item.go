@@ -26,3 +26,13 @@ func (ir *ItemResolve) CheckUnit() bool {
 
 	return true
 }
+
+func (ir ItemResolve) ValidUnit() bool {
+	item, err := database.NewOrderItem("", ir.Product, uint(ir.Quantity), ir.Unit, ir.Price)
+
+	if err != nil {
+		return false
+	}
+
+	return ir.Unit == item.Unit
+}
