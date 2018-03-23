@@ -97,17 +97,21 @@ func (r *ItemsResolve) ChangeUnit(itemName, unit string) error {
 		}
 	}
 
-	newItem := ItemResolve{
-		Product:  item.Product,
-		Quantity: item.Quantity,
-		Unit:     unit,
+	if item != nil {
+		newItem := ItemResolve{
+			Product:  item.Product,
+			Quantity: item.Quantity,
+			Unit:     unit,
+		}
+
+		if newItem.ValidUnit() {
+			item.Unit = unit
+			item.CheckUnit()
+			return nil
+		} else {
+			return fmt.Errorf("%v不能以为%v单位出售", itemName, unit)
+		}
 	}
 
-	if newItem.ValidUnit() {
-		item.Unit = unit
-		item.CheckUnit()
-		return nil
-	}
-
-	return fmt.Errorf("%v不能以为%v单位出售", itemName, unit)
+	return fmt.Errorf("%v不在当前订单中", itemName)
 }

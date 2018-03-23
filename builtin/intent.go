@@ -68,7 +68,7 @@ func (ic *IntentCheck) OnCtx(req context.Request) {
 
 	res := req.ApiAiResult
 
-	if strings.HasPrefix(res.Metadata.IntentName, ic._intent) && res.Score >= ic._score {
+	if ic._intent != "" && strings.HasPrefix(res.Metadata.IntentName, ic._intent) && res.Score >= ic._score {
 		ic.Out <- req
 	} else {
 		ic.Next <- req
