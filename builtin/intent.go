@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	// "log"
+	"log"
 	"strings"
 
 	// "github.com/hysios/apiai-go"
@@ -53,6 +53,8 @@ func (ic *IntentCheck) OnFlow(flow bool) {
 
 func (ic *IntentCheck) OnCtx(req context.Request) {
 	cmd := req.Command
+
+	log.Printf("Intent on %v : %v", ic._command, ic._intent)
 
 	if cmd != nil {
 		if cmd.Action == ic._command {
