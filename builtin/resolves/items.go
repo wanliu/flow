@@ -87,7 +87,7 @@ func (r ItemsResolve) Empty() bool {
 	return true
 }
 
-func (r *ItemsResolve) ChangeUint(itemName, unit string) error {
+func (r *ItemsResolve) ChangeUnit(itemName, unit string) error {
 	var item *ItemResolve
 
 	for _, p := range r.Products {

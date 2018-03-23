@@ -41,14 +41,14 @@ func (c ChangeItemUnit) OnCtx(req context.Request) {
 			if itemName, ok := data["itemName"].(string); ok {
 				if unit, ok := data["unit"].(string); ok {
 					itemsResolve := orderRsv.Products
-					err := itemsResolve.ChangeUnite(itemName, unit)
+					err := itemsResolve.ChangeUnit(itemName, unit)
 
 					if err != nil {
 						req.Res = context.Response{fmt.Sprintf("无效的操作, %v", err.Error()), ctx, nil}
 						c.Out <- req
 						return
 					} else {
-						answer, d := orderRsv.Answer(ctx)
+						_, d := orderRsv.Answer(ctx)
 
 						data := map[string]interface{}{
 							"type":   "info",
