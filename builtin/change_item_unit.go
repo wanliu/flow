@@ -1,27 +1,25 @@
 package builtin
 
 import (
-	"time"
+	"fmt"
 
-	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
-
 	"github.com/wanliu/flow/context"
-
-	flow "github.com/wanliu/goflow"
 )
 
 type ChangeItemUnit struct {
+	TryGetEntities
+
 	Ctx <-chan context.Request
 	Out chan<- context.Request
 }
 
-func NewOChangeItemUnit() interface{} {
+func NewChangeItemUnit() interface{} {
 	return new(ChangeItemUnit)
 }
 
-func OnCtx(req context.Request) {
+func (c ChangeItemUnit) OnCtx(req context.Request) {
 	ctx := req.Ctx
 	orderRsv := resolves.GetCtxOrder(ctx)
 
