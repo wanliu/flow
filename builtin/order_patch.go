@@ -1,46 +1,58 @@
 package builtin
 
 import (
-	"github.com/wanliu/flow/builtin/config"
-	. "github.com/wanliu/flow/builtin/resolves"
-	. "github.com/wanliu/flow/context"
+	// "github.com/wanliu/flow/builtin/config"
+	"github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/context"
 )
 
 type PatchOrder struct {
 	TryGetEntities
 	DefTime string
-	Ctx     <-chan Context
-	Out     chan<- ReplyData
+	Ctx     <-chan context.Request
+	Out     chan<- context.Request
 }
 
 func NewPatchOrder() interface{} {
 	return new(PatchOrder)
 }
 
-func (order *PatchOrder) OnCtx(ctx Context) {
-	patchResolve := NewPatchOrderResolve(ctx)
+func (order *PatchOrder) OnCtx(req context.Request) {
+	ctx := req.Ctx
+	patchResolve := resolves.NewPatchOrderResolve(req)
 
+	var data interface{}
 	output := ""
 
-	if patchResolve.EmptyProducts() {
+	if patchResolve.EmptyProducts() && patchResolve.EmptyGifts() {
 		output = "没有相关的产品"
 	} else {
-		curResolve := ctx.Value(config.CtxKeyOrder).(OrderResolve)
-		patchResolve.Patch(&curResolve)
+		orderRsv := resolves.GetCtxOrder(ctx)
+		patchResolve.Patch(orderRsv)
 
-		output = curResolve.Answer(ctx)
+		var d interface{}
 
-		if curResolve.Resolved() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
-			ctx.SetValue(config.CtxKeyLastOrder, curResolve)
-		} else if curResolve.Failed() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
-		} else {
-			ctx.SetValue(config.CtxKeyOrder, curResolve)
+		output, d = orderRsv.Answer(ctx)
+		data = map[string]interface{}{
+			"type":   "info",
+			"on":     "order",
+			"action": "update",
+			"data":   d,
+		}
+
+		if orderRsv.Resolved() {
+			resolves.ClearCtxOrder(ctx)
+			resolves.SetCtxLastOrder(ctx, orderRsv)
+		} else if orderRsv.Failed() {
+			resolves.ClearCtxOrder(ctx)
 		}
 
 	}
 
-	replyData := ReplyData{output, ctx}
-	order.Out <- replyData
+	req.Res = context.Response{
+		Reply: output,
+		Ctx:   ctx,
+		Data:  data,
+	}
+	order.Out <- req
 }

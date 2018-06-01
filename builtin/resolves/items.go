@@ -8,7 +8,35 @@ type ItemsResolve struct {
 }
 
 func (r *ItemsResolve) Add(pr ItemResolve) {
-	r.Products = append(r.Products, &pr)
+	if pr.CheckUnit() {
+		for _, p := range r.Products {
+			if pr.Product == p.Product {
+				p.Quantity = p.Quantity + pr.Quantity
+				return
+			}
+		}
+
+		r.Products = append(r.Products, &pr)
+	}
+}
+
+func (r *ItemsResolve) Remove(itemName string) bool {
+	newProducts := []*ItemResolve{}
+	included := false
+
+	for _, item := range r.Products {
+		if item.Product == itemName {
+			included = true
+		} else {
+			newProducts = append(newProducts, item)
+		}
+	}
+
+	if included {
+		r.Products = newProducts
+	}
+
+	return included
 }
 
 func (r *ItemsResolve) Patch(isr ItemsResolve) {

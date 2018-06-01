@@ -19,12 +19,12 @@ func (odr OrderDeleteResolve) Hint() string {
 
 func (odr OrderDeleteResolve) SetUp(ctx context.Context) {
 	// need order number to resolve
-	ctx.SetValue(config.CtxKeyOrderNum, odr)
+	ctx.SetCtxValue(config.CtxKeyOrderNum, odr)
 }
 
 func (odr OrderDeleteResolve) ClearUp(ctx context.Context) {
 	// need order number to resolve, clear mark
-	ctx.SetValue(config.CtxKeyOrderNum, nil)
+	ctx.SetCtxValue(config.CtxKeyOrderNum, nil)
 }
 
 func (odr OrderDeleteResolve) Resolve(orderNo string, ctx context.Context) string {
@@ -38,7 +38,7 @@ func (odr OrderDeleteResolve) Resolve(orderNo string, ctx context.Context) strin
 			odr.ClearUp(ctx)
 			return fmt.Sprintf("%v 号订单删除成功", orderNo)
 		} else {
-			return fmt.Sprintf("%v 号订单删除失败，请访问 http://jiejie.wanliu.biz/orders/%v 进行操作", orderNo, order.GlobelId())
+			return fmt.Sprintf("%v 号订单删除失败，请访问 https://jiejie.io/orders/%v 进行操作", orderNo, order.GlobelId())
 		}
 	}
 

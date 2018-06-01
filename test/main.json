@@ -1,13 +1,22 @@
 {
+  "inports": {
+    "Request": {
+      "process": "TextProc",
+      "port": "In"
+    },
+    "Voice": {
+      "process": "Voice",
+      "port": "In"
+    }
+  },
+  "outports": {},
+  "groups": [],
   "processes": {
     "TextProc": {
       "component": "TextPreprocesor"
     },
     "Ai": {
       "component": "ApiAi"
-    },
-    "CM": {
-      "component": "ContextManager"
     },
     "OrderTouch": {
       "component": "OrderTouch"
@@ -26,6 +35,18 @@
     },
     "CancelInt": {
       "component": "IntentCheck"
+    },
+    "OrderItemDeleteInt": {
+      "component": "IntentCheck"
+    },
+    "OrderItemDelete": {
+      "component": "OrderItemDelete"
+    },
+    "OrderGiftDeleteInt": {
+      "component": "IntentCheck"
+    },
+    "OrderGiftDelete": {
+      "component": "OrderGiftDelete"
     },
     "OrderDeleteInt": {
       "component": "IntentCheck"
@@ -100,16 +121,6 @@
       "src": {
         "process": "Ai",
         "port": "Out"
-      },
-      "tgt": {
-        "process": "CM",
-        "port": "Ctx"
-      }
-    },
-    {
-      "src": {
-        "process": "CM",
-        "port": "Process"
       },
       "tgt": {
         "process": "OrderTouch",
@@ -189,6 +200,66 @@
     {
       "src": {
         "process": "CancelInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderItemDeleteInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderItemDeleteInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderItemDelete",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderItemDelete",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderItemDeleteInt",
+        "port": "Next"
+      },
+      "tgt": {
+        "process": "OrderGiftDeleteInt",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderGiftDeleteInt",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "OrderGiftDelete",
+        "port": "Ctx"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderGiftDelete",
+        "port": "Out"
+      },
+      "tgt": {
+        "process": "Reply",
+        "port": "In"
+      }
+    },
+    {
+      "src": {
+        "process": "OrderGiftDeleteInt",
         "port": "Next"
       },
       "tgt": {
@@ -478,16 +549,6 @@
     },
     {
       "src": {
-        "process": "OrderTimeout",
-        "port": "Out"
-      },
-      "tgt": {
-        "process": "Reply",
-        "port": "In"
-      }
-    },
-    {
-      "src": {
         "process": "PatchOrder",
         "port": "Out"
       },
@@ -548,7 +609,7 @@
       }
     },
     {
-      "data": "9e48732878a34e7d960cb4a29ac0f72a",
+      "data": "a0af4ac753c94dff983523714468d4e8",
       "tgt": {
         "process": "Ai",
         "port": "Token"
@@ -611,19 +672,51 @@
       }
     },
     {
-      "src": {
-        "process": "true",
-        "port": "OUT"
-      },
+      "data": 0.5,
       "tgt": {
         "process": "CancelInt",
-        "port": "Flow"
+        "port": "Score"
+      }
+    },
+    {
+      "data": "deleteOrderItem",
+      "tgt": {
+        "process": "OrderItemDeleteInt",
+        "port": "Command"
+      }
+    },
+    {
+      "data": "business.order.item.delete",
+      "tgt": {
+        "process": "OrderItemDeleteInt",
+        "port": "Intent"
       }
     },
     {
       "data": 0.5,
       "tgt": {
-        "process": "CancelInt",
+        "process": "OrderItemDeleteInt",
+        "port": "Score"
+      }
+    },
+    {
+      "data": "deleteOrderGift",
+      "tgt": {
+        "process": "OrderGiftDeleteInt",
+        "port": "Command"
+      }
+    },
+    {
+      "data": "business.order.gift.delete",
+      "tgt": {
+        "process": "OrderGiftDeleteInt",
+        "port": "Intent"
+      }
+    },
+    {
+      "data": 0.5,
+      "tgt": {
+        "process": "OrderGiftDeleteInt",
         "port": "Score"
       }
     },
@@ -691,7 +784,7 @@
       }
     },
     {
-      "data": "business.order.create.address",
+      "data": "business.order.address",
       "tgt": {
         "process": "AdressInt",
         "port": "Intent"
@@ -726,7 +819,7 @@
       }
     },
     {
-      "data": "business.order.create.cancel",
+      "data": "business.order.cancel",
       "tgt": {
         "process": "OrderCancelInt",
         "port": "Intent"
@@ -747,26 +840,12 @@
       }
     },
     {
-      "data": 0.7,
+      "data": 0.4,
       "tgt": {
         "process": "OrderInt",
         "port": "Score"
       }
     }
   ],
-  "inports": {
-    "Text": {
-      "process": "TextProc",
-      "port": "In"
-    },
-    "Ctx": {
-      "process": "Ai",
-      "port": "Ctx"
-    },
-    "Voice": {
-      "process": "Voice",
-      "port": "In"
-    }
-  },
   "caseSensitive": true
 }

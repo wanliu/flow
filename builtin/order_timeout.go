@@ -3,8 +3,8 @@ package builtin
 import (
 	"time"
 
-	. "github.com/wanliu/flow/builtin/resolves"
-	. "github.com/wanliu/flow/context"
+	"github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/context"
 
 	config "github.com/wanliu/flow/builtin/config"
 )
@@ -14,9 +14,9 @@ type OrderTimeout struct {
 
 	mins int
 
-	Ctx <-chan Context
+	Ctx <-chan context.Request
 	// Mins <-chan float64
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func NewOrderTimeout() interface{} {
@@ -27,10 +27,12 @@ func NewOrderTimeout() interface{} {
 // 	c.mins = int(t)
 // }
 
-func (c *OrderTimeout) OnCtx(ctx Context) {
+func (c *OrderTimeout) OnCtx(req context.Request) {
 	go func() {
+		ctx := req.Ctx
+
 		expiredMins := config.SesssionExpiredMinutes
-		settedMins := ctx.Value(config.CtxKeyExpiredMinutes)
+		settedMins := ctx.CtxValue(config.CtxKeyExpiredMinutes)
 
 		if settedMins != nil {
 			expiredMins = settedMins.(int)
@@ -38,13 +40,19 @@ func (c *OrderTimeout) OnCtx(ctx Context) {
 
 		time.Sleep(time.Duration(expiredMins) * time.Minute)
 
-		order := ctx.Value(config.CtxKeyOrder)
+		orderRsv := resolves.GetCtxOrder(ctx)
 
-		if order != nil {
-			cOrder := order.(OrderResolve)
-			if cOrder.Expired(expiredMins) {
-				ctx.SetValue(config.CtxKeyOrder, nil)
-				c.Out <- ReplyData{"由于长时间未操作完成，当前订单已经失效", ctx}
+		if orderRsv != nil {
+			if orderRsv.Expired(expiredMins) {
+				resolves.ClearCtxOrder(ctx)
+
+				// 订单延迟为自发消息，没有原始request对象
+				newReq := context.Request{
+					Ctx: ctx,
+				}
+
+				newReq.Res = context.Response{"由于长时间未操作完成，当前订单已经失效", ctx, nil}
+				c.Out <- newReq
 			}
 		}
 	}()

@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hysios/apiai-go"
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/brain_data/wrapper"
 	"github.com/wanliu/flow/builtin/ai"
@@ -42,11 +41,13 @@ type OrderResolve struct {
 	BrainOrder *database.Order
 }
 
-func NewOrderResolve(ctx context.Context) *OrderResolve {
+func NewOrderResolve(req context.Request) *OrderResolve {
+	ctx := req.Ctx
+
 	resolve := new(OrderResolve)
 	resolve.Touch()
 
-	aiResult := ctx.Value(config.ValueKeyResult).(apiai.Result)
+	aiResult := req.ApiAiResult
 
 	resolve.AiParams = ai.ApiAiOrder{AiResult: aiResult}
 	resolve.ExtractFromParams()
@@ -55,7 +56,7 @@ func NewOrderResolve(ctx context.Context) *OrderResolve {
 		resolve.OrderSyncQueue = syncQueue.(string)
 	}
 
-	if viewer := ctx.Value("Viewer"); viewer != nil {
+	if viewer := ctx.CtxValue("Viewer"); viewer != nil {
 		user := viewer.(*database.User)
 		resolve.User = user
 	}
@@ -69,6 +70,50 @@ func NewOrderResolve(ctx context.Context) *OrderResolve {
 
 func (r *OrderResolve) Touch() {
 	r.UpdatedAt = time.Now()
+}
+
+func (r OrderResolve) ToDescStruct() interface{} {
+	if r.IsFailed {
+		return nil
+	}
+
+	if r.IsResolved && r.BrainOrder != nil {
+		return r.BrainOrder.ToDescStruct()
+	}
+
+	result := map[string]interface{}{}
+
+	result["customer"] = r.Customer
+	result["time"] = r.Time
+	result["note"] = r.Note
+	result["storehouse"] = r.Storehouse
+	items := []map[string]interface{}{}
+
+	for _, item := range r.Products.Products {
+		i := map[string]interface{}{}
+		i["product"] = item.Name
+		i["quantity"] = item.Quantity
+		i["unit"] = item.Unit
+		i["price"] = item.Price
+		items = append(items, i)
+	}
+	result["items"] = items
+
+	if len(r.Gifts.Products) > 0 {
+		gifts := []map[string]interface{}{}
+
+		for _, item := range r.Gifts.Products {
+			i := map[string]interface{}{}
+			i["product"] = item.Name
+			i["quantity"] = item.Quantity
+			i["unit"] = item.Unit
+			gifts = append(gifts, i)
+		}
+
+		result["gifts"] = gifts
+	}
+
+	return result
 }
 
 func (r OrderResolve) Modifable(expireMin int) bool {
@@ -88,7 +133,8 @@ func (r *OrderResolve) Cancel() bool {
 
 // 是否达到可以生成订单的条件
 func (r OrderResolve) Fulfiled() bool {
-	return len(r.Products.Products) > 0 && (r.Address != "" || r.Customer != "")
+	// return len(r.Products.Products) > 0 && (r.Address != "" || r.Customer != "")
+	return len(r.Products.Products) > 0 && r.Customer != ""
 }
 
 // 是否已经成功生成订单
@@ -128,7 +174,16 @@ func (r *OrderResolve) ExtractItems() {
 		name := strings.Replace(i.Product, "%", "%%", -1)
 		unit := strings.Replace(i.Unit, " ", "", -1)
 
-		item := &ItemResolve{
+		if i.Taste != "" || i.Spec != "" {
+			prod, _ := database.GetProductByNameTaste(name, i.Taste, i.Spec)
+			if prod != nil {
+				name = prod.Name
+			} else {
+				continue
+			}
+		}
+
+		item := ItemResolve{
 			Resolved: true,
 			Name:     name,
 			Price:    i.Price,
@@ -137,7 +192,8 @@ func (r *OrderResolve) ExtractItems() {
 			Unit:     unit,
 		}
 
-		r.Products.Products = append(r.Products.Products, item)
+		r.Products.Add(item)
+		// r.Products.Products = append(r.Products.Products, item)
 	}
 }
 
@@ -146,7 +202,7 @@ func (r *OrderResolve) ExtractGiftItems() {
 		name := strings.Replace(i.Product, "%", "%%", -1)
 		unit := strings.Replace(i.Unit, " ", "", -1)
 
-		item := &ItemResolve{
+		item := ItemResolve{
 			Resolved: true,
 			Name:     name,
 			Price:    i.Price,
@@ -155,7 +211,8 @@ func (r *OrderResolve) ExtractGiftItems() {
 			Unit:     unit,
 		}
 
-		r.Gifts.Products = append(r.Gifts.Products, item)
+		r.Gifts.Add(item)
+		// r.Gifts.Products = append(r.Gifts.Products, item)
 	}
 }
 
@@ -208,18 +265,23 @@ func (r OrderResolve) EmptyProducts() bool {
 	return r.Products.Empty()
 }
 
+func (r OrderResolve) EmptyGifts() bool {
+	return r.Gifts.Empty()
+}
+
 // 商品与数量不匹配, 识别为:
 // 商品:
 // [ 伊利金典纯牛奶 , 红谷粒多1*12瓶, 伊利安幕希酸奶原味 , 190QQ星儿童成长牛奶健固型, xxxxx]
 // 数量:
 // [ 16 提,  3 盒 , 3 提 ,  6 提 ]
-func (r *OrderResolve) Answer(ctx context.Context) string {
+func (r *OrderResolve) Answer(ctx context.Context) (string, interface{}) {
 	if r.MismatchQuantity() {
-		return r.MismatchAnswer()
+		return r.MismatchAnswer(), nil
 	} else if r.Fulfiled() {
-		return r.PostOrderAndAnswer(ctx)
+		reply := r.PostOrderAndAnswer(ctx)
+		return reply, r.ToDescStruct()
 	} else {
-		return r.AnswerHead() + r.AnswerFooter(ctx, "", "")
+		return r.AnswerHead(ctx) + r.AnswerFooter(ctx, "", ""), r.ToDescStruct()
 	}
 }
 
@@ -317,7 +379,8 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 			r.IsResolved = true
 			r.BrainOrder = &order
 			r.Id = order.ID
-			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			// return r.AnswerHead(ctx) + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			return r.AnswerHead(ctx)
 		}
 	} else {
 		// order, err := r.User.CreateSaledOrder(r.Address, r.Note, r.Time, 0, 0, items, gifts)
@@ -330,7 +393,8 @@ func (r *OrderResolve) PostOrderAndAnswer(ctx context.Context) string {
 			r.IsResolved = true
 			r.BrainOrder = &order
 			r.Id = order.ID
-			return r.AnswerHead() + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			// return r.AnswerHead(ctx) + r.AnswerBody() + r.AnswerFooter(ctx, order.No, order.GlobelId())
+			return r.AnswerHead(ctx)
 		}
 	}
 }
@@ -349,11 +413,14 @@ func (r OrderResolve) AddressInfo() string {
 	}
 }
 
-func (r OrderResolve) AnswerHead() string {
+func (r OrderResolve) AnswerHead(ctx context.Context) string {
 	desc := "订单正在处理, 已经添加" + CnNum(len(r.Products.Products)) + "种产品"
 
 	if r.Fulfiled() {
 		desc = "订单已经生成, 共" + CnNum(len(r.Products.Products)) + "种产品"
+		if context.GroupChat(ctx) {
+			desc = "已经帮你开单, 共" + CnNum(len(r.Products.Products)) + "种产品"
+		}
 	}
 
 	if len(r.Gifts.Products) > 0 {
@@ -368,47 +435,47 @@ func (r OrderResolve) AnswerHead() string {
 func (r OrderResolve) AnswerBody() string {
 	desc := ""
 
-	if r.IsResolved && r.BrainOrder != nil {
-		for _, i := range r.BrainOrder.OrderItems {
-			desc = desc + fmt.Sprintf("%v %v %v\n", i.ProductName, i.Quantity, i.Unit)
-		}
+	// if r.IsResolved && r.BrainOrder != nil {
+	// 	for _, i := range r.BrainOrder.OrderItems {
+	// 		desc = desc + fmt.Sprintf("%v %v %v\n", i.ProductName, i.Quantity, i.Unit)
+	// 	}
 
-		if len(r.BrainOrder.GiftItems) > 0 {
-			desc = desc + "申请的赠品:\n"
+	// 	if len(r.BrainOrder.GiftItems) > 0 {
+	// 		desc = desc + "申请的赠品:\n"
 
-			for _, g := range r.BrainOrder.GiftItems {
-				desc = desc + fmt.Sprintf("%v %v %v\n", g.ProductName, g.Quantity, g.Unit)
-			}
-		}
+	// 		for _, g := range r.BrainOrder.GiftItems {
+	// 			desc = desc + fmt.Sprintf("%v %v %v\n", g.ProductName, g.Quantity, g.Unit)
+	// 		}
+	// 	}
 
-		desc = desc + fmt.Sprintf("时间:%v\n", r.BrainOrder.DeliveryTime.Format("2006年01月02日"))
+	// 	desc = desc + fmt.Sprintf("时间:%v\n", r.BrainOrder.DeliveryTime.Format("2006年01月02日"))
 
-		if r.BrainOrder.Note != "" {
-			desc = desc + "备注：" + r.BrainOrder.Note + "\n"
-		}
-	} else {
-		for _, p := range r.Products.Products {
-			// desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + p.Unit + "\n"
-			desc = desc + fmt.Sprintf("%v %v %v\n", p.Product, p.Quantity, p.Unit)
+	// 	if r.BrainOrder.Note != "" {
+	// 		desc = desc + "备注：" + r.BrainOrder.Note + "\n"
+	// 	}
+	// } else {
+	// 	for _, p := range r.Products.Products {
+	// 		// desc = desc + p.Product + " " + strconv.Itoa(p.Quantity) + p.Unit + "\n"
+	// 		desc = desc + fmt.Sprintf("%v %v %v\n", p.Product, p.Quantity, p.Unit)
 
-		}
+	// 	}
 
-		if len(r.Gifts.Products) > 0 {
-			desc = desc + "申请的赠品:\n"
+	// 	if len(r.Gifts.Products) > 0 {
+	// 		desc = desc + "申请的赠品:\n"
 
-			for _, g := range r.Gifts.Products {
-				// desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + g.Unit + "\n"
-				desc = desc + fmt.Sprintf("%v %v %v\n", g.Product, g.Quantity, g.Unit)
-			}
-		}
+	// 		for _, g := range r.Gifts.Products {
+	// 			// desc = desc + g.Product + " " + strconv.Itoa(g.Quantity) + g.Unit + "\n"
+	// 			desc = desc + fmt.Sprintf("%v %v %v\n", g.Product, g.Quantity, g.Unit)
+	// 		}
+	// 	}
 
-		// desc = desc + "时间:" + r.Time.Format("2006年01月02日") + "\n"
-		desc = desc + fmt.Sprintf("时间:%v\n", r.Time.Format("2006年01月02日"))
+	// 	// desc = desc + "时间:" + r.Time.Format("2006年01月02日") + "\n"
+	// 	desc = desc + fmt.Sprintf("时间:%v\n", r.Time.Format("2006年01月02日"))
 
-		if r.Note != "" {
-			desc = desc + "备注：" + r.Note + "\n"
-		}
-	}
+	// 	if r.Note != "" {
+	// 		desc = desc + "备注：" + r.Note + "\n"
+	// 	}
+	// }
 
 	return desc
 }
@@ -419,7 +486,11 @@ func (r OrderResolve) AnswerFooter(ctx context.Context, no, id interface{}) stri
 	if r.Fulfiled() {
 		desc = desc + r.AddressInfo()
 		desc = desc + "订单已经生成，订单号为：" + fmt.Sprint(no) + "\n"
-		desc = desc + "订单入口: http://jiejie.wanliu.biz/order/QueryDetail/" + fmt.Sprint(id)
+		desc = desc + "订单入口: https://jiejie.io/order/QueryDetail/" + fmt.Sprint(id) + "\n"
+
+		if context.GroupChat(ctx) {
+			desc = desc + "你可以随时取消订单"
+		}
 	} else {
 		if r.ExtractedCustomer != "" && r.Customer == "" {
 			confirm := CustomerCreation{
@@ -430,7 +501,9 @@ func (r OrderResolve) AnswerFooter(ctx context.Context, no, id interface{}) stri
 
 			desc = desc + fmt.Sprintf("\"%v\"为无效的客户，%v\n", r.ExtractedCustomer, confirm.Notice(ctx))
 			// desc = desc + fmt.Sprintf("\"%v\"为无效的客户，还缺少客户信息\n", r.ExtractedCustomer)
-		} else {
+		} else if len(r.Products.Products) == 0 {
+			desc = desc + "商品列表为空,请添加商品\n"
+		} else if r.Customer == "" {
 			desc = desc + "还缺少客户信息\n"
 		}
 	}

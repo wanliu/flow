@@ -22,7 +22,12 @@ type ctxt struct {
 	done   chan bool
 	rece   chan interface{}
 
+	// 0 for text
+	// 1 for text and data
+	postMode int
+
 	send      chan string
+	sendData  chan ResReply
 	sendTable chan *Table
 	quit      chan bool
 
@@ -47,13 +52,20 @@ type Context interface {
 
 	Value(interface{}) interface{}
 	SetValue(interface{}, interface{})
+	CtxValue(interface{}) interface{}
+	SetCtxValue(interface{}, interface{})
 	GlobalValue(interface{}) interface{}
 	SetGlobalValue(interface{}, interface{})
+
+	SetPostMode(int)
+	PostMode() int
 
 	Post(string, ...interface{}) error
 	PostTable(Table) error
 
 	Run()
+	RunCallback(handler ContextReplyHander)
+	RunCallbackOnce(handler ContextReplyHander)
 	Close()
 
 	Reset()
@@ -83,6 +95,7 @@ func NewContext(args ...CtxOptFunc) (*ctxt, error) {
 		rece:      make(chan interface{}),
 		done:      make(chan bool),
 		send:      make(chan string),
+		sendData:  make(chan ResReply),
 		sendTable: make(chan *Table),
 		quit:      make(chan bool),
 		errHandle: opt.Error,
@@ -141,15 +154,38 @@ func (ctx *ctxt) Pop() Context {
 	return ctx.Stack.Pop()
 }
 
+// TODO 混合私聊和群聊情况，私聊可以去读群聊，而群聊不可以读取私聊信息？
+func (ctx *ctxt) CtxValue(name interface{}) interface{} {
+	if GroupChat(ctx) {
+		name = fmt.Sprintf("Group:%v", name)
+	}
+
+	ctx.RLock()
+	defer ctx.RUnlock()
+	return ctx.values[name]
+}
+
+func (ctx *ctxt) SetCtxValue(name, value interface{}) {
+	if GroupChat(ctx) {
+		name = fmt.Sprintf("Group:%v", name)
+	}
+
+	ctx.Lock()
+	defer ctx.Unlock()
+	ctx.values[name] = value
+}
+
 func (ctx *ctxt) Value(name interface{}) interface{} {
 	ctx.RLock()
 	defer ctx.RUnlock()
+
 	return ctx.values[name]
 }
 
 func (ctx *ctxt) SetValue(name, value interface{}) {
 	ctx.Lock()
 	defer ctx.Unlock()
+
 	ctx.values[name] = value
 }
 
@@ -214,9 +250,43 @@ func (ctx *ctxt) Send(raw interface{}) {
 // 	return nil
 // }
 
+func (ctx *ctxt) SetPostMode(mode int) {
+	ctx.postMode = mode
+}
+
+func (ctx ctxt) PostMode() int {
+	return ctx.postMode
+}
+
 func (ctx *ctxt) Post(text string, args ...interface{}) error {
 	ctx.counter++
-	ctx.Stack.Root.send <- fmt.Sprintf(text, args...)
+
+	if 0 == ctx.PostMode() {
+		// ctx.Stack.Root.send <- fmt.Sprintf(text, args...)
+		ctx.Stack.Root.send <- text
+	} else {
+		r := map[string]interface{}{
+			"reply": text,
+		}
+
+		if len(args) > 0 {
+			r["data"] = args[0]
+		}
+
+		reply := ResReply{
+			Data: r,
+		}
+
+		if len(args) > 1 {
+			switch req := args[1].(type) {
+			case Request:
+				reply.Req = &req
+			}
+		}
+
+		ctx.Stack.Root.sendData <- reply
+	}
+
 	return nil
 }
 
@@ -234,6 +304,9 @@ LOOP:
 		case txt := <-ctx.send:
 			ctx.counter--
 			err = ctx.Reply.Text(txt, ctx)
+		case _ = <-ctx.sendData:
+			ctx.counter--
+			err = ctx.Reply.Text("unimplimented data channel", ctx)
 		case table := <-ctx.sendTable:
 			ctx.counter--
 			err = ctx.Reply.Table(table, ctx)
@@ -242,6 +315,47 @@ LOOP:
 			break LOOP
 		}
 		ctx.doReplyError(err)
+	}
+}
+
+type ContextReplyHander func(txt *string, table *Table, data *ResReply)
+
+func (ctx *ctxt) RunCallback(handler ContextReplyHander) {
+	var err error
+LOOP:
+	for {
+		select {
+		case txt := <-ctx.send:
+			ctx.counter--
+			handler(&txt, nil, nil)
+		case data := <-ctx.sendData:
+			ctx.counter--
+			handler(nil, nil, &data)
+		case table := <-ctx.sendTable:
+			ctx.counter--
+			handler(nil, table, nil)
+		case <-ctx.quit:
+			// ctx.waitingEnd()
+			break LOOP
+		}
+		ctx.doReplyError(err)
+	}
+}
+
+func (ctx *ctxt) RunCallbackOnce(handler ContextReplyHander) {
+	select {
+	case txt := <-ctx.send:
+		ctx.counter--
+		handler(&txt, nil, nil)
+	case table := <-ctx.sendTable:
+		ctx.counter--
+		handler(nil, table, nil)
+	case data := <-ctx.sendData:
+		ctx.counter--
+		handler(nil, nil, &data)
+	case <-time.After(time.Second * 20):
+		txt := "请求超时，请稍候再试"
+		handler(&txt, nil, nil)
 	}
 }
 

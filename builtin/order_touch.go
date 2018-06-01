@@ -3,10 +3,9 @@ package builtin
 import (
 	"log"
 
-	. "github.com/wanliu/flow/builtin/resolves"
-	. "github.com/wanliu/flow/context"
-
-	config "github.com/wanliu/flow/builtin/config"
+	// "github.com/wanliu/flow/builtin/config"
+	"github.com/wanliu/flow/builtin/resolves"
+	"github.com/wanliu/flow/context"
 )
 
 type OrderTouch struct {
@@ -14,26 +13,24 @@ type OrderTouch struct {
 
 	mins int
 
-	Ctx     <-chan Context
-	Next    chan<- Context
-	Timeout chan<- Context
+	Ctx     <-chan context.Request
+	Next    chan<- context.Request
+	Timeout chan<- context.Request
 }
 
 func NewOrderTouch() interface{} {
 	return new(OrderTouch)
 }
 
-func (c *OrderTouch) OnCtx(ctx Context) {
-	order := ctx.Value(config.CtxKeyOrder)
+func (c *OrderTouch) OnCtx(req context.Request) {
+	ctx := req.Ctx
+	orderRsv := resolves.GetCtxOrder(ctx)
 
-	if order != nil {
-		cOrder := order.(OrderResolve)
+	if orderRsv != nil {
 		log.Printf("[Update] Current order touched.")
-		cOrder.Touch()
-		ctx.SetValue(config.CtxKeyOrder, cOrder)
-
-		c.Timeout <- ctx
+		orderRsv.Touch()
+		c.Timeout <- req
 	}
 
-	c.Next <- ctx
+	c.Next <- req
 }

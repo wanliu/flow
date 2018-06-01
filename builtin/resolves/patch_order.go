@@ -1,16 +1,15 @@
 package resolves
 
 import (
-	// "log"
+	"log"
 	// "strconv"
 	// "strings"
 	"time"
 
-	"github.com/hysios/apiai-go"
 	"github.com/wanliu/brain_data/database"
 	"github.com/wanliu/flow/builtin/ai"
 	"github.com/wanliu/flow/builtin/config"
-	. "github.com/wanliu/flow/context"
+	"github.com/wanliu/flow/context"
 )
 
 type PatchOrderResolve struct {
@@ -19,10 +18,11 @@ type PatchOrderResolve struct {
 	OriginUpdatedAt time.Time
 }
 
-func NewPatchOrderResolve(ctx Context) *PatchOrderResolve {
+func NewPatchOrderResolve(req context.Request) *PatchOrderResolve {
+	ctx := req.Ctx
 	resolve := new(PatchOrderResolve)
 
-	aiResult := ctx.Value("Result").(apiai.Result)
+	aiResult := req.ApiAiResult
 
 	resolve.AiParams = ai.ApiAiOrder{AiResult: aiResult}
 	resolve.ExtractFromParams()
@@ -32,7 +32,7 @@ func NewPatchOrderResolve(ctx Context) *PatchOrderResolve {
 		resolve.OrderSyncQueue = syncQueue.(string)
 	}
 
-	if viewer := ctx.Value("Viewer"); viewer != nil {
+	if viewer := ctx.CtxValue("Viewer"); viewer != nil {
 		user := viewer.(*database.User)
 		resolve.User = user
 	}
@@ -54,7 +54,8 @@ func (r *PatchOrderResolve) Patch(orderResolve *OrderResolve) {
 		r.Origin.Customer = r.Customer
 	}
 
-	if r.OrderSyncQueue != "" && r.Origin.OrderSyncQueue == "" {
+	log.Printf("New Synce Queue: %v, orign Synce Queue: %v", r.OrderSyncQueue, r.Origin.OrderSyncQueue)
+	if r.OrderSyncQueue != "" {
 		r.Origin.OrderSyncQueue = r.OrderSyncQueue
 	}
 

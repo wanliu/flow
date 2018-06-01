@@ -5,6 +5,7 @@ import (
 
 	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
+
 	"github.com/wanliu/flow/context"
 )
 
@@ -14,11 +15,11 @@ type Order struct {
 	expMins        float64
 	OrderSyncQueue string
 
-	Ctx           <-chan context.Context
+	Ctx           <-chan context.Request
 	ExpireMinutes <-chan float64
-	New           chan<- context.Context
-	Patch         chan<- context.Context
-	Out           chan<- ReplyData
+	New           chan<- context.Request
+	Patch         chan<- context.Request
+	Out           chan<- context.Request
 	SyncQueue     <-chan string
 }
 
@@ -30,33 +31,38 @@ func (c *Order) OnSyncQueue(queue string) {
 	c.OrderSyncQueue = queue
 }
 
-func (c *Order) OnCtx(ctx context.Context) {
-	currentOrder := ctx.Value(config.CtxKeyOrder)
-
-	if c.expMins != 0 {
-		ctx.SetValue(config.CtxKeyExpiredMinutes, int(c.expMins))
-	}
+func (c *Order) OnCtx(req context.Request) {
+	ctx := req.Ctx
 
 	if c.OrderSyncQueue != "" {
 		ctx.SetValue(config.CtxKeySyncQueue, c.OrderSyncQueue)
 	}
 
-	if nil != currentOrder {
-		cOrder := currentOrder.(resolves.OrderResolve)
+	if c.expMins != 0 {
+		ctx.SetCtxValue(config.CtxKeyExpiredMinutes, int(c.expMins))
+	}
 
+	if context.GroupChat(ctx) {
+		c.New <- req
+		return
+	}
+
+	orderRsv := resolves.GetCtxOrder(ctx)
+
+	if nil != orderRsv {
 		exMin := config.SesssionExpiredMinutes
 
 		if c.expMins != 0 {
 			exMin = int(c.expMins)
 		}
 
-		if cOrder.Modifable(exMin) {
-			c.Patch <- ctx
+		if orderRsv.Modifable(exMin) {
+			c.Patch <- req
 		} else {
-			c.New <- ctx
+			c.New <- req
 		}
 	} else {
-		c.New <- ctx
+		c.New <- req
 	}
 }
 

@@ -1,11 +1,12 @@
-INPORT=TextProc.In:Text
-INPORT=Ai.Ctx:Ctx
+INPORT=TextProc.In:Request
 INPORT=Voice.In:Voice
+# INPORT=Ai.Ctx:Ctx
 
 TextProc(TextPreprocesor) Out -> In Ai(ApiAi)
-Ai() Out -> Ctx CM(ContextManager)
+# Ai() Out -> Ctx CM(ContextManager)
 
-CM() Process -> Ctx OrderTouch(OrderTouch)
+# CM() Process -> Ctx OrderTouch(OrderTouch)
+Ai() Out -> Ctx OrderTouch(OrderTouch)
 OrderTouch() Timeout -> Ctx OrderTimeout(OrderTimeout)
 
 OrderTouch() Next -> Ctx ConfirmInt(IntentCheck)
@@ -16,7 +17,15 @@ ConfirmInt() Next -> Ctx CancelInt(IntentCheck)
 CancelInt() Out -> Cancel Confirm()
 CancelInt() FlowOut -> Expire Confirm()
 
-CancelInt() Next -> Ctx OrderDeleteInt(IntentCheck)
+CancelInt() Next -> Ctx OrderItemDeleteInt(IntentCheck)
+OrderItemDeleteInt() Out -> Ctx OrderItemDelete(OrderItemDelete)
+OrderItemDelete() Out -> In Reply()
+
+OrderItemDeleteInt() Next -> Ctx OrderGiftDeleteInt(IntentCheck)
+OrderGiftDeleteInt() Out -> Ctx OrderGiftDelete(OrderGiftDelete)
+OrderGiftDelete() Out -> In Reply()
+
+OrderGiftDeleteInt() Next -> Ctx OrderDeleteInt(IntentCheck)
 OrderDeleteInt() Out -> Ctx OrderDelete(OrderDelete)
 OrderDelete() Out -> In Reply()
 
@@ -53,7 +62,7 @@ NewOrder() RetryOut -> RetryIn Ai()
 Ai() RetryOut -> RetryIn NewOrder()
 NewOrder() Out -> In Reply()
 NewOrder() Timeout -> Ctx OrderTimeout()
-OrderTimeout() Out -> In Reply()
+# OrderTimeout() Out -> In Reply()
 PatchOrder() Out -> In Reply()
 
 OrderInt() Next -> Ctx Unimplemented(Unimplemented)
@@ -65,7 +74,7 @@ Voice(Voice) Out -> In Reply()
 
 '123456789' -> SessionId Ai()
 'http://127.0.0.1:8123' -> ProxyUrl Ai()
-'9e48732878a34e7d960cb4a29ac0f72a' -> Token Ai()
+'a0af4ac753c94dff983523714468d4e8' -> Token Ai()
 1 -> RetryCount Ai()
 
 5 -> ExpireMinutes OpenOrder()
@@ -78,8 +87,16 @@ Voice(Voice) Out -> In Reply()
 0.5 -> Score ConfirmInt()
 
 'buiness.cancel' -> Intent CancelInt()
-true -> Flow CancelInt()
+# true -> Flow CancelInt()
 0.5 -> Score CancelInt()
+
+'deleteOrderItem' -> Command OrderItemDeleteInt()
+'business.order.item.delete' -> Intent OrderItemDeleteInt()
+0.5 -> Score OrderItemDeleteInt()
+
+'deleteOrderGift' -> Command OrderGiftDeleteInt()
+'business.order.gift.delete' -> Intent OrderGiftDeleteInt()
+0.5 -> Score OrderGiftDeleteInt()
 
 'business.order.delete' -> Intent OrderDeleteInt()
 0.7 -> Score OrderDeleteInt()
@@ -95,7 +112,7 @@ true -> Flow CancelInt()
 'business.customer.orders.page' -> Intent CustomerOrdersPageInt()
 0.7 -> Score CustomerOrdersPageInt()
 
-'business.order.create.address' -> Intent AdressInt()
+'business.order.address' -> Intent AdressInt()
 0.1 -> Score AdressInt()
 
 0.7 -> ConfirmScore OrderAddress()
@@ -103,11 +120,11 @@ true -> Flow CancelInt()
 'business.order.current.display' -> Intent OrderPrinterInt()
 0.7 -> Score OrderPrinterInt()
 
-'business.order.create.cancel' -> Intent OrderCancelInt()
+'business.order.cancel' -> Intent OrderCancelInt()
 0.7 -> Score OrderCancelInt()
 
 'business.order.create' -> Intent OrderInt()
-0.7 -> Score OrderInt()
+0.4 -> Score OrderInt()
 
 # 延迟回复时间
 # 5 -> DelayMin Reply()

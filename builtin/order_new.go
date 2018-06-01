@@ -5,6 +5,7 @@ import (
 
 	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
+
 	"github.com/wanliu/flow/context"
 )
 
@@ -13,14 +14,14 @@ type NewOrder struct {
 	DefTime    string
 	retryCount int
 
-	Ctx     <-chan context.Context
+	Ctx     <-chan context.Request
 	Deftime <-chan string
-	Out     chan<- ReplyData
-	Notice  chan<- context.Context
-	Timeout chan<- context.Context
+	Out     chan<- context.Request
+	Notice  chan<- context.Request
+	Timeout chan<- context.Request
 
-	RetryOut chan<- context.Context
-	RetryIn  <-chan context.Context
+	RetryOut chan<- context.Request
+	RetryIn  <-chan context.Request
 
 	RetryCount <-chan float64
 }
@@ -38,56 +39,74 @@ func (c *NewOrder) OnRetryCount(count float64) {
 	c.retryCount = int(count)
 }
 
-func (c *NewOrder) OnCtx(ctx context.Context) {
-	orderResolve := resolves.NewOrderResolve(ctx)
+func (c *NewOrder) OnCtx(req context.Request) {
+	ctx := req.Ctx
+	orderRsv := resolves.NewOrderResolve(req)
 
 	if c.DefTime != "" {
-		orderResolve.SetDefTime(c.DefTime)
+		orderRsv.SetDefTime(c.DefTime)
 	}
 
 	output := ""
 
-	if orderResolve.EmptyProducts() {
+	if orderRsv.EmptyProducts() {
 		if c.retryCount > 0 {
 			log.Printf("重新获取开单产品，第1次，共%v次", c.retryCount)
-			c.RetryOut <- ctx
+			c.RetryOut <- req
 		} else {
+			if context.GroupChat(ctx) {
+				c.GroupAnswer(req, orderRsv)
+				return
+			}
+
 			output = "没有相关的产品"
-			replyData := ReplyData{output, ctx}
-			c.Out <- replyData
+			req.Res = context.Response{
+				Reply: output,
+				Ctx:   ctx,
+			}
+			c.Out <- req
 		}
 	} else {
-		output = orderResolve.Answer(ctx)
+		reply, d := orderRsv.Answer(ctx)
 
-		if orderResolve.Resolved() {
-			ctx.SetValue(config.CtxKeyLastOrder, *orderResolve)
-			ctx.SetValue(config.CtxKeyOrder, nil)
-		} else if orderResolve.Failed() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
-		} else if orderResolve.MismatchQuantity() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
+		if orderRsv.Resolved() {
+			resolves.SetCtxLastOrder(ctx, orderRsv)
+			resolves.ClearCtxOrder(ctx)
+		} else if orderRsv.Failed() {
+			resolves.ClearCtxOrder(ctx)
+		} else if orderRsv.MismatchQuantity() {
+			resolves.ClearCtxOrder(ctx)
 		} else {
-			ctx.SetValue(config.CtxKeyOrder, *orderResolve)
+			resolves.SetCtxOrder(ctx, orderRsv)
 		}
 
-		// c.Notice <- ctx
-		c.Timeout <- ctx
+		c.Timeout <- req
 
-		replyData := ReplyData{output, ctx}
-		c.Out <- replyData
+		data := map[string]interface{}{
+			"type":   "info",
+			"on":     "order",
+			"action": "create",
+			"data":   d,
+		}
+
+		req.Res = context.Response{
+			Reply: reply,
+			Ctx:   ctx,
+			Data:  data,
+		}
+		c.Out <- req
 	}
 }
 
-func (c *NewOrder) OnRetryIn(ctx context.Context) {
-	orderResolve := resolves.NewOrderResolve(ctx)
+func (c *NewOrder) OnRetryIn(req context.Request) {
+	ctx := req.Ctx
+	orderRsv := resolves.NewOrderResolve(req)
 
 	if c.DefTime != "" {
-		orderResolve.SetDefTime(c.DefTime)
+		orderRsv.SetDefTime(c.DefTime)
 	}
 
-	output := ""
-
-	if orderResolve.EmptyProducts() {
+	if orderRsv.EmptyProducts() {
 		retriedCount := 1
 		retriedCountInt := ctx.Value(config.CtxKeyRetriedCount)
 
@@ -96,36 +115,78 @@ func (c *NewOrder) OnRetryIn(ctx context.Context) {
 		}
 
 		if retriedCount >= c.retryCount {
-			output = "没有相关的产品"
+			if context.GroupChat(ctx) {
+				c.GroupAnswer(req, orderRsv)
+				return
+			}
 
-			replyData := ReplyData{output, ctx}
-			c.Out <- replyData
+			output := "没有相关的产品"
+
+			req.Res = context.Response{
+				Reply: output,
+				Ctx:   ctx,
+			}
+			c.Out <- req
 		} else {
 			retriedCount++
 			log.Printf("重新获取开单产品，第%v次，共%v次", retriedCount, c.retryCount)
 
 			ctx.SetValue(config.CtxKeyRetriedCount, retriedCount)
-			c.RetryOut <- ctx
+			c.RetryOut <- req
 		}
 	} else {
-		output = orderResolve.Answer(ctx)
+		reply, d := orderRsv.Answer(ctx)
 
-		if orderResolve.Resolved() {
-			ctx.SetValue(config.CtxKeyLastOrder, *orderResolve)
-			ctx.SetValue(config.CtxKeyOrder, nil)
-		} else if orderResolve.Failed() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
-		} else if orderResolve.MismatchQuantity() {
-			ctx.SetValue(config.CtxKeyOrder, nil)
+		if orderRsv.Resolved() {
+			resolves.SetCtxLastOrder(ctx, orderRsv)
+			resolves.ClearCtxOrder(ctx)
+		} else if orderRsv.Failed() {
+			resolves.ClearCtxOrder(ctx)
+		} else if orderRsv.MismatchQuantity() {
+			resolves.ClearCtxOrder(ctx)
 		} else {
-			ctx.SetValue(config.CtxKeyOrder, *orderResolve)
+			resolves.SetCtxOrder(ctx, orderRsv)
 		}
 
 		// c.Notice <- ctx
-		c.Timeout <- ctx
+		c.Timeout <- req
 
-		replyData := ReplyData{output, ctx}
-		c.Out <- replyData
+		data := map[string]interface{}{
+			"type":   "info",
+			"on":     "order",
+			"action": "create",
+			"data":   d,
+		}
+
+		req.Res = context.Response{
+			Reply: reply,
+			Ctx:   ctx,
+			Data:  data,
+		}
+		c.Out <- req
 	}
 
+}
+
+func (c *NewOrder) GroupAnswer(req context.Request, orderRsv *resolves.OrderResolve) {
+	ctx := req.Ctx
+	reply, d := orderRsv.Answer(ctx)
+
+	data := map[string]interface{}{
+		"type":   "info",
+		"on":     "order",
+		"action": "create",
+		"data":   d,
+	}
+
+	if orderRsv.Fulfiled() {
+		req.Res = context.Response{
+			Reply: reply,
+			Ctx:   ctx,
+			Data:  data,
+		}
+		c.Out <- req
+	} else {
+		log.Printf("群聊开单失败, 取消回复。失败原因：%v", reply)
+	}
 }

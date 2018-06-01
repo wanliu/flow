@@ -19,23 +19,15 @@ func ComponentList() map[string]func() interface{} {
 	_components["LuisAnalyze"] = NewLuisAnalyze
 	_components["Stringifier"] = NewStringifier
 	_components["IntentCheck"] = NewIntentCheck
-	_components["CtxReset"] = NewCtxReset
-	_components["TryGetProducts"] = NewTryGetProducts
 	_components["MyInput"] = NewMyInput
 	_components["QuerySave"] = NewQuerySave
-	_components["ContextManager"] = NewContextManager
 	_components["Final"] = NewFinal
 	_components["Order"] = GetOrder
 	_components["NewOrder"] = NewNewOrder
 	_components["PatchOrder"] = NewPatchOrder
-	_components["Praise"] = NewPraise
 	_components["Unimplemented"] = NewUnimplemented
 	_components["Critical"] = NewCritical
 	_components["Abuse"] = NewAbuse
-	_components["Greet"] = NewGreet
-	_components["StockQuery"] = NewStockQuery
-	_components["PriceQuery"] = NewPriceQuery
-	_components["Robot"] = NewRobot
 	_components["ApiAi"] = NewApiAi
 	_components["OperationNotice"] = NewOperationNotice
 	_components["OrderPrinter"] = NewOrderPrinter
@@ -50,6 +42,8 @@ func ComponentList() map[string]func() interface{} {
 	_components["OrderNumber"] = NewOrderNumber
 	_components["TextPreprocesor"] = NewTextPreprocesor
 	_components["CustomerOrders"] = NewCustomerOrders
+	_components["OrderItemDelete"] = NewOrderItemDelete
+	_components["OrderGiftDelete"] = NewOrderGiftDelete
 
 	return _components
 }
@@ -112,20 +106,6 @@ func ComponentInfos() map[string]Component {
 		Constructor: NewIntentCheck,
 	}
 
-	result["CtxReset"] = Component{
-		Name:        "CtxReset",
-		Description: "Reset Context to initial status",
-		Icon:        "refresh",
-		Constructor: NewCtxReset,
-	}
-
-	result["TryGetProducts"] = Component{
-		Name:        "TryGetProducts",
-		Description: "Try to query products data from Entities of Luis Query Result",
-		Icon:        "product-hunt",
-		Constructor: NewTryGetProducts,
-	}
-
 	result["MyInput"] = Component{
 		Name:        "MyInput",
 		Description: "Input with stdin stream",
@@ -137,13 +117,6 @@ func ComponentInfos() map[string]Component {
 		Name:        "QuerySave",
 		Description: "Merge Context with Value",
 		Icon:        "save",
-		Constructor: NewQuerySave,
-	}
-
-	result["ContextManager"] = Component{
-		Name:        "ContextManager",
-		Description: "Context Manager must be use in Context Component",
-		Icon:        "server",
 		Constructor: NewQuerySave,
 	}
 
@@ -175,13 +148,6 @@ func ComponentInfos() map[string]Component {
 		Constructor: NewPatchOrder,
 	}
 
-	result["Praise"] = Component{
-		Name:        "Praise",
-		Description: "Praise Component",
-		Icon:        "",
-		Constructor: NewPraise,
-	}
-
 	result["Unimplemented"] = Component{
 		Name:        "Unimplemented",
 		Description: "Unimplemented Component",
@@ -201,34 +167,6 @@ func ComponentInfos() map[string]Component {
 		Description: "Abuse Component",
 		Icon:        "",
 		Constructor: NewAbuse,
-	}
-
-	result["Greet"] = Component{
-		Name:        "Greet",
-		Description: "Greet Component",
-		Icon:        "",
-		Constructor: NewGreet,
-	}
-
-	result["StockQuery"] = Component{
-		Name:        "StockQuery",
-		Description: "StockQuery Component",
-		Icon:        "",
-		Constructor: NewStockQuery,
-	}
-
-	result["PriceQuery"] = Component{
-		Name:        "PriceQuery",
-		Description: "PriceQuery Component",
-		Icon:        "",
-		Constructor: NewPriceQuery,
-	}
-
-	result["Robot"] = Component{
-		Name:        "Robot",
-		Description: "Robot Component",
-		Icon:        "",
-		Constructor: NewRobot,
 	}
 
 	result["ApiAi"] = Component{
@@ -327,6 +265,20 @@ func ComponentInfos() map[string]Component {
 		Description: "CustomerOrders Component",
 		Icon:        "",
 		Constructor: NewCustomerOrders,
+	}
+
+	result["OrderItemDelete"] = Component{
+		Name:        "OrderItemDelete",
+		Description: "OrderItemDelete Component",
+		Icon:        "",
+		Constructor: NewOrderItemDelete,
+	}
+
+	result["OrderGiftDelete"] = Component{
+		Name:        "OrderGiftDelete",
+		Description: "OrderGiftDelete Component",
+		Icon:        "",
+		Constructor: NewOrderGiftDelete,
 	}
 
 	return result

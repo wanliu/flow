@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wanliu/flow/context"
+
 	flow "github.com/wanliu/goflow"
 )
 
@@ -28,6 +30,16 @@ var REPLACE_DICT map[string]string = map[string]string{
 	"190QQ": "一九零QQ",
 	"200Q":  "二百Q",
 	"1l":    "一L",
+	"毫升":    "ml",
+	"十":     "10",
+	"一百":    "100",
+	"一百九":   "190",
+	"二百":    "200",
+	"二百四":   "240",
+	"二百五":   "250",
+	"一千":    "1000",
+	"题":     "提",
+	"q":     "Q",
 }
 
 type TextPreprocesor struct {
@@ -35,21 +47,48 @@ type TextPreprocesor struct {
 
 	MultiField
 
-	Out chan<- string
-	In  <-chan string
+	Out   chan<- context.Request
+	In    <-chan context.Request
+	Reply chan<- context.Request
 }
 
 func NewTextPreprocesor() interface{} {
 	return new(TextPreprocesor)
 }
 
-func (c *TextPreprocesor) OnIn(input string) {
-	output := atFilter(input)
+func (c *TextPreprocesor) OnIn(req context.Request) {
+	if req.IsCommand() {
+		c.Out <- req
+		return
+	}
+
+	text := req.Text
+
+	output := atFilter(text)
+	output = replaceDeliver(output)
 	output = numberAfterLetter(output)
 	output = dateTransfer(output)
 	output = dictTransfer(output)
 	output = replaceUnit(output)
-	c.Out <- output
+
+	req.Text = output
+
+	c.Out <- req
+}
+
+func replaceDeliver(s string) string {
+	r := regexp.MustCompile(`急送[^，,.。]`)
+
+	is := r.FindStringIndex(s)
+
+	for len(is) == 2 {
+		b := is[0] + 6
+		s = s[:b] + "," + s[b:]
+
+		is = r.FindStringIndex(s)
+	}
+
+	return s
 }
 
 func numberAfterLetter(s string) string {
@@ -116,7 +155,7 @@ func replaceUnit(s string) string {
 	}
 
 	for _, unit := range units {
-		r := regexp.MustCompile("[\\d一二三四五六七八九十零]\\s*" + unit)
+		r := regexp.MustCompile("[\\d一二两三四五六七八九十零]\\s*" + unit)
 		is := r.FindStringIndex(s)
 		for len(is) == 2 {
 			total := is[1] - is[0]
@@ -124,6 +163,18 @@ func replaceUnit(s string) string {
 			s = fmt.Sprintf("%v%v%v", s[:is[0]+total-unitlen], palceholder, s[is[1]-unitlen:])
 			is = r.FindStringIndex(s)
 		}
+	}
+
+	// 在单位后面加逗号
+	r := regexp.MustCompile(`[件提条瓶排箱桶支袋个][^，,.。]`)
+
+	is := r.FindStringIndex(s)
+
+	for len(is) == 2 {
+		b := is[0] + 3
+		s = s[:b] + "," + s[b:]
+
+		is = r.FindStringIndex(s)
 	}
 
 	return s

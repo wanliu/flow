@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/hysios/apiai-go"
+	"github.com/wanliu/flow/builtin/config"
 	. "github.com/wanliu/flow/context"
 	goflow "github.com/wanliu/goflow"
 )
@@ -21,12 +22,12 @@ type QuerySave struct {
 }
 
 func (q *QuerySave) Init() {
-	q.Fields = []string{"Ctx", "Result"}
+	q.Fields = []string{"Ctx", config.ValueKeyResult}
 	q.Process = func() error {
-		res, rok := q.Value("Result").(apiai.Result)
+		res, rok := q.Value(config.ValueKeyResult).(apiai.Result)
 		ctx, cok := q.Value("Ctx").(Context)
 		if rok && cok {
-			ctx.SetValue("Result", res)
+			ctx.SetValue(config.ValueKeyResult, res)
 			intent := res.Metadata.IntentName
 			score := res.Score
 			query := res.ResolvedQuery
@@ -46,5 +47,5 @@ func (q *QuerySave) OnCtx(ctx Context) {
 }
 
 func (q *QuerySave) OnResult(res apiai.Result) {
-	q.SetValue("Result", res)
+	q.SetValue(config.ValueKeyResult, res)
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/builtin/resolves"
+
 	"github.com/wanliu/flow/context"
 )
 
@@ -20,38 +21,70 @@ type CustomerOrders struct {
 
 	expireMins int
 
-	Ctx       <-chan context.Context
-	Page      <-chan context.Context
+	Ctx       <-chan context.Request
+	Page      <-chan context.Request
 	ExpireMin <-chan interface{}
 
-	Out chan<- ReplyData
+	Out chan<- context.Request
 }
 
 func NewCustomerOrders() interface{} {
 	return new(CustomerOrders)
 }
 
-func (c *CustomerOrders) OnCtx(ctx context.Context) {
-	rsv := resolves.NewCusOrdersResolve(ctx, Per)
+func (c *CustomerOrders) OnCtx(req context.Request) {
+	// if context.GroupChat(ctx) {
+	// 	log.Printf("不回应非开单相关的普通群聊")
+	// 	return
+	// }
 
-	reply := rsv.Answer()
+	ctx := req.Ctx
+	apiResult := req.ApiAiResult
+
+	rsv := resolves.NewCusOrdersResolve(apiResult, Per)
+
+	reply, d := rsv.Answer()
+
+	data := map[string]interface{}{
+		"type":   "info",
+		"on":     "customerOrders",
+		"action": "query",
+		"data":   d,
+	}
 
 	rsv.Setup(ctx)
 	c.ResetTick(rsv, ctx)
 
-	c.Out <- ReplyData{reply, ctx}
+	req.Res = context.Response{reply, ctx, data}
+	c.Out <- req
 }
 
-func (c *CustomerOrders) OnPage(ctx context.Context) {
-	in := ctx.Value(config.CtxKeyCusOrders)
+func (c *CustomerOrders) OnPage(req context.Request) {
+	ctx := req.Ctx
+
+	in := ctx.CtxValue(config.CtxKeyCusOrders)
 	if in == nil {
-		c.Out <- ReplyData{"当前没有正在进行的查询", ctx}
+		if context.GroupChat(ctx) {
+			log.Printf("不回应无context的非@翻页")
+			return
+		}
+
+		req.Res = context.Response{"当前没有正在进行的查询", ctx, nil}
+		c.Out <- req
 	} else {
 		rsv := in.(*resolves.CustomerOrdersResolve)
 
 		c.ResetTick(rsv, ctx)
-		reply := rsv.Answer()
-		c.Out <- ReplyData{reply, ctx}
+		reply, d := rsv.Answer()
+		data := map[string]interface{}{
+			"type":   "info",
+			"on":     "customerOrders",
+			"action": "query",
+			"data":   d,
+		}
+
+		req.Res = context.Response{reply, ctx, data}
+		c.Out <- req
 
 		rsv.ClearIfDone(ctx)
 	}

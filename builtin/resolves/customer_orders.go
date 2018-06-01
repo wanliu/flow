@@ -33,14 +33,13 @@ type CustomerOrdersResolve struct {
 	LastActiveTime *time.Time
 }
 
-func NewCusOrdersResolve(ctx context.Context, perPage int) *CustomerOrdersResolve {
+func NewCusOrdersResolve(aiResult apiai.Result, perPage int) *CustomerOrdersResolve {
 	var product string
 
 	if perPage <= 0 {
 		perPage = 5
 	}
 
-	aiResult := ctx.Value("Result").(apiai.Result)
 	aiParams := ai.ApiAiOrder{AiResult: aiResult}
 
 	customerName := aiParams.Customer()
@@ -72,24 +71,26 @@ func NewCusOrdersResolve(ctx context.Context, perPage int) *CustomerOrdersResolv
 	return &rsv
 }
 
-func (r *CustomerOrdersResolve) Answer() string {
+func (r *CustomerOrdersResolve) Answer() (string, interface{}) {
+	var data interface{}
+
 	if r.CustomerName == "" {
 		r.Done = true
-		return "未提供客户，无法查询客户订单"
+		return "未提供客户，无法查询客户订单", nil
 	}
 
 	if r.Done {
-		return "查询的订单已经显示完毕"
+		return "查询的订单已经显示完毕", nil
 	}
 
 	if r.Customer == nil {
 		r.Done = true
-		return fmt.Sprintf("客户\"%v\"不存在，无法查询客户订单", r.CustomerName)
+		return fmt.Sprintf("客户\"%v\"不存在，无法查询客户订单", r.CustomerName), nil
 	}
 
 	if r.ProductName != "" && r.Product == nil {
 		r.Done = true
-		return fmt.Sprintf("商品\"%v\"不存在，无法查询包含该商品的订单", r.ProductName)
+		return fmt.Sprintf("商品\"%v\"不存在，无法查询包含该商品的订单", r.ProductName), nil
 	}
 
 	result := r.AnswerHeader()
@@ -100,7 +101,7 @@ func (r *CustomerOrdersResolve) Answer() string {
 
 	if r.Total == 0 {
 		result = result + "没有订单可以显示"
-		return result
+		return result, nil
 	}
 
 	orders := r.FetchOrders()
@@ -118,27 +119,13 @@ func (r *CustomerOrdersResolve) Answer() string {
 	r.Done = r.IsDone()
 
 	if orders != nil && len(*orders) > 0 {
+		ordersData := []interface{}{}
+
 		for _, order := range *orders {
-			result = result + "------------------------\n"
-			result = result + fmt.Sprintf("订单号：%v\n总金额：%v\n送货时间：%v\n", order.No, fmt.Sprintf("%.2f", order.Amount), order.DeliveryTime.Format("2006年01月02日"))
-			if order.Note != "" {
-				result = result + fmt.Sprint("备注：%v\n", order.Note)
-			}
-
-			result = result + "商品:\n"
-			for _, item := range order.OrderItems {
-				result = result + fmt.Sprintf("  %v %v%v\n", item.ProductName, item.Quantity, item.Unit)
-			}
-
-			if len(order.GiftItems) > 0 {
-				result = result + "赠品:\n"
-				for _, gift := range order.GiftItems {
-					result = result + fmt.Sprintf("  %v %v%v\n", gift.ProductName, gift.Quantity, gift.Unit)
-				}
-			}
+			ordersData = append(ordersData, order.ToDescStruct())
 		}
 
-		result = result + "------------------------\n"
+		data = ordersData
 
 		if !r.Done {
 			result = result + "输入\"继续\"，或者\"下一页\"，查看剩下的订单\n"
@@ -156,7 +143,7 @@ func (r *CustomerOrdersResolve) Answer() string {
 		result = result + "没有订单可以显示"
 	}
 
-	return result
+	return result, data
 }
 
 func (r *CustomerOrdersResolve) AnswerHeader() string {
@@ -259,7 +246,7 @@ func (r *CustomerOrdersResolve) IsDone() bool {
 
 func (r *CustomerOrdersResolve) Setup(ctx context.Context) {
 	if !r.Done {
-		ctx.SetValue(config.CtxKeyCusOrders, r)
+		ctx.SetCtxValue(config.CtxKeyCusOrders, r)
 	}
 }
 
@@ -270,12 +257,12 @@ func (r *CustomerOrdersResolve) ClearIfDone(ctx context.Context) {
 }
 
 func (r *CustomerOrdersResolve) Clear(ctx context.Context) {
-	in := ctx.Value(config.CtxKeyCusOrders)
+	in := ctx.CtxValue(config.CtxKeyCusOrders)
 	if in != nil {
 		rsv := in.(*CustomerOrdersResolve)
 
 		if r == rsv {
-			ctx.SetValue(config.CtxKeyCusOrders, nil)
+			ctx.SetCtxValue(config.CtxKeyCusOrders, nil)
 		}
 	}
 }

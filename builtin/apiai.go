@@ -1,12 +1,14 @@
 package builtin
 
 import (
+	"encoding/json"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/hysios/apiai-go"
 	"github.com/oleiade/lane"
-	"github.com/wanliu/flow/builtin/config"
+	// "github.com/wanliu/flow/builtin/config"
 	"github.com/wanliu/flow/context"
 
 	. "github.com/wanliu/flow/builtin/ai"
@@ -34,17 +36,16 @@ type ApiAi struct {
 	TxtQueue *lane.Queue
 
 	Echo      <-chan bool
-	In        <-chan string
+	In        <-chan context.Request
 	Token     <-chan string
 	SessionId <-chan string
 	ProxyUrl  <-chan string
-	Out       chan<- context.Context
-	Ctx       <-chan context.Context
+	Out       chan<- context.Request
 
 	RetryCount <-chan float64
 
-	RetryIn  <-chan context.Context
-	RetryOut chan<- context.Context
+	RetryIn  <-chan context.Request
+	RetryOut chan<- context.Request
 }
 
 func (c *ApiAi) Init() {
@@ -52,13 +53,24 @@ func (c *ApiAi) Init() {
 	c.TxtQueue = lane.NewQueue()
 }
 
-func (c *ApiAi) OnIn(input string) {
-	// c.SetValue(config.ValueKeyText, input)
-	c.Lock()
-	c.TxtQueue.Enqueue(input)
-	c.Unlock()
+func (c *ApiAi) OnIn(req context.Request) {
+	if req.IsCommand() {
+		c.Out <- req
+		return
+	}
 
-	c.SendCtxQuery()
+	text := req.Text
+	res := c.SendQuery(text)
+
+	intent := res.Metadata.IntentName
+	score := res.Score
+	data, _ := json.Marshal(res)
+
+	log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%\n结果:%v", text, intent, score*100, string(data))
+
+	req.ApiAiResult = res
+
+	c.Out <- req
 }
 
 func (c *ApiAi) OnToken(token string) {
@@ -77,58 +89,30 @@ func (c *ApiAi) OnProxyUrl(proxy string) {
 	c.proxyUrl = proxy
 }
 
-func (c *ApiAi) OnCtx(ctx context.Context) {
-	// c.SetValue(config.ValueKeyCtx, ctx)
-	c.Lock()
-	c.CtxQueue.Enqueue(ctx)
-	c.Unlock()
+func (c *ApiAi) OnRetryIn(req context.Request) {
+	text := req.Text
+	res := c.SendQuery(text)
 
-	c.SendCtxQuery()
-}
+	intent := res.Metadata.IntentName
+	score := res.Score
+	data, _ := json.Marshal(res)
 
-func (c *ApiAi) OnRetryIn(ctx context.Context) {
-	originRes := ctx.Value(config.CtxkeyResult)
-	if originRes != nil {
-		res := originRes.(apiai.Result)
-		query := res.ResolvedQuery
-		res = c.SendQuery(query)
-		ctx.SetValue(config.CtxkeyResult, res)
+	log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%\n结果:%v", text, intent, score*100, string(data))
 
-		intent := res.Metadata.IntentName
-		score := res.Score
+	req.ApiAiResult = res
 
-		log.Printf("重试意图解析\"%s\" -> %s 准确度: %2.2f%%", query, intent, score*100)
-
-		c.RetryOut <- ctx
-	}
-}
-
-func (c *ApiAi) SendCtxQuery() {
-	c.Lock()
-
-	for c.CtxQueue.Head() != nil && c.TxtQueue.Head() != nil {
-		txt := c.TxtQueue.Dequeue().(string)
-		ctx := c.CtxQueue.Dequeue().(context.Context)
-
-		res := c.SendQuery(txt)
-
-		ctx.SetValue(config.CtxkeyResult, res)
-
-		intent := res.Metadata.IntentName
-		score := res.Score
-		// query := res.ResolvedQuery
-
-		log.Printf("意图解析\"%s\" -> %s 准确度: %2.2f%%\n结果:%v", txt, intent, score*100, res)
-
-		c.Out <- ctx
-	}
-
-	c.Unlock()
+	c.RetryOut <- req
 }
 
 func (c *ApiAi) SendQuery(txt string) apiai.Result {
 	count := 0
+
+	tBegin := time.Now()
+
 	res, err := ApiAiQuery(txt, c.token, c.sessionId, c.proxyUrl)
+
+	tEnd := time.Now()
+	log.Printf("ApiAi request cost time %v", tEnd.Sub(tBegin))
 
 	for err != nil && count < c.retryCount {
 		count++
